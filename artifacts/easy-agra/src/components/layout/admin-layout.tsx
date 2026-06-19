@@ -28,6 +28,7 @@ const superAdminNavItems: NavItem[] = [
   { href: "/super-admin/dashboard", icon: Shield, label: "Super Dashboard" },
   { href: "/super-admin/users", icon: Users, label: "All Users" },
   { href: "/super-admin/admins", icon: Shield, label: "Manage Admins" },
+  { href: "/super-admin/owner-requests", icon: FileCheck, label: "Owner Requests" },
   { href: "/super-admin/platform-settings", icon: Settings, label: "Platform Settings" },
   { href: "/super-admin/activity-logs", icon: Activity, label: "Activity Logs" },
   { href: "/admin/notifications", icon: Bell, label: "Announcements" },

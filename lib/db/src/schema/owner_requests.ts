@@ -5,6 +5,7 @@ import {
   timestamp,
   integer,
   pgEnum,
+  jsonb,
 } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod/v4";
@@ -29,10 +30,24 @@ export const ownerRequestsTable = pgTable("owner_requests", {
     .references(() => usersTable.id, { onDelete: "cascade" }),
   requestedRole: ownerRequestedRoleEnum("requested_role").notNull(),
   status: ownerRequestStatusEnum("status").notNull().default("pending"),
+  // Business info
   businessName: text("business_name"),
   businessDescription: text("business_description"),
+  businessAddress: text("business_address"),
+  city: text("city"),
+  state: text("state"),
+  gstNumber: text("gst_number"),
+  // Owner contact info (may differ from account)
+  ownerName: text("owner_name"),
+  ownerMobile: text("owner_mobile"),
+  ownerEmail: text("owner_email"),
+  // Files stored as base64 data URIs
+  businessPhotos: jsonb("business_photos").$type<string[]>(),
+  identityProof: text("identity_proof"),
+  // Review
   rejectionReason: text("rejection_reason"),
   reviewedBy: integer("reviewed_by").references(() => usersTable.id),
+  approvedAt: timestamp("approved_at", { withTimezone: true }),
   createdAt: timestamp("created_at", { withTimezone: true })
     .notNull()
     .defaultNow(),

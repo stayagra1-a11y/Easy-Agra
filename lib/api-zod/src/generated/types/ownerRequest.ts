@@ -19,9 +19,29 @@ export interface OwnerRequest {
   /** @nullable */
   businessDescription?: string | null;
   /** @nullable */
+  businessAddress?: string | null;
+  /** @nullable */
+  city?: string | null;
+  /** @nullable */
+  state?: string | null;
+  /** @nullable */
+  gstNumber?: string | null;
+  /** @nullable */
+  ownerName?: string | null;
+  /** @nullable */
+  ownerMobile?: string | null;
+  /** @nullable */
+  ownerEmail?: string | null;
+  /** @nullable */
+  businessPhotos?: string[] | null;
+  /** @nullable */
+  identityProof?: string | null;
+  /** @nullable */
   rejectionReason?: string | null;
   /** @nullable */
   reviewedBy?: number | null;
+  /** @nullable */
+  approvedAt?: string | null;
   createdAt: string;
   updatedAt: string;
   user: User;

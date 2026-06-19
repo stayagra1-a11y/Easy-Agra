@@ -32,6 +32,7 @@ import SuperAdminUsers from "@/pages/super-admin/users";
 import SuperAdminAdmins from "@/pages/super-admin/admins";
 import PlatformSettings from "@/pages/super-admin/platform-settings";
 import SuperAdminActivityLogs from "@/pages/super-admin/activity-logs";
+import SuperAdminOwnerRequests from "@/pages/super-admin/owner-requests";
 
 // Owner dashboards
 import HotelOwnerDashboard from "@/pages/hotel-owner/dashboard";
@@ -132,6 +133,7 @@ function Router() {
       <Route path="/super-admin/admins" component={() => <ProtectedRoute component={SuperAdminAdmins} allowedRoles={["super_admin"]} />} />
       <Route path="/super-admin/platform-settings" component={() => <ProtectedRoute component={PlatformSettings} allowedRoles={["super_admin"]} />} />
       <Route path="/super-admin/activity-logs" component={() => <ProtectedRoute component={SuperAdminActivityLogs} allowedRoles={["super_admin"]} />} />
+      <Route path="/super-admin/owner-requests" component={() => <ProtectedRoute component={SuperAdminOwnerRequests} allowedRoles={["super_admin"]} />} />
 
       {/* Fallback */}
       <Route component={NotFound} />

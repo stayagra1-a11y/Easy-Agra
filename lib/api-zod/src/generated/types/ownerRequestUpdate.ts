@@ -5,10 +5,8 @@
  * Easy Agra API specification
  * OpenAPI spec version: 0.1.0
  */
-import type { OwnerRequestInputRequestedRole } from './ownerRequestInputRequestedRole';
 
-export interface OwnerRequestInput {
-  requestedRole: OwnerRequestInputRequestedRole;
+export interface OwnerRequestUpdate {
   businessName?: string;
   businessDescription?: string;
   businessAddress?: string;

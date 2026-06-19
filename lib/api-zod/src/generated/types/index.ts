@@ -32,6 +32,7 @@ export * from './ownerRequestRejectInput';
 export * from './ownerRequestRequestedRole';
 export * from './ownerRequestsPage';
 export * from './ownerRequestStatus';
+export * from './ownerRequestUpdate';
 export * from './photoUploadInput';
 export * from './platformSettings';
 export * from './platformSettingsUpdate';

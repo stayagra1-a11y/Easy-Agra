@@ -40,6 +40,7 @@ import type {
   OwnerRequest,
   OwnerRequestInput,
   OwnerRequestRejectInput,
+  OwnerRequestUpdate,
   OwnerRequestsPage,
   PhotoUploadInput,
   PlatformSettings,
@@ -1391,6 +1392,225 @@ export const useSubmitOwnerRequest = <TError = ErrorType<ErrorResponse>,
       return useMutation(getSubmitOwnerRequestMutationOptions(options));
     }
 
+export const getGetOwnerRequestUrl = (id: number,) => {
+
+
+
+
+  return `/api/owner-requests/${id}`
+}
+
+/**
+ * @summary Get a single owner request (admin/super_admin)
+ */
+export const getOwnerRequest = async (id: number, options?: RequestInit): Promise<OwnerRequest> => {
+
+  return customFetch<OwnerRequest>(getGetOwnerRequestUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetOwnerRequestQueryKey = (id: number,) => {
+    return [
+    `/api/owner-requests/${id}`
+    ] as const;
+    }
+
+
+export const getGetOwnerRequestQueryOptions = <TData = Awaited<ReturnType<typeof getOwnerRequest>>, TError = ErrorType<ErrorResponse>>(id: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getOwnerRequest>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetOwnerRequestQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getOwnerRequest>>> = ({ signal }) => getOwnerRequest(id, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: !!(id), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getOwnerRequest>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetOwnerRequestQueryResult = NonNullable<Awaited<ReturnType<typeof getOwnerRequest>>>
+export type GetOwnerRequestQueryError = ErrorType<ErrorResponse>
+
+
+/**
+ * @summary Get a single owner request (admin/super_admin)
+ */
+
+export function useGetOwnerRequest<TData = Awaited<ReturnType<typeof getOwnerRequest>>, TError = ErrorType<ErrorResponse>>(
+ id: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getOwnerRequest>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetOwnerRequestQueryOptions(id,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getUpdateOwnerRequestUrl = (id: number,) => {
+
+
+
+
+  return `/api/owner-requests/${id}`
+}
+
+/**
+ * @summary Update owner request while pending (customer)
+ */
+export const updateOwnerRequest = async (id: number,
+    ownerRequestUpdate: OwnerRequestUpdate, options?: RequestInit): Promise<OwnerRequest> => {
+
+  return customFetch<OwnerRequest>(getUpdateOwnerRequestUrl(id),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      ownerRequestUpdate,)
+  }
+);}
+
+
+
+
+export const getUpdateOwnerRequestMutationOptions = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateOwnerRequest>>, TError,{id: number;data: BodyType<OwnerRequestUpdate>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateOwnerRequest>>, TError,{id: number;data: BodyType<OwnerRequestUpdate>}, TContext> => {
+
+const mutationKey = ['updateOwnerRequest'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateOwnerRequest>>, {id: number;data: BodyType<OwnerRequestUpdate>}> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  updateOwnerRequest(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateOwnerRequestMutationResult = NonNullable<Awaited<ReturnType<typeof updateOwnerRequest>>>
+    export type UpdateOwnerRequestMutationBody = BodyType<OwnerRequestUpdate>
+    export type UpdateOwnerRequestMutationError = ErrorType<ErrorResponse>
+
+    /**
+ * @summary Update owner request while pending (customer)
+ */
+export const useUpdateOwnerRequest = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateOwnerRequest>>, TError,{id: number;data: BodyType<OwnerRequestUpdate>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof updateOwnerRequest>>,
+        TError,
+        {id: number;data: BodyType<OwnerRequestUpdate>},
+        TContext
+      > => {
+      return useMutation(getUpdateOwnerRequestMutationOptions(options));
+    }
+
+export const getCancelOwnerRequestUrl = (id: number,) => {
+
+
+
+
+  return `/api/owner-requests/${id}`
+}
+
+/**
+ * @summary Cancel owner request while pending (customer)
+ */
+export const cancelOwnerRequest = async (id: number, options?: RequestInit): Promise<MessageResponse> => {
+
+  return customFetch<MessageResponse>(getCancelOwnerRequestUrl(id),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+export const getCancelOwnerRequestMutationOptions = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof cancelOwnerRequest>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof cancelOwnerRequest>>, TError,{id: number}, TContext> => {
+
+const mutationKey = ['cancelOwnerRequest'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof cancelOwnerRequest>>, {id: number}> = (props) => {
+          const {id} = props ?? {};
+
+          return  cancelOwnerRequest(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CancelOwnerRequestMutationResult = NonNullable<Awaited<ReturnType<typeof cancelOwnerRequest>>>
+
+    export type CancelOwnerRequestMutationError = ErrorType<ErrorResponse>
+
+    /**
+ * @summary Cancel owner request while pending (customer)
+ */
+export const useCancelOwnerRequest = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof cancelOwnerRequest>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof cancelOwnerRequest>>,
+        TError,
+        {id: number},
+        TContext
+      > => {
+      return useMutation(getCancelOwnerRequestMutationOptions(options));
+    }
+
 export const getApproveOwnerRequestUrl = (id: number,) => {
 
 
@@ -1531,6 +1751,76 @@ export const useRejectOwnerRequest = <TError = ErrorType<unknown>,
         TContext
       > => {
       return useMutation(getRejectOwnerRequestMutationOptions(options));
+    }
+
+export const getRestoreOwnerRequestUrl = (id: number,) => {
+
+
+
+
+  return `/api/owner-requests/${id}/restore`
+}
+
+/**
+ * @summary Restore a rejected request back to pending (super_admin)
+ */
+export const restoreOwnerRequest = async (id: number, options?: RequestInit): Promise<OwnerRequest> => {
+
+  return customFetch<OwnerRequest>(getRestoreOwnerRequestUrl(id),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+export const getRestoreOwnerRequestMutationOptions = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof restoreOwnerRequest>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof restoreOwnerRequest>>, TError,{id: number}, TContext> => {
+
+const mutationKey = ['restoreOwnerRequest'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof restoreOwnerRequest>>, {id: number}> = (props) => {
+          const {id} = props ?? {};
+
+          return  restoreOwnerRequest(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RestoreOwnerRequestMutationResult = NonNullable<Awaited<ReturnType<typeof restoreOwnerRequest>>>
+
+    export type RestoreOwnerRequestMutationError = ErrorType<ErrorResponse>
+
+    /**
+ * @summary Restore a rejected request back to pending (super_admin)
+ */
+export const useRestoreOwnerRequest = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof restoreOwnerRequest>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof restoreOwnerRequest>>,
+        TError,
+        {id: number},
+        TContext
+      > => {
+      return useMutation(getRestoreOwnerRequestMutationOptions(options));
     }
 
 export const getGetMyOwnerRequestUrl = () => {

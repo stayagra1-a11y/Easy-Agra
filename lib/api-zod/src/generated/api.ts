@@ -326,8 +326,18 @@ export const ListOwnerRequestsResponse = zod.object({
   "status": zod.enum(['pending', 'approved', 'rejected']),
   "businessName": zod.string().nullish(),
   "businessDescription": zod.string().nullish(),
+  "businessAddress": zod.string().nullish(),
+  "city": zod.string().nullish(),
+  "state": zod.string().nullish(),
+  "gstNumber": zod.string().nullish(),
+  "ownerName": zod.string().nullish(),
+  "ownerMobile": zod.string().nullish(),
+  "ownerEmail": zod.string().nullish(),
+  "businessPhotos": zod.array(zod.string()).nullish(),
+  "identityProof": zod.string().nullish(),
   "rejectionReason": zod.string().nullish(),
   "reviewedBy": zod.number().nullish(),
+  "approvedAt": zod.string().nullish(),
   "createdAt": zod.string(),
   "updatedAt": zod.string(),
   "user": zod.object({
@@ -356,7 +366,130 @@ export const ListOwnerRequestsResponse = zod.object({
 export const SubmitOwnerRequestBody = zod.object({
   "requestedRole": zod.enum(['hotel_owner', 'restaurant_owner', 'spa_owner']),
   "businessName": zod.string().optional(),
-  "businessDescription": zod.string().optional()
+  "businessDescription": zod.string().optional(),
+  "businessAddress": zod.string().optional(),
+  "city": zod.string().optional(),
+  "state": zod.string().optional(),
+  "gstNumber": zod.string().optional(),
+  "ownerName": zod.string().optional(),
+  "ownerMobile": zod.string().optional(),
+  "ownerEmail": zod.string().optional(),
+  "businessPhotos": zod.array(zod.string()).optional(),
+  "identityProof": zod.string().optional()
+})
+
+
+/**
+ * @summary Get a single owner request (admin/super_admin)
+ */
+export const GetOwnerRequestParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const GetOwnerRequestResponse = zod.object({
+  "id": zod.number(),
+  "userId": zod.number(),
+  "requestedRole": zod.enum(['hotel_owner', 'restaurant_owner', 'spa_owner']),
+  "status": zod.enum(['pending', 'approved', 'rejected']),
+  "businessName": zod.string().nullish(),
+  "businessDescription": zod.string().nullish(),
+  "businessAddress": zod.string().nullish(),
+  "city": zod.string().nullish(),
+  "state": zod.string().nullish(),
+  "gstNumber": zod.string().nullish(),
+  "ownerName": zod.string().nullish(),
+  "ownerMobile": zod.string().nullish(),
+  "ownerEmail": zod.string().nullish(),
+  "businessPhotos": zod.array(zod.string()).nullish(),
+  "identityProof": zod.string().nullish(),
+  "rejectionReason": zod.string().nullish(),
+  "reviewedBy": zod.number().nullish(),
+  "approvedAt": zod.string().nullish(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string(),
+  "user": zod.object({
+  "id": zod.number(),
+  "fullName": zod.string(),
+  "email": zod.string(),
+  "mobile": zod.string(),
+  "city": zod.string().nullish(),
+  "state": zod.string().nullish(),
+  "role": zod.enum(['super_admin', 'admin', 'hotel_owner', 'restaurant_owner', 'spa_owner', 'customer']),
+  "status": zod.enum(['pending', 'active', 'suspended', 'rejected']),
+  "profilePhoto": zod.string().nullish(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+})
+
+
+/**
+ * @summary Update owner request while pending (customer)
+ */
+export const UpdateOwnerRequestParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const UpdateOwnerRequestBody = zod.object({
+  "businessName": zod.string().optional(),
+  "businessDescription": zod.string().optional(),
+  "businessAddress": zod.string().optional(),
+  "city": zod.string().optional(),
+  "state": zod.string().optional(),
+  "gstNumber": zod.string().optional(),
+  "ownerName": zod.string().optional(),
+  "ownerMobile": zod.string().optional(),
+  "ownerEmail": zod.string().optional(),
+  "businessPhotos": zod.array(zod.string()).optional(),
+  "identityProof": zod.string().optional()
+})
+
+export const UpdateOwnerRequestResponse = zod.object({
+  "id": zod.number(),
+  "userId": zod.number(),
+  "requestedRole": zod.enum(['hotel_owner', 'restaurant_owner', 'spa_owner']),
+  "status": zod.enum(['pending', 'approved', 'rejected']),
+  "businessName": zod.string().nullish(),
+  "businessDescription": zod.string().nullish(),
+  "businessAddress": zod.string().nullish(),
+  "city": zod.string().nullish(),
+  "state": zod.string().nullish(),
+  "gstNumber": zod.string().nullish(),
+  "ownerName": zod.string().nullish(),
+  "ownerMobile": zod.string().nullish(),
+  "ownerEmail": zod.string().nullish(),
+  "businessPhotos": zod.array(zod.string()).nullish(),
+  "identityProof": zod.string().nullish(),
+  "rejectionReason": zod.string().nullish(),
+  "reviewedBy": zod.number().nullish(),
+  "approvedAt": zod.string().nullish(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string(),
+  "user": zod.object({
+  "id": zod.number(),
+  "fullName": zod.string(),
+  "email": zod.string(),
+  "mobile": zod.string(),
+  "city": zod.string().nullish(),
+  "state": zod.string().nullish(),
+  "role": zod.enum(['super_admin', 'admin', 'hotel_owner', 'restaurant_owner', 'spa_owner', 'customer']),
+  "status": zod.enum(['pending', 'active', 'suspended', 'rejected']),
+  "profilePhoto": zod.string().nullish(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+})
+
+
+/**
+ * @summary Cancel owner request while pending (customer)
+ */
+export const CancelOwnerRequestParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const CancelOwnerRequestResponse = zod.object({
+  "message": zod.string()
 })
 
 
@@ -374,8 +507,18 @@ export const ApproveOwnerRequestResponse = zod.object({
   "status": zod.enum(['pending', 'approved', 'rejected']),
   "businessName": zod.string().nullish(),
   "businessDescription": zod.string().nullish(),
+  "businessAddress": zod.string().nullish(),
+  "city": zod.string().nullish(),
+  "state": zod.string().nullish(),
+  "gstNumber": zod.string().nullish(),
+  "ownerName": zod.string().nullish(),
+  "ownerMobile": zod.string().nullish(),
+  "ownerEmail": zod.string().nullish(),
+  "businessPhotos": zod.array(zod.string()).nullish(),
+  "identityProof": zod.string().nullish(),
   "rejectionReason": zod.string().nullish(),
   "reviewedBy": zod.number().nullish(),
+  "approvedAt": zod.string().nullish(),
   "createdAt": zod.string(),
   "updatedAt": zod.string(),
   "user": zod.object({
@@ -412,8 +555,62 @@ export const RejectOwnerRequestResponse = zod.object({
   "status": zod.enum(['pending', 'approved', 'rejected']),
   "businessName": zod.string().nullish(),
   "businessDescription": zod.string().nullish(),
+  "businessAddress": zod.string().nullish(),
+  "city": zod.string().nullish(),
+  "state": zod.string().nullish(),
+  "gstNumber": zod.string().nullish(),
+  "ownerName": zod.string().nullish(),
+  "ownerMobile": zod.string().nullish(),
+  "ownerEmail": zod.string().nullish(),
+  "businessPhotos": zod.array(zod.string()).nullish(),
+  "identityProof": zod.string().nullish(),
   "rejectionReason": zod.string().nullish(),
   "reviewedBy": zod.number().nullish(),
+  "approvedAt": zod.string().nullish(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string(),
+  "user": zod.object({
+  "id": zod.number(),
+  "fullName": zod.string(),
+  "email": zod.string(),
+  "mobile": zod.string(),
+  "city": zod.string().nullish(),
+  "state": zod.string().nullish(),
+  "role": zod.enum(['super_admin', 'admin', 'hotel_owner', 'restaurant_owner', 'spa_owner', 'customer']),
+  "status": zod.enum(['pending', 'active', 'suspended', 'rejected']),
+  "profilePhoto": zod.string().nullish(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+})
+
+
+/**
+ * @summary Restore a rejected request back to pending (super_admin)
+ */
+export const RestoreOwnerRequestParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const RestoreOwnerRequestResponse = zod.object({
+  "id": zod.number(),
+  "userId": zod.number(),
+  "requestedRole": zod.enum(['hotel_owner', 'restaurant_owner', 'spa_owner']),
+  "status": zod.enum(['pending', 'approved', 'rejected']),
+  "businessName": zod.string().nullish(),
+  "businessDescription": zod.string().nullish(),
+  "businessAddress": zod.string().nullish(),
+  "city": zod.string().nullish(),
+  "state": zod.string().nullish(),
+  "gstNumber": zod.string().nullish(),
+  "ownerName": zod.string().nullish(),
+  "ownerMobile": zod.string().nullish(),
+  "ownerEmail": zod.string().nullish(),
+  "businessPhotos": zod.array(zod.string()).nullish(),
+  "identityProof": zod.string().nullish(),
+  "rejectionReason": zod.string().nullish(),
+  "reviewedBy": zod.number().nullish(),
+  "approvedAt": zod.string().nullish(),
   "createdAt": zod.string(),
   "updatedAt": zod.string(),
   "user": zod.object({
@@ -442,8 +639,18 @@ export const GetMyOwnerRequestResponse = zod.object({
   "status": zod.enum(['pending', 'approved', 'rejected']),
   "businessName": zod.string().nullish(),
   "businessDescription": zod.string().nullish(),
+  "businessAddress": zod.string().nullish(),
+  "city": zod.string().nullish(),
+  "state": zod.string().nullish(),
+  "gstNumber": zod.string().nullish(),
+  "ownerName": zod.string().nullish(),
+  "ownerMobile": zod.string().nullish(),
+  "ownerEmail": zod.string().nullish(),
+  "businessPhotos": zod.array(zod.string()).nullish(),
+  "identityProof": zod.string().nullish(),
   "rejectionReason": zod.string().nullish(),
   "reviewedBy": zod.number().nullish(),
+  "approvedAt": zod.string().nullish(),
   "createdAt": zod.string(),
   "updatedAt": zod.string(),
   "user": zod.object({

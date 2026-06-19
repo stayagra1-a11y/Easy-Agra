@@ -450,6 +450,83 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
 
+  /owner-requests/{id}:
+    get:
+      operationId: getOwnerRequest
+      tags: [owner-requests]
+      summary: Get a single owner request (admin/super_admin)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Owner request detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OwnerRequest"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    put:
+      operationId: updateOwnerRequest
+      tags: [owner-requests]
+      summary: Update owner request while pending (customer)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OwnerRequestUpdate"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OwnerRequest"
+        "403":
+          description: Not allowed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    delete:
+      operationId: cancelOwnerRequest
+      tags: [owner-requests]
+      summary: Cancel owner request while pending (customer)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Cancelled
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+        "403":
+          description: Not allowed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
   /owner-requests/{id}/approve:
     post:
       operationId: approveOwnerRequest
@@ -493,6 +570,31 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/OwnerRequest"
+
+  /owner-requests/{id}/restore:
+    post:
+      operationId: restoreOwnerRequest
+      tags: [owner-requests]
+      summary: Restore a rejected request back to pending (super_admin)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Restored to pending
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OwnerRequest"
+        "403":
+          description: Not allowed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
 
   /owner-requests/my:
     get:
@@ -920,10 +1022,32 @@ components:
           type: ["string", "null"]
         businessDescription:
           type: ["string", "null"]
+        businessAddress:
+          type: ["string", "null"]
+        city:
+          type: ["string", "null"]
+        state:
+          type: ["string", "null"]
+        gstNumber:
+          type: ["string", "null"]
+        ownerName:
+          type: ["string", "null"]
+        ownerMobile:
+          type: ["string", "null"]
+        ownerEmail:
+          type: ["string", "null"]
+        businessPhotos:
+          type: ["array", "null"]
+          items:
+            type: string
+        identityProof:
+          type: ["string", "null"]
         rejectionReason:
           type: ["string", "null"]
         reviewedBy:
           type: ["integer", "null"]
+        approvedAt:
+          type: ["string", "null"]
         createdAt:
           type: string
         updatedAt:
@@ -968,8 +1092,56 @@ components:
           type: string
         businessDescription:
           type: string
+        businessAddress:
+          type: string
+        city:
+          type: string
+        state:
+          type: string
+        gstNumber:
+          type: string
+        ownerName:
+          type: string
+        ownerMobile:
+          type: string
+        ownerEmail:
+          type: string
+        businessPhotos:
+          type: array
+          items:
+            type: string
+        identityProof:
+          type: string
       required:
         - requestedRole
+
+    OwnerRequestUpdate:
+      type: object
+      properties:
+        businessName:
+          type: string
+        businessDescription:
+          type: string
+        businessAddress:
+          type: string
+        city:
+          type: string
+        state:
+          type: string
+        gstNumber:
+          type: string
+        ownerName:
+          type: string
+        ownerMobile:
+          type: string
+        ownerEmail:
+          type: string
+        businessPhotos:
+          type: array
+          items:
+            type: string
+        identityProof:
+          type: string
 
     OwnerRequestRejectInput:
       type: object
