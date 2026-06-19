@@ -44,10 +44,10 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
   const isSuperAdmin = user?.role === "super_admin";
   const navItems = isSuperAdmin ? superAdminNavItems : adminNavItems;
 
-  const handleLogout = async () => {
-    await logoutMutation.mutateAsync();
+  const handleLogout = () => {
     queryClient.setQueryData(getGetMeQueryKey(), null);
     queryClient.clear();
+    logoutMutation.mutate();
     window.location.href = "/login";
   };
 

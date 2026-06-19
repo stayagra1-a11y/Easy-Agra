@@ -35,10 +35,10 @@ export function OwnerLayout({ children }: { children: React.ReactNode }) {
   const logoutMutation = useLogout();
   const { data: unreadData } = useGetUnreadNotificationCount();
 
-  const handleLogout = async () => {
-    await logoutMutation.mutateAsync();
+  const handleLogout = () => {
     queryClient.setQueryData(getGetMeQueryKey(), null);
     queryClient.clear();
+    logoutMutation.mutate();
     window.location.href = "/login";
   };
 
