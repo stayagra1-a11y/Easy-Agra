@@ -28,6 +28,8 @@ tags:
     description: Hotel management
   - name: rooms
     description: Room management
+  - name: bookings
+    description: Booking management and monitoring
 
 paths:
   /healthz:
@@ -1296,6 +1298,241 @@ paths:
               schema:
                 $ref: "#/components/schemas/Room"
 
+  /bookings/stats:
+    get:
+      operationId: getBookingStats
+      tags: [bookings]
+      summary: Booking statistics for admin dashboard
+      security:
+        - cookieAuth: []
+      responses:
+        "200":
+          description: Booking stats
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BookingStats"
+
+  /bookings/analytics:
+    get:
+      operationId: getBookingAnalytics
+      tags: [bookings]
+      summary: Booking analytics data
+      security:
+        - cookieAuth: []
+      responses:
+        "200":
+          description: Analytics
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BookingAnalytics"
+
+  /bookings:
+    get:
+      operationId: listBookings
+      tags: [bookings]
+      summary: List bookings
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+        - name: search
+          in: query
+          schema:
+            type: string
+        - name: hotelId
+          in: query
+          schema:
+            type: integer
+        - name: customerId
+          in: query
+          schema:
+            type: integer
+        - name: dateFrom
+          in: query
+          schema:
+            type: string
+        - name: dateTo
+          in: query
+          schema:
+            type: string
+        - name: page
+          in: query
+          schema:
+            type: integer
+        - name: limit
+          in: query
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Bookings list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BookingsPage"
+    post:
+      operationId: createBooking
+      tags: [bookings]
+      summary: Create a new booking
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BookingInput"
+      responses:
+        "201":
+          description: Booking created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Booking"
+
+  /bookings/{id}:
+    get:
+      operationId: getBooking
+      tags: [bookings]
+      summary: Get booking detail
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Booking
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Booking"
+
+  /bookings/{id}/confirm:
+    post:
+      operationId: confirmBooking
+      tags: [bookings]
+      summary: Confirm a booking
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Confirmed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Booking"
+
+  /bookings/{id}/reject:
+    post:
+      operationId: rejectBooking
+      tags: [bookings]
+      summary: Reject a booking
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BookingRejectInput"
+      responses:
+        "200":
+          description: Rejected
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Booking"
+
+  /bookings/{id}/cancel:
+    post:
+      operationId: cancelBooking
+      tags: [bookings]
+      summary: Cancel a booking
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BookingCancelInput"
+      responses:
+        "200":
+          description: Cancelled
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Booking"
+
+  /bookings/{id}/checkin:
+    post:
+      operationId: checkInBooking
+      tags: [bookings]
+      summary: Check in a booking
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Checked in
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Booking"
+
+  /bookings/{id}/checkout:
+    post:
+      operationId: checkOutBooking
+      tags: [bookings]
+      summary: Check out a booking
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Checked out
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Booking"
+
 components:
   schemas:
     HealthStatus:
@@ -2338,3 +2575,257 @@ components:
         - maintenanceRooms
         - deletedRooms
         - totalAvailable
+
+    Booking:
+      type: object
+      properties:
+        id:
+          type: integer
+        bookingRef:
+          type: string
+        customerId:
+          type: integer
+        hotelId:
+          type: integer
+        roomId:
+          type: integer
+        ownerId:
+          type: integer
+        checkInDate:
+          type: string
+        checkOutDate:
+          type: string
+        nights:
+          type: integer
+        adultsCount:
+          type: integer
+        childrenCount:
+          type: integer
+        baseAmount:
+          type: number
+        discountAmount:
+          type: number
+        taxAmount:
+          type: number
+        taxRate:
+          type: number
+        finalAmount:
+          type: number
+        status:
+          type: string
+          enum: [pending, confirmed, rejected, cancelled, checked_in, checked_out]
+        cancelReason:
+          type: string
+          nullable: true
+        rejectionReason:
+          type: string
+          nullable: true
+        customerNotes:
+          type: string
+          nullable: true
+        confirmedBy:
+          type: integer
+          nullable: true
+        confirmedAt:
+          type: string
+          nullable: true
+        checkedInAt:
+          type: string
+          nullable: true
+        checkedOutAt:
+          type: string
+          nullable: true
+        customerName:
+          type: string
+          nullable: true
+        hotelName:
+          type: string
+          nullable: true
+        roomName:
+          type: string
+          nullable: true
+        ownerName:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+      required:
+        - id
+        - bookingRef
+        - customerId
+        - hotelId
+        - roomId
+        - ownerId
+        - checkInDate
+        - checkOutDate
+        - nights
+        - adultsCount
+        - childrenCount
+        - baseAmount
+        - discountAmount
+        - taxAmount
+        - taxRate
+        - finalAmount
+        - status
+        - createdAt
+        - updatedAt
+
+    BookingInput:
+      type: object
+      properties:
+        hotelId:
+          type: integer
+        roomId:
+          type: integer
+        checkInDate:
+          type: string
+        checkOutDate:
+          type: string
+        adultsCount:
+          type: integer
+        childrenCount:
+          type: integer
+        customerNotes:
+          type: string
+      required:
+        - hotelId
+        - roomId
+        - checkInDate
+        - checkOutDate
+
+    BookingRejectInput:
+      type: object
+      properties:
+        reason:
+          type: string
+      required:
+        - reason
+
+    BookingCancelInput:
+      type: object
+      properties:
+        reason:
+          type: string
+
+    BookingsPage:
+      type: object
+      properties:
+        bookings:
+          type: array
+          items:
+            $ref: "#/components/schemas/Booking"
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+      required:
+        - bookings
+        - total
+        - page
+        - limit
+
+    BookingStats:
+      type: object
+      properties:
+        total:
+          type: integer
+        pending:
+          type: integer
+        confirmed:
+          type: integer
+        rejected:
+          type: integer
+        cancelled:
+          type: integer
+        checkedIn:
+          type: integer
+        checkedOut:
+          type: integer
+        totalRevenue:
+          type: number
+        confirmedRevenue:
+          type: number
+        todayBookings:
+          type: integer
+        weekBookings:
+          type: integer
+        monthBookings:
+          type: integer
+      required:
+        - total
+        - pending
+        - confirmed
+        - rejected
+        - cancelled
+        - checkedIn
+        - checkedOut
+        - totalRevenue
+        - confirmedRevenue
+        - todayBookings
+        - weekBookings
+        - monthBookings
+
+    BookingAnalytics:
+      type: object
+      properties:
+        topHotelsByBookings:
+          type: array
+          items:
+            type: object
+            properties:
+              hotelId:
+                type: integer
+              hotelName:
+                type: string
+              bookingCount:
+                type: integer
+              revenue:
+                type: number
+            required: [hotelId, hotelName, bookingCount, revenue]
+        topRoomTypes:
+          type: array
+          items:
+            type: object
+            properties:
+              roomType:
+                type: string
+              bookingCount:
+                type: integer
+              revenue:
+                type: number
+            required: [roomType, bookingCount, revenue]
+        topOwners:
+          type: array
+          items:
+            type: object
+            properties:
+              ownerId:
+                type: integer
+              ownerName:
+                type: string
+              bookingCount:
+                type: integer
+              revenue:
+                type: number
+            required: [ownerId, ownerName, bookingCount, revenue]
+        byDay:
+          type: array
+          items:
+            type: object
+            properties:
+              date:
+                type: string
+              bookingCount:
+                type: integer
+              revenue:
+                type: number
+            required: [date, bookingCount, revenue]
+      required:
+        - topHotelsByBookings
+        - topRoomTypes
+        - topOwners
+        - byDay

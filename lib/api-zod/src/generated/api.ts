@@ -1658,3 +1658,372 @@ export const SetRoomMaintenanceResponse = zod.object({
 })
 
 
+/**
+ * @summary Booking statistics for admin dashboard
+ */
+export const GetBookingStatsResponse = zod.object({
+  "total": zod.number(),
+  "pending": zod.number(),
+  "confirmed": zod.number(),
+  "rejected": zod.number(),
+  "cancelled": zod.number(),
+  "checkedIn": zod.number(),
+  "checkedOut": zod.number(),
+  "totalRevenue": zod.number(),
+  "confirmedRevenue": zod.number(),
+  "todayBookings": zod.number(),
+  "weekBookings": zod.number(),
+  "monthBookings": zod.number()
+})
+
+
+/**
+ * @summary Booking analytics data
+ */
+export const GetBookingAnalyticsResponse = zod.object({
+  "topHotelsByBookings": zod.array(zod.object({
+  "hotelId": zod.number(),
+  "hotelName": zod.string(),
+  "bookingCount": zod.number(),
+  "revenue": zod.number()
+})),
+  "topRoomTypes": zod.array(zod.object({
+  "roomType": zod.string(),
+  "bookingCount": zod.number(),
+  "revenue": zod.number()
+})),
+  "topOwners": zod.array(zod.object({
+  "ownerId": zod.number(),
+  "ownerName": zod.string(),
+  "bookingCount": zod.number(),
+  "revenue": zod.number()
+})),
+  "byDay": zod.array(zod.object({
+  "date": zod.string(),
+  "bookingCount": zod.number(),
+  "revenue": zod.number()
+}))
+})
+
+
+/**
+ * @summary List bookings
+ */
+export const ListBookingsQueryParams = zod.object({
+  "status": zod.coerce.string().optional(),
+  "search": zod.coerce.string().optional(),
+  "hotelId": zod.coerce.number().optional(),
+  "customerId": zod.coerce.number().optional(),
+  "dateFrom": zod.coerce.string().optional(),
+  "dateTo": zod.coerce.string().optional(),
+  "page": zod.coerce.number().optional(),
+  "limit": zod.coerce.number().optional()
+})
+
+export const ListBookingsResponse = zod.object({
+  "bookings": zod.array(zod.object({
+  "id": zod.number(),
+  "bookingRef": zod.string(),
+  "customerId": zod.number(),
+  "hotelId": zod.number(),
+  "roomId": zod.number(),
+  "ownerId": zod.number(),
+  "checkInDate": zod.string(),
+  "checkOutDate": zod.string(),
+  "nights": zod.number(),
+  "adultsCount": zod.number(),
+  "childrenCount": zod.number(),
+  "baseAmount": zod.number(),
+  "discountAmount": zod.number(),
+  "taxAmount": zod.number(),
+  "taxRate": zod.number(),
+  "finalAmount": zod.number(),
+  "status": zod.enum(['pending', 'confirmed', 'rejected', 'cancelled', 'checked_in', 'checked_out']),
+  "cancelReason": zod.string().nullish(),
+  "rejectionReason": zod.string().nullish(),
+  "customerNotes": zod.string().nullish(),
+  "confirmedBy": zod.number().nullish(),
+  "confirmedAt": zod.string().nullish(),
+  "checkedInAt": zod.string().nullish(),
+  "checkedOutAt": zod.string().nullish(),
+  "customerName": zod.string().nullish(),
+  "hotelName": zod.string().nullish(),
+  "roomName": zod.string().nullish(),
+  "ownerName": zod.string().nullish(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})),
+  "total": zod.number(),
+  "page": zod.number(),
+  "limit": zod.number()
+})
+
+
+/**
+ * @summary Create a new booking
+ */
+export const CreateBookingBody = zod.object({
+  "hotelId": zod.number(),
+  "roomId": zod.number(),
+  "checkInDate": zod.string(),
+  "checkOutDate": zod.string(),
+  "adultsCount": zod.number().optional(),
+  "childrenCount": zod.number().optional(),
+  "customerNotes": zod.string().optional()
+})
+
+
+/**
+ * @summary Get booking detail
+ */
+export const GetBookingParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const GetBookingResponse = zod.object({
+  "id": zod.number(),
+  "bookingRef": zod.string(),
+  "customerId": zod.number(),
+  "hotelId": zod.number(),
+  "roomId": zod.number(),
+  "ownerId": zod.number(),
+  "checkInDate": zod.string(),
+  "checkOutDate": zod.string(),
+  "nights": zod.number(),
+  "adultsCount": zod.number(),
+  "childrenCount": zod.number(),
+  "baseAmount": zod.number(),
+  "discountAmount": zod.number(),
+  "taxAmount": zod.number(),
+  "taxRate": zod.number(),
+  "finalAmount": zod.number(),
+  "status": zod.enum(['pending', 'confirmed', 'rejected', 'cancelled', 'checked_in', 'checked_out']),
+  "cancelReason": zod.string().nullish(),
+  "rejectionReason": zod.string().nullish(),
+  "customerNotes": zod.string().nullish(),
+  "confirmedBy": zod.number().nullish(),
+  "confirmedAt": zod.string().nullish(),
+  "checkedInAt": zod.string().nullish(),
+  "checkedOutAt": zod.string().nullish(),
+  "customerName": zod.string().nullish(),
+  "hotelName": zod.string().nullish(),
+  "roomName": zod.string().nullish(),
+  "ownerName": zod.string().nullish(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+
+
+/**
+ * @summary Confirm a booking
+ */
+export const ConfirmBookingParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const ConfirmBookingResponse = zod.object({
+  "id": zod.number(),
+  "bookingRef": zod.string(),
+  "customerId": zod.number(),
+  "hotelId": zod.number(),
+  "roomId": zod.number(),
+  "ownerId": zod.number(),
+  "checkInDate": zod.string(),
+  "checkOutDate": zod.string(),
+  "nights": zod.number(),
+  "adultsCount": zod.number(),
+  "childrenCount": zod.number(),
+  "baseAmount": zod.number(),
+  "discountAmount": zod.number(),
+  "taxAmount": zod.number(),
+  "taxRate": zod.number(),
+  "finalAmount": zod.number(),
+  "status": zod.enum(['pending', 'confirmed', 'rejected', 'cancelled', 'checked_in', 'checked_out']),
+  "cancelReason": zod.string().nullish(),
+  "rejectionReason": zod.string().nullish(),
+  "customerNotes": zod.string().nullish(),
+  "confirmedBy": zod.number().nullish(),
+  "confirmedAt": zod.string().nullish(),
+  "checkedInAt": zod.string().nullish(),
+  "checkedOutAt": zod.string().nullish(),
+  "customerName": zod.string().nullish(),
+  "hotelName": zod.string().nullish(),
+  "roomName": zod.string().nullish(),
+  "ownerName": zod.string().nullish(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+
+
+/**
+ * @summary Reject a booking
+ */
+export const RejectBookingParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const RejectBookingBody = zod.object({
+  "reason": zod.string()
+})
+
+export const RejectBookingResponse = zod.object({
+  "id": zod.number(),
+  "bookingRef": zod.string(),
+  "customerId": zod.number(),
+  "hotelId": zod.number(),
+  "roomId": zod.number(),
+  "ownerId": zod.number(),
+  "checkInDate": zod.string(),
+  "checkOutDate": zod.string(),
+  "nights": zod.number(),
+  "adultsCount": zod.number(),
+  "childrenCount": zod.number(),
+  "baseAmount": zod.number(),
+  "discountAmount": zod.number(),
+  "taxAmount": zod.number(),
+  "taxRate": zod.number(),
+  "finalAmount": zod.number(),
+  "status": zod.enum(['pending', 'confirmed', 'rejected', 'cancelled', 'checked_in', 'checked_out']),
+  "cancelReason": zod.string().nullish(),
+  "rejectionReason": zod.string().nullish(),
+  "customerNotes": zod.string().nullish(),
+  "confirmedBy": zod.number().nullish(),
+  "confirmedAt": zod.string().nullish(),
+  "checkedInAt": zod.string().nullish(),
+  "checkedOutAt": zod.string().nullish(),
+  "customerName": zod.string().nullish(),
+  "hotelName": zod.string().nullish(),
+  "roomName": zod.string().nullish(),
+  "ownerName": zod.string().nullish(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+
+
+/**
+ * @summary Cancel a booking
+ */
+export const CancelBookingParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const CancelBookingBody = zod.object({
+  "reason": zod.string().optional()
+})
+
+export const CancelBookingResponse = zod.object({
+  "id": zod.number(),
+  "bookingRef": zod.string(),
+  "customerId": zod.number(),
+  "hotelId": zod.number(),
+  "roomId": zod.number(),
+  "ownerId": zod.number(),
+  "checkInDate": zod.string(),
+  "checkOutDate": zod.string(),
+  "nights": zod.number(),
+  "adultsCount": zod.number(),
+  "childrenCount": zod.number(),
+  "baseAmount": zod.number(),
+  "discountAmount": zod.number(),
+  "taxAmount": zod.number(),
+  "taxRate": zod.number(),
+  "finalAmount": zod.number(),
+  "status": zod.enum(['pending', 'confirmed', 'rejected', 'cancelled', 'checked_in', 'checked_out']),
+  "cancelReason": zod.string().nullish(),
+  "rejectionReason": zod.string().nullish(),
+  "customerNotes": zod.string().nullish(),
+  "confirmedBy": zod.number().nullish(),
+  "confirmedAt": zod.string().nullish(),
+  "checkedInAt": zod.string().nullish(),
+  "checkedOutAt": zod.string().nullish(),
+  "customerName": zod.string().nullish(),
+  "hotelName": zod.string().nullish(),
+  "roomName": zod.string().nullish(),
+  "ownerName": zod.string().nullish(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+
+
+/**
+ * @summary Check in a booking
+ */
+export const CheckInBookingParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const CheckInBookingResponse = zod.object({
+  "id": zod.number(),
+  "bookingRef": zod.string(),
+  "customerId": zod.number(),
+  "hotelId": zod.number(),
+  "roomId": zod.number(),
+  "ownerId": zod.number(),
+  "checkInDate": zod.string(),
+  "checkOutDate": zod.string(),
+  "nights": zod.number(),
+  "adultsCount": zod.number(),
+  "childrenCount": zod.number(),
+  "baseAmount": zod.number(),
+  "discountAmount": zod.number(),
+  "taxAmount": zod.number(),
+  "taxRate": zod.number(),
+  "finalAmount": zod.number(),
+  "status": zod.enum(['pending', 'confirmed', 'rejected', 'cancelled', 'checked_in', 'checked_out']),
+  "cancelReason": zod.string().nullish(),
+  "rejectionReason": zod.string().nullish(),
+  "customerNotes": zod.string().nullish(),
+  "confirmedBy": zod.number().nullish(),
+  "confirmedAt": zod.string().nullish(),
+  "checkedInAt": zod.string().nullish(),
+  "checkedOutAt": zod.string().nullish(),
+  "customerName": zod.string().nullish(),
+  "hotelName": zod.string().nullish(),
+  "roomName": zod.string().nullish(),
+  "ownerName": zod.string().nullish(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+
+
+/**
+ * @summary Check out a booking
+ */
+export const CheckOutBookingParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const CheckOutBookingResponse = zod.object({
+  "id": zod.number(),
+  "bookingRef": zod.string(),
+  "customerId": zod.number(),
+  "hotelId": zod.number(),
+  "roomId": zod.number(),
+  "ownerId": zod.number(),
+  "checkInDate": zod.string(),
+  "checkOutDate": zod.string(),
+  "nights": zod.number(),
+  "adultsCount": zod.number(),
+  "childrenCount": zod.number(),
+  "baseAmount": zod.number(),
+  "discountAmount": zod.number(),
+  "taxAmount": zod.number(),
+  "taxRate": zod.number(),
+  "finalAmount": zod.number(),
+  "status": zod.enum(['pending', 'confirmed', 'rejected', 'cancelled', 'checked_in', 'checked_out']),
+  "cancelReason": zod.string().nullish(),
+  "rejectionReason": zod.string().nullish(),
+  "customerNotes": zod.string().nullish(),
+  "confirmedBy": zod.number().nullish(),
+  "confirmedAt": zod.string().nullish(),
+  "checkedInAt": zod.string().nullish(),
+  "checkedOutAt": zod.string().nullish(),
+  "customerName": zod.string().nullish(),
+  "hotelName": zod.string().nullish(),
+  "roomName": zod.string().nullish(),
+  "ownerName": zod.string().nullish(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+
+

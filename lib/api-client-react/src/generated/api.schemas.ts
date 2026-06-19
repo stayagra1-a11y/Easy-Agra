@@ -722,6 +722,124 @@ export interface RoomStats {
   totalAvailable: number;
 }
 
+export type BookingStatus = typeof BookingStatus[keyof typeof BookingStatus];
+
+
+export const BookingStatus = {
+  pending: 'pending',
+  confirmed: 'confirmed',
+  rejected: 'rejected',
+  cancelled: 'cancelled',
+  checked_in: 'checked_in',
+  checked_out: 'checked_out',
+} as const;
+
+export interface Booking {
+  id: number;
+  bookingRef: string;
+  customerId: number;
+  hotelId: number;
+  roomId: number;
+  ownerId: number;
+  checkInDate: string;
+  checkOutDate: string;
+  nights: number;
+  adultsCount: number;
+  childrenCount: number;
+  baseAmount: number;
+  discountAmount: number;
+  taxAmount: number;
+  taxRate: number;
+  finalAmount: number;
+  status: BookingStatus;
+  cancelReason?: string | null;
+  rejectionReason?: string | null;
+  customerNotes?: string | null;
+  confirmedBy?: number | null;
+  confirmedAt?: string | null;
+  checkedInAt?: string | null;
+  checkedOutAt?: string | null;
+  customerName?: string | null;
+  hotelName?: string | null;
+  roomName?: string | null;
+  ownerName?: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface BookingInput {
+  hotelId: number;
+  roomId: number;
+  checkInDate: string;
+  checkOutDate: string;
+  adultsCount?: number;
+  childrenCount?: number;
+  customerNotes?: string;
+}
+
+export interface BookingRejectInput {
+  reason: string;
+}
+
+export interface BookingCancelInput {
+  reason?: string;
+}
+
+export interface BookingsPage {
+  bookings: Booking[];
+  total: number;
+  page: number;
+  limit: number;
+}
+
+export interface BookingStats {
+  total: number;
+  pending: number;
+  confirmed: number;
+  rejected: number;
+  cancelled: number;
+  checkedIn: number;
+  checkedOut: number;
+  totalRevenue: number;
+  confirmedRevenue: number;
+  todayBookings: number;
+  weekBookings: number;
+  monthBookings: number;
+}
+
+export type BookingAnalyticsTopHotelsByBookingsItem = {
+  hotelId: number;
+  hotelName: string;
+  bookingCount: number;
+  revenue: number;
+};
+
+export type BookingAnalyticsTopRoomTypesItem = {
+  roomType: string;
+  bookingCount: number;
+  revenue: number;
+};
+
+export type BookingAnalyticsTopOwnersItem = {
+  ownerId: number;
+  ownerName: string;
+  bookingCount: number;
+  revenue: number;
+};
+
+export type BookingAnalyticsByDayItem = {
+  date: string;
+  bookingCount: number;
+  revenue: number;
+};
+
+export interface BookingAnalytics {
+  topHotelsByBookings: BookingAnalyticsTopHotelsByBookingsItem[];
+  topRoomTypes: BookingAnalyticsTopRoomTypesItem[];
+  topOwners: BookingAnalyticsTopOwnersItem[];
+  byDay: BookingAnalyticsByDayItem[];
+}
+
 export type ListUsersParams = {
 role?: string;
 status?: string;
@@ -765,6 +883,17 @@ export type ListRoomsParams = {
 hotelId?: number;
 status?: string;
 search?: string;
+page?: number;
+limit?: number;
+};
+
+export type ListBookingsParams = {
+status?: string;
+search?: string;
+hotelId?: number;
+customerId?: number;
+dateFrom?: string;
+dateTo?: string;
 page?: number;
 limit?: number;
 };

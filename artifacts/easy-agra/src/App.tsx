@@ -26,6 +26,8 @@ import AdminUsers from "@/pages/admin/users";
 import AdminOwnerRequests from "@/pages/admin/owner-requests";
 import AdminActivityLogs from "@/pages/admin/activity-logs";
 import AdminNotifications from "@/pages/admin/notifications";
+import AdminBookings from "@/pages/admin/bookings";
+import BookingAnalytics from "@/pages/admin/booking-analytics";
 
 // Super Admin
 import SuperAdminDashboard from "@/pages/super-admin/dashboard";
@@ -137,6 +139,8 @@ function Router() {
       <Route path="/admin/owner-requests" component={() => <ProtectedRoute component={AdminOwnerRequests} allowedRoles={["admin", "super_admin"]} />} />
       <Route path="/admin/activity-logs" component={() => <ProtectedRoute component={AdminActivityLogs} allowedRoles={["admin", "super_admin"]} />} />
       <Route path="/admin/notifications" component={() => <ProtectedRoute component={AdminNotifications} allowedRoles={["admin", "super_admin"]} />} />
+      <Route path="/admin/bookings" component={() => <ProtectedRoute component={AdminBookings} allowedRoles={["admin", "super_admin"]} />} />
+      <Route path="/admin/booking-analytics" component={() => <ProtectedRoute component={BookingAnalytics} allowedRoles={["admin", "super_admin"]} />} />
 
       {/* Super Admin routes */}
       <Route path="/super-admin/dashboard" component={() => <ProtectedRoute component={SuperAdminDashboard} allowedRoles={["super_admin"]} />} />
