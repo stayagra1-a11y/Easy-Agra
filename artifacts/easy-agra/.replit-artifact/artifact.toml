@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/"
+title = "Easy Agra"
+version = "1.0.0"
+id = "artifacts/easy-agra"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 19073
+
+[services.development]
+run = "pnpm --filter @workspace/easy-agra run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/easy-agra", "run", "build" ]
+publicDir = "artifacts/easy-agra/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "19073"
+BASE_PATH = "/"

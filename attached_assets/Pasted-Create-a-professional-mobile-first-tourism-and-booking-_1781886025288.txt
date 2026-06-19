@@ -1,0 +1,203 @@
+Create a professional mobile-first tourism and booking web app called "Easy Agra".
+
+Purpose:
+Easy Agra is a tourism platform for Agra where customers can discover and book hotels, restaurants, spas, and explore famous tourist places.
+
+Build ONLY Part 1: Foundation, Authentication and User Management.
+
+User Roles:
+1. Admin
+2. Hotel Owner
+3. Restaurant Owner
+4. Spa Owner
+5. Customer
+
+Authentication Features:
+- User Registration
+- User Login
+- Logout
+- Forgot Password
+- Reset Password
+- Remember Me
+- Secure Authentication System
+- Session Management
+
+Registration Form Fields:
+- Full Name
+- Mobile Number
+- Email Address
+- Password
+- Confirm Password
+- City
+- State
+- Profile Photo Upload
+
+Profile Features:
+- View Profile
+- Edit Profile
+- Change Password
+- Upload Profile Photo
+- Update Contact Information
+
+Role-Based Access Control:
+- Admin has full access to all modules.
+- Hotel Owner can access only hotel-related dashboard.
+- Restaurant Owner can access only restaurant-related dashboard.
+- Spa Owner can access only spa-related dashboard.
+- Customer can access booking and tourism features only.
+
+Dashboard Routing:
+After login:
+- Admin → Admin Dashboard
+- Hotel Owner → Hotel Owner Dashboard
+- Restaurant Owner → Restaurant Owner Dashboard
+- Spa Owner → Spa Owner Dashboard
+- Customer → Customer Home Dashboard
+
+Owner Approval System:
+- Users cannot directly become Hotel Owner, Restaurant Owner, or Spa Owner.
+- Customer can submit a request to become an owner.
+- Admin can approve or reject owner requests.
+- After approval, user role is automatically updated.
+
+Notification System:
+- Welcome notification after registration.
+- Owner approval notification.
+- Account update notification.
+
+Settings Page:
+- Edit Profile
+- Change Password
+- Notification Preferences
+- Delete Account
+
+Support Pages:
+- Contact Us
+- Help Center
+- FAQ
+
+Legal Pages:
+- Privacy Policy
+- Terms and Conditions
+
+UI Requirements:
+- Modern OYO-inspired design
+- Mobile-first responsive layout
+- Clean navigation
+- Professional cards and buttons
+- Fast loading
+- Easy-to-use interface
+
+Database Tables Required:
+Users
+OwnerRequests
+Notifications
+UserSessions
+
+Generate:
+1. Database schema
+2. Frontend pages
+3. Backend logic
+4. Authentication flow
+5. Role-based routing
+6. Dashboard structure
+7. Complete folder structure
+
+Note
+
+Ownership Rules:
+- Every hotel must be linked to its owner account.
+- Every restaurant must be linked to its owner account.
+- Every spa must be linked to its owner account.
+- Owners can create, view, edit and manage only their own listings.
+- Owners cannot access, edit, delete or view private data of other owners.
+- Admin has full access to all listings and all users.
+- Enforce ownership checks on both frontend and backend.
+
+Account Status System:
+- Pending
+- Active
+- Suspended
+- Rejected
+
+New owner accounts remain Pending until approved by Admin.
+Suspended users cannot login.
+
+SUPER ADMIN FEATURES
+
+Role Hierarchy:
+
+1. Super Admin
+2. Admin
+3. Hotel Owner
+4. Restaurant Owner
+5. Spa Owner
+6. Customer
+
+Super Admin Permissions:
+
+- Full access to the entire platform.
+- Create, edit, suspend and delete Admin accounts.
+- Promote or demote Admins.
+- View all users, listings and bookings.
+- Transfer ownership of hotels, restaurants and spas.
+- Suspend or permanently ban any account.
+- Restore suspended accounts.
+- Access all reports and analytics.
+- View complete system activity logs.
+- Manage platform settings.
+- Manage commissions and fees.
+- Manage featured listings.
+- Send announcements to all users.
+- Export platform data and reports.
+
+Admin Restrictions:
+
+- Admin cannot modify Super Admin accounts.
+- Admin cannot access Super Admin settings.
+- Admin cannot delete or suspend Super Admin.
+- Admin actions are monitored and logged.
+
+System Activity Logs:
+Record:
+
+- User Login
+- User Logout
+- Profile Updates
+- Listing Creation
+- Listing Updates
+- Listing Deletion
+- Approval Actions
+- Suspension Actions
+
+Every log must contain:
+
+- User ID
+- User Role
+- Action Type
+- Date and Time
+- IP Address (if available)
+
+Emergency Recovery Features:
+
+- Super Admin can restore deleted listings.
+- Super Admin can restore suspended users.
+- Super Admin can recover ownership of a business listing.
+
+Platform Settings:
+
+- App Name
+- Logo
+- Contact Information
+- Support Email
+- Terms and Conditions
+- Privacy Policy
+- Notification Settings
+- Maintenance Mode
+
+Maintenance Mode:
+Only Super Admin can enable or disable maintenance mode.
+When enabled, only Super Admin can access the platform.
+All other users see a maintenance page.
+
+Do not build hotel booking, restaurant booking, spa booking or payment modules yet. Focus only on Foundation, Authentication and User Management.

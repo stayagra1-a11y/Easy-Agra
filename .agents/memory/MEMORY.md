@@ -1,0 +1,2 @@
+- [Easy Agra API types](easy-agra-api-types.md) — DashboardStats is flat (no .stats wrapper); OwnerRequestRejectInput uses `reason` not `rejectionReason`; logout/markAllNotificationsRead take void not {}
+- [Easy Agra useGetMyOwnerRequest](easy-agra-query-key.md) — queryKey is required when passing custom query options; use inline `queryKey: ["getMyOwnerRequest"]`
