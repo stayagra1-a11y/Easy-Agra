@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { Home, Bell, User, Settings, LogOut, Map } from "lucide-react";
+import { Home, Bell, User, Settings, LogOut, Map, CalendarDays, Star } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { useGetUnreadNotificationCount, useLogout, getGetMeQueryKey } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
@@ -22,9 +22,10 @@ export function CustomerLayout({ children }: { children: React.ReactNode }) {
 
   const navItems = [
     { href: "/", icon: Home, label: "Home" },
+    { href: "/customer/bookings", icon: CalendarDays, label: "Bookings" },
+    { href: "/customer/reviews", icon: Star, label: "Reviews" },
     { href: "/notifications", icon: Bell, label: "Alerts", badge: unreadData?.count },
     { href: "/profile", icon: User, label: "Profile" },
-    { href: "/settings", icon: Settings, label: "Settings" },
   ];
 
   return (

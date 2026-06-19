@@ -2027,3 +2027,443 @@ export const CheckOutBookingResponse = zod.object({
 })
 
 
+/**
+ * @summary Review stats for admin
+ */
+export const GetReviewStatsResponse = zod.object({
+  "total": zod.number(),
+  "approved": zod.number(),
+  "hidden": zod.number(),
+  "removed": zod.number(),
+  "reported": zod.number(),
+  "avgRating": zod.number(),
+  "distribution": zod.object({
+
+}).passthrough()
+})
+
+
+/**
+ * @summary Bookings eligible for review
+ */
+export const GetEligibleBookingsResponseItem = zod.object({
+  "bookingId": zod.number(),
+  "bookingRef": zod.string(),
+  "hotelId": zod.number(),
+  "hotelName": zod.string(),
+  "checkInDate": zod.string(),
+  "checkOutDate": zod.string(),
+  "checkedOutAt": zod.string().nullish(),
+  "alreadyReviewed": zod.boolean(),
+  "existingReviewId": zod.number().nullish()
+})
+export const GetEligibleBookingsResponse = zod.array(GetEligibleBookingsResponseItem)
+
+
+/**
+ * @summary Top rated hotels
+ */
+export const GetTopRatedHotelsQueryParams = zod.object({
+  "limit": zod.coerce.number().optional()
+})
+
+export const GetTopRatedHotelsResponseItem = zod.object({
+  "hotelId": zod.number(),
+  "hotelName": zod.string(),
+  "hotelCity": zod.string(),
+  "hotelCoverPhoto": zod.string().nullish(),
+  "avgRating": zod.number(),
+  "reviewCount": zod.number(),
+  "avgCleanliness": zod.number().optional(),
+  "avgRoomQuality": zod.number().optional(),
+  "avgStaff": zod.number().optional(),
+  "avgLocation": zod.number().optional(),
+  "avgValue": zod.number().optional(),
+  "positivePct": zod.number()
+})
+export const GetTopRatedHotelsResponse = zod.array(GetTopRatedHotelsResponseItem)
+
+
+/**
+ * @summary Reviews for a specific hotel
+ */
+export const FetchHotelReviewsParams = zod.object({
+  "hotelId": zod.coerce.number()
+})
+
+export const FetchHotelReviewsResponse = zod.object({
+  "reviews": zod.array(zod.object({
+  "id": zod.number(),
+  "bookingId": zod.number(),
+  "hotelId": zod.number(),
+  "customerId": zod.number(),
+  "ownerId": zod.number(),
+  "overallRating": zod.number(),
+  "cleanlinessRating": zod.number(),
+  "roomQualityRating": zod.number(),
+  "staffRating": zod.number(),
+  "locationRating": zod.number(),
+  "valueRating": zod.number(),
+  "reviewTitle": zod.string(),
+  "reviewDescription": zod.string(),
+  "reviewPhotos": zod.array(zod.string()),
+  "ownerReplyTitle": zod.string().nullish(),
+  "ownerReplyMessage": zod.string().nullish(),
+  "ownerRepliedAt": zod.string().nullish(),
+  "status": zod.enum(['approved', 'hidden', 'removed']),
+  "reportCount": zod.number(),
+  "reportReasons": zod.array(zod.string()),
+  "reportStatus": zod.enum(['none', 'pending', 'reviewed']),
+  "editableUntil": zod.string().nullish(),
+  "customerName": zod.string().nullish(),
+  "customerPhoto": zod.string().nullish(),
+  "hotelName": zod.string().nullish(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})),
+  "total": zod.number(),
+  "page": zod.number(),
+  "limit": zod.number(),
+  "summary": zod.object({
+  "avgOverall": zod.number().optional(),
+  "avgCleanliness": zod.number().optional(),
+  "avgRoomQuality": zod.number().optional(),
+  "avgStaff": zod.number().optional(),
+  "avgLocation": zod.number().optional(),
+  "avgValue": zod.number().optional(),
+  "total": zod.number().optional(),
+  "distribution": zod.object({
+
+}).passthrough().optional()
+}).nullish()
+})
+
+
+/**
+ * @summary List reviews
+ */
+export const ListReviewsQueryParams = zod.object({
+  "hotelId": zod.coerce.number().optional(),
+  "customerId": zod.coerce.number().optional(),
+  "rating": zod.coerce.number().optional(),
+  "status": zod.coerce.string().optional(),
+  "reportStatus": zod.coerce.string().optional(),
+  "search": zod.coerce.string().optional(),
+  "sort": zod.coerce.string().optional(),
+  "page": zod.coerce.number().optional(),
+  "limit": zod.coerce.number().optional()
+})
+
+export const ListReviewsResponse = zod.object({
+  "reviews": zod.array(zod.object({
+  "id": zod.number(),
+  "bookingId": zod.number(),
+  "hotelId": zod.number(),
+  "customerId": zod.number(),
+  "ownerId": zod.number(),
+  "overallRating": zod.number(),
+  "cleanlinessRating": zod.number(),
+  "roomQualityRating": zod.number(),
+  "staffRating": zod.number(),
+  "locationRating": zod.number(),
+  "valueRating": zod.number(),
+  "reviewTitle": zod.string(),
+  "reviewDescription": zod.string(),
+  "reviewPhotos": zod.array(zod.string()),
+  "ownerReplyTitle": zod.string().nullish(),
+  "ownerReplyMessage": zod.string().nullish(),
+  "ownerRepliedAt": zod.string().nullish(),
+  "status": zod.enum(['approved', 'hidden', 'removed']),
+  "reportCount": zod.number(),
+  "reportReasons": zod.array(zod.string()),
+  "reportStatus": zod.enum(['none', 'pending', 'reviewed']),
+  "editableUntil": zod.string().nullish(),
+  "customerName": zod.string().nullish(),
+  "customerPhoto": zod.string().nullish(),
+  "hotelName": zod.string().nullish(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})),
+  "total": zod.number(),
+  "page": zod.number(),
+  "limit": zod.number(),
+  "summary": zod.object({
+  "avgOverall": zod.number().optional(),
+  "avgCleanliness": zod.number().optional(),
+  "avgRoomQuality": zod.number().optional(),
+  "avgStaff": zod.number().optional(),
+  "avgLocation": zod.number().optional(),
+  "avgValue": zod.number().optional(),
+  "total": zod.number().optional(),
+  "distribution": zod.object({
+
+}).passthrough().optional()
+}).nullish()
+})
+
+
+/**
+ * @summary Submit a review
+ */
+export const CreateReviewBody = zod.object({
+  "bookingId": zod.number(),
+  "overallRating": zod.number(),
+  "cleanlinessRating": zod.number(),
+  "roomQualityRating": zod.number(),
+  "staffRating": zod.number(),
+  "locationRating": zod.number(),
+  "valueRating": zod.number(),
+  "reviewTitle": zod.string(),
+  "reviewDescription": zod.string(),
+  "reviewPhotos": zod.array(zod.string()).optional()
+})
+
+
+/**
+ * @summary Get review detail
+ */
+export const GetReviewParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const GetReviewResponse = zod.object({
+  "id": zod.number(),
+  "bookingId": zod.number(),
+  "hotelId": zod.number(),
+  "customerId": zod.number(),
+  "ownerId": zod.number(),
+  "overallRating": zod.number(),
+  "cleanlinessRating": zod.number(),
+  "roomQualityRating": zod.number(),
+  "staffRating": zod.number(),
+  "locationRating": zod.number(),
+  "valueRating": zod.number(),
+  "reviewTitle": zod.string(),
+  "reviewDescription": zod.string(),
+  "reviewPhotos": zod.array(zod.string()),
+  "ownerReplyTitle": zod.string().nullish(),
+  "ownerReplyMessage": zod.string().nullish(),
+  "ownerRepliedAt": zod.string().nullish(),
+  "status": zod.enum(['approved', 'hidden', 'removed']),
+  "reportCount": zod.number(),
+  "reportReasons": zod.array(zod.string()),
+  "reportStatus": zod.enum(['none', 'pending', 'reviewed']),
+  "editableUntil": zod.string().nullish(),
+  "customerName": zod.string().nullish(),
+  "customerPhoto": zod.string().nullish(),
+  "hotelName": zod.string().nullish(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+
+
+/**
+ * @summary Edit a review
+ */
+export const UpdateReviewParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const UpdateReviewBody = zod.object({
+  "bookingId": zod.number(),
+  "overallRating": zod.number(),
+  "cleanlinessRating": zod.number(),
+  "roomQualityRating": zod.number(),
+  "staffRating": zod.number(),
+  "locationRating": zod.number(),
+  "valueRating": zod.number(),
+  "reviewTitle": zod.string(),
+  "reviewDescription": zod.string(),
+  "reviewPhotos": zod.array(zod.string()).optional()
+})
+
+export const UpdateReviewResponse = zod.object({
+  "id": zod.number(),
+  "bookingId": zod.number(),
+  "hotelId": zod.number(),
+  "customerId": zod.number(),
+  "ownerId": zod.number(),
+  "overallRating": zod.number(),
+  "cleanlinessRating": zod.number(),
+  "roomQualityRating": zod.number(),
+  "staffRating": zod.number(),
+  "locationRating": zod.number(),
+  "valueRating": zod.number(),
+  "reviewTitle": zod.string(),
+  "reviewDescription": zod.string(),
+  "reviewPhotos": zod.array(zod.string()),
+  "ownerReplyTitle": zod.string().nullish(),
+  "ownerReplyMessage": zod.string().nullish(),
+  "ownerRepliedAt": zod.string().nullish(),
+  "status": zod.enum(['approved', 'hidden', 'removed']),
+  "reportCount": zod.number(),
+  "reportReasons": zod.array(zod.string()),
+  "reportStatus": zod.enum(['none', 'pending', 'reviewed']),
+  "editableUntil": zod.string().nullish(),
+  "customerName": zod.string().nullish(),
+  "customerPhoto": zod.string().nullish(),
+  "hotelName": zod.string().nullish(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+
+
+/**
+ * @summary Delete a review
+ */
+export const DeleteReviewParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const DeleteReviewResponse = zod.object({
+  "success": zod.boolean()
+})
+
+
+/**
+ * @summary Owner reply to review
+ */
+export const ReplyToReviewParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const ReplyToReviewBody = zod.object({
+  "replyTitle": zod.string().optional(),
+  "replyMessage": zod.string()
+})
+
+export const ReplyToReviewResponse = zod.object({
+  "id": zod.number(),
+  "bookingId": zod.number(),
+  "hotelId": zod.number(),
+  "customerId": zod.number(),
+  "ownerId": zod.number(),
+  "overallRating": zod.number(),
+  "cleanlinessRating": zod.number(),
+  "roomQualityRating": zod.number(),
+  "staffRating": zod.number(),
+  "locationRating": zod.number(),
+  "valueRating": zod.number(),
+  "reviewTitle": zod.string(),
+  "reviewDescription": zod.string(),
+  "reviewPhotos": zod.array(zod.string()),
+  "ownerReplyTitle": zod.string().nullish(),
+  "ownerReplyMessage": zod.string().nullish(),
+  "ownerRepliedAt": zod.string().nullish(),
+  "status": zod.enum(['approved', 'hidden', 'removed']),
+  "reportCount": zod.number(),
+  "reportReasons": zod.array(zod.string()),
+  "reportStatus": zod.enum(['none', 'pending', 'reviewed']),
+  "editableUntil": zod.string().nullish(),
+  "customerName": zod.string().nullish(),
+  "customerPhoto": zod.string().nullish(),
+  "hotelName": zod.string().nullish(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+
+
+/**
+ * @summary Report a review
+ */
+export const ReportReviewParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const ReportReviewBody = zod.object({
+  "reason": zod.string()
+})
+
+export const ReportReviewResponse = zod.object({
+  "success": zod.boolean()
+})
+
+
+/**
+ * @summary Admin hide a review
+ */
+export const HideReviewParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const HideReviewResponse = zod.object({
+  "id": zod.number(),
+  "bookingId": zod.number(),
+  "hotelId": zod.number(),
+  "customerId": zod.number(),
+  "ownerId": zod.number(),
+  "overallRating": zod.number(),
+  "cleanlinessRating": zod.number(),
+  "roomQualityRating": zod.number(),
+  "staffRating": zod.number(),
+  "locationRating": zod.number(),
+  "valueRating": zod.number(),
+  "reviewTitle": zod.string(),
+  "reviewDescription": zod.string(),
+  "reviewPhotos": zod.array(zod.string()),
+  "ownerReplyTitle": zod.string().nullish(),
+  "ownerReplyMessage": zod.string().nullish(),
+  "ownerRepliedAt": zod.string().nullish(),
+  "status": zod.enum(['approved', 'hidden', 'removed']),
+  "reportCount": zod.number(),
+  "reportReasons": zod.array(zod.string()),
+  "reportStatus": zod.enum(['none', 'pending', 'reviewed']),
+  "editableUntil": zod.string().nullish(),
+  "customerName": zod.string().nullish(),
+  "customerPhoto": zod.string().nullish(),
+  "hotelName": zod.string().nullish(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+
+
+/**
+ * @summary Super admin restore a review
+ */
+export const RestoreReviewParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const RestoreReviewResponse = zod.object({
+  "id": zod.number(),
+  "bookingId": zod.number(),
+  "hotelId": zod.number(),
+  "customerId": zod.number(),
+  "ownerId": zod.number(),
+  "overallRating": zod.number(),
+  "cleanlinessRating": zod.number(),
+  "roomQualityRating": zod.number(),
+  "staffRating": zod.number(),
+  "locationRating": zod.number(),
+  "valueRating": zod.number(),
+  "reviewTitle": zod.string(),
+  "reviewDescription": zod.string(),
+  "reviewPhotos": zod.array(zod.string()),
+  "ownerReplyTitle": zod.string().nullish(),
+  "ownerReplyMessage": zod.string().nullish(),
+  "ownerRepliedAt": zod.string().nullish(),
+  "status": zod.enum(['approved', 'hidden', 'removed']),
+  "reportCount": zod.number(),
+  "reportReasons": zod.array(zod.string()),
+  "reportStatus": zod.enum(['none', 'pending', 'reviewed']),
+  "editableUntil": zod.string().nullish(),
+  "customerName": zod.string().nullish(),
+  "customerPhoto": zod.string().nullish(),
+  "hotelName": zod.string().nullish(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+
+
+/**
+ * @summary Super admin permanently remove a review
+ */
+export const RemoveReviewParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const RemoveReviewResponse = zod.object({
+  "success": zod.boolean()
+})
+
+

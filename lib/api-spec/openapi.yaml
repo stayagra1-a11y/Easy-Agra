@@ -30,6 +30,8 @@ tags:
     description: Room management
   - name: bookings
     description: Booking management and monitoring
+  - name: reviews
+    description: Hotel reviews and ratings
 
 paths:
   /healthz:
@@ -1533,6 +1535,342 @@ paths:
               schema:
                 $ref: "#/components/schemas/Booking"
 
+  /reviews/stats:
+    get:
+      operationId: getReviewStats
+      tags: [reviews]
+      summary: Review stats for admin
+      security:
+        - cookieAuth: []
+      responses:
+        "200":
+          description: Review stats
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ReviewStats"
+
+  /reviews/eligible-bookings:
+    get:
+      operationId: getEligibleBookings
+      tags: [reviews]
+      summary: Bookings eligible for review
+      security:
+        - cookieAuth: []
+      responses:
+        "200":
+          description: Eligible bookings
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/EligibleBooking"
+
+  /reviews/top-hotels:
+    get:
+      operationId: getTopRatedHotels
+      tags: [reviews]
+      summary: Top rated hotels
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Top hotels
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TopRatedHotel"
+
+  /reviews/hotel/{hotelId}:
+    get:
+      operationId: fetchHotelReviews
+      tags: [reviews]
+      summary: Reviews for a specific hotel
+      parameters:
+        - name: hotelId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Hotel reviews
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ReviewsPage"
+
+  /reviews:
+    get:
+      operationId: listReviews
+      tags: [reviews]
+      summary: List reviews
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: hotelId
+          in: query
+          schema:
+            type: integer
+        - name: customerId
+          in: query
+          schema:
+            type: integer
+        - name: rating
+          in: query
+          schema:
+            type: integer
+        - name: status
+          in: query
+          schema:
+            type: string
+        - name: reportStatus
+          in: query
+          schema:
+            type: string
+        - name: search
+          in: query
+          schema:
+            type: string
+        - name: sort
+          in: query
+          schema:
+            type: string
+        - name: page
+          in: query
+          schema:
+            type: integer
+        - name: limit
+          in: query
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Reviews list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ReviewsPage"
+    post:
+      operationId: createReview
+      tags: [reviews]
+      summary: Submit a review
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReviewInput"
+      responses:
+        "201":
+          description: Review created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Review"
+
+  /reviews/{id}:
+    get:
+      operationId: getReview
+      tags: [reviews]
+      summary: Get review detail
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Review
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Review"
+    put:
+      operationId: updateReview
+      tags: [reviews]
+      summary: Edit a review
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReviewInput"
+      responses:
+        "200":
+          description: Updated review
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Review"
+    delete:
+      operationId: deleteReview
+      tags: [reviews]
+      summary: Delete a review
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                required: [success]
+
+  /reviews/{id}/reply:
+    post:
+      operationId: replyToReview
+      tags: [reviews]
+      summary: Owner reply to review
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReviewReplyInput"
+      responses:
+        "200":
+          description: Reply added
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Review"
+
+  /reviews/{id}/report:
+    post:
+      operationId: reportReview
+      tags: [reviews]
+      summary: Report a review
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReviewReportInput"
+      responses:
+        "200":
+          description: Reported
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                required: [success]
+
+  /reviews/{id}/hide:
+    post:
+      operationId: hideReview
+      tags: [reviews]
+      summary: Admin hide a review
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Hidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Review"
+
+  /reviews/{id}/restore:
+    post:
+      operationId: restoreReview
+      tags: [reviews]
+      summary: Super admin restore a review
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Restored
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Review"
+
+  /reviews/{id}/remove:
+    post:
+      operationId: removeReview
+      tags: [reviews]
+      summary: Super admin permanently remove a review
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Removed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                required: [success]
+
 components:
   schemas:
     HealthStatus:
@@ -2829,3 +3167,282 @@ components:
         - topRoomTypes
         - topOwners
         - byDay
+
+    Review:
+      type: object
+      properties:
+        id:
+          type: integer
+        bookingId:
+          type: integer
+        hotelId:
+          type: integer
+        customerId:
+          type: integer
+        ownerId:
+          type: integer
+        overallRating:
+          type: integer
+        cleanlinessRating:
+          type: integer
+        roomQualityRating:
+          type: integer
+        staffRating:
+          type: integer
+        locationRating:
+          type: integer
+        valueRating:
+          type: integer
+        reviewTitle:
+          type: string
+        reviewDescription:
+          type: string
+        reviewPhotos:
+          type: array
+          items:
+            type: string
+        ownerReplyTitle:
+          type: string
+          nullable: true
+        ownerReplyMessage:
+          type: string
+          nullable: true
+        ownerRepliedAt:
+          type: string
+          nullable: true
+        status:
+          type: string
+          enum: [approved, hidden, removed]
+        reportCount:
+          type: integer
+        reportReasons:
+          type: array
+          items:
+            type: string
+        reportStatus:
+          type: string
+          enum: [none, pending, reviewed]
+        editableUntil:
+          type: string
+          nullable: true
+        customerName:
+          type: string
+          nullable: true
+        customerPhoto:
+          type: string
+          nullable: true
+        hotelName:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+      required:
+        - id
+        - bookingId
+        - hotelId
+        - customerId
+        - ownerId
+        - overallRating
+        - cleanlinessRating
+        - roomQualityRating
+        - staffRating
+        - locationRating
+        - valueRating
+        - reviewTitle
+        - reviewDescription
+        - reviewPhotos
+        - status
+        - reportCount
+        - reportReasons
+        - reportStatus
+        - createdAt
+        - updatedAt
+
+    ReviewInput:
+      type: object
+      properties:
+        bookingId:
+          type: integer
+        overallRating:
+          type: integer
+        cleanlinessRating:
+          type: integer
+        roomQualityRating:
+          type: integer
+        staffRating:
+          type: integer
+        locationRating:
+          type: integer
+        valueRating:
+          type: integer
+        reviewTitle:
+          type: string
+        reviewDescription:
+          type: string
+        reviewPhotos:
+          type: array
+          items:
+            type: string
+      required:
+        - bookingId
+        - overallRating
+        - cleanlinessRating
+        - roomQualityRating
+        - staffRating
+        - locationRating
+        - valueRating
+        - reviewTitle
+        - reviewDescription
+
+    ReviewReplyInput:
+      type: object
+      properties:
+        replyTitle:
+          type: string
+        replyMessage:
+          type: string
+      required:
+        - replyMessage
+
+    ReviewReportInput:
+      type: object
+      properties:
+        reason:
+          type: string
+      required:
+        - reason
+
+    ReviewsPage:
+      type: object
+      properties:
+        reviews:
+          type: array
+          items:
+            $ref: "#/components/schemas/Review"
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+        summary:
+          type: object
+          nullable: true
+          properties:
+            avgOverall:
+              type: number
+            avgCleanliness:
+              type: number
+            avgRoomQuality:
+              type: number
+            avgStaff:
+              type: number
+            avgLocation:
+              type: number
+            avgValue:
+              type: number
+            total:
+              type: integer
+            distribution:
+              type: object
+      required:
+        - reviews
+        - total
+        - page
+        - limit
+
+    ReviewStats:
+      type: object
+      properties:
+        total:
+          type: integer
+        approved:
+          type: integer
+        hidden:
+          type: integer
+        removed:
+          type: integer
+        reported:
+          type: integer
+        avgRating:
+          type: number
+        distribution:
+          type: object
+      required:
+        - total
+        - approved
+        - hidden
+        - removed
+        - reported
+        - avgRating
+        - distribution
+
+    EligibleBooking:
+      type: object
+      properties:
+        bookingId:
+          type: integer
+        bookingRef:
+          type: string
+        hotelId:
+          type: integer
+        hotelName:
+          type: string
+        checkInDate:
+          type: string
+        checkOutDate:
+          type: string
+        checkedOutAt:
+          type: string
+          nullable: true
+        alreadyReviewed:
+          type: boolean
+        existingReviewId:
+          type: integer
+          nullable: true
+      required:
+        - bookingId
+        - bookingRef
+        - hotelId
+        - hotelName
+        - checkInDate
+        - checkOutDate
+        - alreadyReviewed
+
+    TopRatedHotel:
+      type: object
+      properties:
+        hotelId:
+          type: integer
+        hotelName:
+          type: string
+        hotelCity:
+          type: string
+        hotelCoverPhoto:
+          type: string
+          nullable: true
+        avgRating:
+          type: number
+        reviewCount:
+          type: integer
+        avgCleanliness:
+          type: number
+        avgRoomQuality:
+          type: number
+        avgStaff:
+          type: number
+        avgLocation:
+          type: number
+        avgValue:
+          type: number
+        positivePct:
+          type: integer
+      required:
+        - hotelId
+        - hotelName
+        - hotelCity
+        - avgRating
+        - reviewCount
+        - positivePct

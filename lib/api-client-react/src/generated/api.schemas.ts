@@ -840,6 +840,136 @@ export interface BookingAnalytics {
   byDay: BookingAnalyticsByDayItem[];
 }
 
+export type ReviewStatus = typeof ReviewStatus[keyof typeof ReviewStatus];
+
+
+export const ReviewStatus = {
+  approved: 'approved',
+  hidden: 'hidden',
+  removed: 'removed',
+} as const;
+
+export type ReviewReportStatus = typeof ReviewReportStatus[keyof typeof ReviewReportStatus];
+
+
+export const ReviewReportStatus = {
+  none: 'none',
+  pending: 'pending',
+  reviewed: 'reviewed',
+} as const;
+
+export interface Review {
+  id: number;
+  bookingId: number;
+  hotelId: number;
+  customerId: number;
+  ownerId: number;
+  overallRating: number;
+  cleanlinessRating: number;
+  roomQualityRating: number;
+  staffRating: number;
+  locationRating: number;
+  valueRating: number;
+  reviewTitle: string;
+  reviewDescription: string;
+  reviewPhotos: string[];
+  ownerReplyTitle?: string | null;
+  ownerReplyMessage?: string | null;
+  ownerRepliedAt?: string | null;
+  status: ReviewStatus;
+  reportCount: number;
+  reportReasons: string[];
+  reportStatus: ReviewReportStatus;
+  editableUntil?: string | null;
+  customerName?: string | null;
+  customerPhoto?: string | null;
+  hotelName?: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ReviewInput {
+  bookingId: number;
+  overallRating: number;
+  cleanlinessRating: number;
+  roomQualityRating: number;
+  staffRating: number;
+  locationRating: number;
+  valueRating: number;
+  reviewTitle: string;
+  reviewDescription: string;
+  reviewPhotos?: string[];
+}
+
+export interface ReviewReplyInput {
+  replyTitle?: string;
+  replyMessage: string;
+}
+
+export interface ReviewReportInput {
+  reason: string;
+}
+
+export type ReviewsPageSummaryDistribution = { [key: string]: unknown };
+
+export type ReviewsPageSummary = {
+  avgOverall?: number;
+  avgCleanliness?: number;
+  avgRoomQuality?: number;
+  avgStaff?: number;
+  avgLocation?: number;
+  avgValue?: number;
+  total?: number;
+  distribution?: ReviewsPageSummaryDistribution;
+} | null;
+
+export interface ReviewsPage {
+  reviews: Review[];
+  total: number;
+  page: number;
+  limit: number;
+  summary?: ReviewsPageSummary;
+}
+
+export type ReviewStatsDistribution = { [key: string]: unknown };
+
+export interface ReviewStats {
+  total: number;
+  approved: number;
+  hidden: number;
+  removed: number;
+  reported: number;
+  avgRating: number;
+  distribution: ReviewStatsDistribution;
+}
+
+export interface EligibleBooking {
+  bookingId: number;
+  bookingRef: string;
+  hotelId: number;
+  hotelName: string;
+  checkInDate: string;
+  checkOutDate: string;
+  checkedOutAt?: string | null;
+  alreadyReviewed: boolean;
+  existingReviewId?: number | null;
+}
+
+export interface TopRatedHotel {
+  hotelId: number;
+  hotelName: string;
+  hotelCity: string;
+  hotelCoverPhoto?: string | null;
+  avgRating: number;
+  reviewCount: number;
+  avgCleanliness?: number;
+  avgRoomQuality?: number;
+  avgStaff?: number;
+  avgLocation?: number;
+  avgValue?: number;
+  positivePct: number;
+}
+
 export type ListUsersParams = {
 role?: string;
 status?: string;
@@ -896,5 +1026,33 @@ dateFrom?: string;
 dateTo?: string;
 page?: number;
 limit?: number;
+};
+
+export type GetTopRatedHotelsParams = {
+limit?: number;
+};
+
+export type ListReviewsParams = {
+hotelId?: number;
+customerId?: number;
+rating?: number;
+status?: string;
+reportStatus?: string;
+search?: string;
+sort?: string;
+page?: number;
+limit?: number;
+};
+
+export type DeleteReview200 = {
+  success: boolean;
+};
+
+export type ReportReview200 = {
+  success: boolean;
+};
+
+export type RemoveReview200 = {
+  success: boolean;
 };
 
