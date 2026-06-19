@@ -858,3 +858,422 @@ export const SendAnnouncementResponse = zod.object({
 })
 
 
+/**
+ * @summary Get hotel owner dashboard stats
+ */
+export const GetHotelStatsResponse = zod.object({
+  "totalHotels": zod.number(),
+  "draftHotels": zod.number(),
+  "pendingHotels": zod.number(),
+  "approvedHotels": zod.number(),
+  "rejectedHotels": zod.number(),
+  "suspendedHotels": zod.number(),
+  "deletedHotels": zod.number()
+})
+
+
+/**
+ * @summary List hotels
+ */
+export const ListHotelsQueryParams = zod.object({
+  "status": zod.coerce.string().optional(),
+  "search": zod.coerce.string().optional(),
+  "city": zod.coerce.string().optional(),
+  "page": zod.coerce.number().optional(),
+  "limit": zod.coerce.number().optional()
+})
+
+export const ListHotelsResponse = zod.object({
+  "hotels": zod.array(zod.object({
+  "id": zod.number(),
+  "ownerId": zod.number(),
+  "name": zod.string(),
+  "description": zod.string().nullish(),
+  "category": zod.enum(['budget', 'standard', 'premium', 'luxury']),
+  "address": zod.string().nullish(),
+  "city": zod.string().nullish(),
+  "state": zod.string().nullish(),
+  "pincode": zod.string().nullish(),
+  "googleMapLink": zod.string().nullish(),
+  "landmark": zod.string().nullish(),
+  "contactPerson": zod.string().nullish(),
+  "contactMobile": zod.string().nullish(),
+  "contactEmail": zod.string().nullish(),
+  "website": zod.string().nullish(),
+  "checkInTime": zod.string().nullish(),
+  "checkOutTime": zod.string().nullish(),
+  "totalRooms": zod.number().nullish(),
+  "policies": zod.string().nullish(),
+  "cancellationPolicy": zod.string().nullish(),
+  "amenities": zod.array(zod.string()).nullish(),
+  "coverImage": zod.string().nullish(),
+  "galleryImages": zod.array(zod.string()).nullish(),
+  "status": zod.enum(['draft', 'pending', 'approved', 'rejected', 'suspended']),
+  "rejectionReason": zod.string().nullish(),
+  "reviewedBy": zod.number().nullish(),
+  "approvedAt": zod.string().nullish(),
+  "deletedAt": zod.string().nullish(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})),
+  "total": zod.number(),
+  "page": zod.number(),
+  "limit": zod.number()
+})
+
+
+/**
+ * @summary Create a hotel
+ */
+export const CreateHotelBody = zod.object({
+  "name": zod.string(),
+  "description": zod.string().optional(),
+  "category": zod.enum(['budget', 'standard', 'premium', 'luxury']),
+  "address": zod.string().optional(),
+  "city": zod.string().optional(),
+  "state": zod.string().optional(),
+  "pincode": zod.string().optional(),
+  "googleMapLink": zod.string().optional(),
+  "landmark": zod.string().optional(),
+  "contactPerson": zod.string().optional(),
+  "contactMobile": zod.string().optional(),
+  "contactEmail": zod.string().optional(),
+  "website": zod.string().optional(),
+  "checkInTime": zod.string().optional(),
+  "checkOutTime": zod.string().optional(),
+  "totalRooms": zod.number().optional(),
+  "policies": zod.string().optional(),
+  "cancellationPolicy": zod.string().optional(),
+  "amenities": zod.array(zod.string()).optional(),
+  "coverImage": zod.string().optional(),
+  "galleryImages": zod.array(zod.string()).optional()
+})
+
+
+/**
+ * @summary Get hotel by ID
+ */
+export const GetHotelParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const GetHotelResponse = zod.object({
+  "id": zod.number(),
+  "ownerId": zod.number(),
+  "name": zod.string(),
+  "description": zod.string().nullish(),
+  "category": zod.enum(['budget', 'standard', 'premium', 'luxury']),
+  "address": zod.string().nullish(),
+  "city": zod.string().nullish(),
+  "state": zod.string().nullish(),
+  "pincode": zod.string().nullish(),
+  "googleMapLink": zod.string().nullish(),
+  "landmark": zod.string().nullish(),
+  "contactPerson": zod.string().nullish(),
+  "contactMobile": zod.string().nullish(),
+  "contactEmail": zod.string().nullish(),
+  "website": zod.string().nullish(),
+  "checkInTime": zod.string().nullish(),
+  "checkOutTime": zod.string().nullish(),
+  "totalRooms": zod.number().nullish(),
+  "policies": zod.string().nullish(),
+  "cancellationPolicy": zod.string().nullish(),
+  "amenities": zod.array(zod.string()).nullish(),
+  "coverImage": zod.string().nullish(),
+  "galleryImages": zod.array(zod.string()).nullish(),
+  "status": zod.enum(['draft', 'pending', 'approved', 'rejected', 'suspended']),
+  "rejectionReason": zod.string().nullish(),
+  "reviewedBy": zod.number().nullish(),
+  "approvedAt": zod.string().nullish(),
+  "deletedAt": zod.string().nullish(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+
+
+/**
+ * @summary Update a hotel
+ */
+export const UpdateHotelParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const UpdateHotelBody = zod.object({
+  "name": zod.string().optional(),
+  "description": zod.string().optional(),
+  "category": zod.enum(['budget', 'standard', 'premium', 'luxury']).optional(),
+  "address": zod.string().optional(),
+  "city": zod.string().optional(),
+  "state": zod.string().optional(),
+  "pincode": zod.string().optional(),
+  "googleMapLink": zod.string().optional(),
+  "landmark": zod.string().optional(),
+  "contactPerson": zod.string().optional(),
+  "contactMobile": zod.string().optional(),
+  "contactEmail": zod.string().optional(),
+  "website": zod.string().optional(),
+  "checkInTime": zod.string().optional(),
+  "checkOutTime": zod.string().optional(),
+  "totalRooms": zod.number().optional(),
+  "policies": zod.string().optional(),
+  "cancellationPolicy": zod.string().optional(),
+  "amenities": zod.array(zod.string()).optional(),
+  "coverImage": zod.string().optional(),
+  "galleryImages": zod.array(zod.string()).optional()
+})
+
+export const UpdateHotelResponse = zod.object({
+  "id": zod.number(),
+  "ownerId": zod.number(),
+  "name": zod.string(),
+  "description": zod.string().nullish(),
+  "category": zod.enum(['budget', 'standard', 'premium', 'luxury']),
+  "address": zod.string().nullish(),
+  "city": zod.string().nullish(),
+  "state": zod.string().nullish(),
+  "pincode": zod.string().nullish(),
+  "googleMapLink": zod.string().nullish(),
+  "landmark": zod.string().nullish(),
+  "contactPerson": zod.string().nullish(),
+  "contactMobile": zod.string().nullish(),
+  "contactEmail": zod.string().nullish(),
+  "website": zod.string().nullish(),
+  "checkInTime": zod.string().nullish(),
+  "checkOutTime": zod.string().nullish(),
+  "totalRooms": zod.number().nullish(),
+  "policies": zod.string().nullish(),
+  "cancellationPolicy": zod.string().nullish(),
+  "amenities": zod.array(zod.string()).nullish(),
+  "coverImage": zod.string().nullish(),
+  "galleryImages": zod.array(zod.string()).nullish(),
+  "status": zod.enum(['draft', 'pending', 'approved', 'rejected', 'suspended']),
+  "rejectionReason": zod.string().nullish(),
+  "reviewedBy": zod.number().nullish(),
+  "approvedAt": zod.string().nullish(),
+  "deletedAt": zod.string().nullish(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+
+
+/**
+ * @summary Soft delete a hotel
+ */
+export const DeleteHotelParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const DeleteHotelResponse = zod.object({
+  "message": zod.string()
+})
+
+
+/**
+ * @summary Submit hotel for approval
+ */
+export const SubmitHotelParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const SubmitHotelResponse = zod.object({
+  "id": zod.number(),
+  "ownerId": zod.number(),
+  "name": zod.string(),
+  "description": zod.string().nullish(),
+  "category": zod.enum(['budget', 'standard', 'premium', 'luxury']),
+  "address": zod.string().nullish(),
+  "city": zod.string().nullish(),
+  "state": zod.string().nullish(),
+  "pincode": zod.string().nullish(),
+  "googleMapLink": zod.string().nullish(),
+  "landmark": zod.string().nullish(),
+  "contactPerson": zod.string().nullish(),
+  "contactMobile": zod.string().nullish(),
+  "contactEmail": zod.string().nullish(),
+  "website": zod.string().nullish(),
+  "checkInTime": zod.string().nullish(),
+  "checkOutTime": zod.string().nullish(),
+  "totalRooms": zod.number().nullish(),
+  "policies": zod.string().nullish(),
+  "cancellationPolicy": zod.string().nullish(),
+  "amenities": zod.array(zod.string()).nullish(),
+  "coverImage": zod.string().nullish(),
+  "galleryImages": zod.array(zod.string()).nullish(),
+  "status": zod.enum(['draft', 'pending', 'approved', 'rejected', 'suspended']),
+  "rejectionReason": zod.string().nullish(),
+  "reviewedBy": zod.number().nullish(),
+  "approvedAt": zod.string().nullish(),
+  "deletedAt": zod.string().nullish(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+
+
+/**
+ * @summary Approve a hotel
+ */
+export const ApproveHotelParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const ApproveHotelResponse = zod.object({
+  "id": zod.number(),
+  "ownerId": zod.number(),
+  "name": zod.string(),
+  "description": zod.string().nullish(),
+  "category": zod.enum(['budget', 'standard', 'premium', 'luxury']),
+  "address": zod.string().nullish(),
+  "city": zod.string().nullish(),
+  "state": zod.string().nullish(),
+  "pincode": zod.string().nullish(),
+  "googleMapLink": zod.string().nullish(),
+  "landmark": zod.string().nullish(),
+  "contactPerson": zod.string().nullish(),
+  "contactMobile": zod.string().nullish(),
+  "contactEmail": zod.string().nullish(),
+  "website": zod.string().nullish(),
+  "checkInTime": zod.string().nullish(),
+  "checkOutTime": zod.string().nullish(),
+  "totalRooms": zod.number().nullish(),
+  "policies": zod.string().nullish(),
+  "cancellationPolicy": zod.string().nullish(),
+  "amenities": zod.array(zod.string()).nullish(),
+  "coverImage": zod.string().nullish(),
+  "galleryImages": zod.array(zod.string()).nullish(),
+  "status": zod.enum(['draft', 'pending', 'approved', 'rejected', 'suspended']),
+  "rejectionReason": zod.string().nullish(),
+  "reviewedBy": zod.number().nullish(),
+  "approvedAt": zod.string().nullish(),
+  "deletedAt": zod.string().nullish(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+
+
+/**
+ * @summary Reject a hotel
+ */
+export const RejectHotelParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const RejectHotelBody = zod.object({
+  "reason": zod.string()
+})
+
+export const RejectHotelResponse = zod.object({
+  "id": zod.number(),
+  "ownerId": zod.number(),
+  "name": zod.string(),
+  "description": zod.string().nullish(),
+  "category": zod.enum(['budget', 'standard', 'premium', 'luxury']),
+  "address": zod.string().nullish(),
+  "city": zod.string().nullish(),
+  "state": zod.string().nullish(),
+  "pincode": zod.string().nullish(),
+  "googleMapLink": zod.string().nullish(),
+  "landmark": zod.string().nullish(),
+  "contactPerson": zod.string().nullish(),
+  "contactMobile": zod.string().nullish(),
+  "contactEmail": zod.string().nullish(),
+  "website": zod.string().nullish(),
+  "checkInTime": zod.string().nullish(),
+  "checkOutTime": zod.string().nullish(),
+  "totalRooms": zod.number().nullish(),
+  "policies": zod.string().nullish(),
+  "cancellationPolicy": zod.string().nullish(),
+  "amenities": zod.array(zod.string()).nullish(),
+  "coverImage": zod.string().nullish(),
+  "galleryImages": zod.array(zod.string()).nullish(),
+  "status": zod.enum(['draft', 'pending', 'approved', 'rejected', 'suspended']),
+  "rejectionReason": zod.string().nullish(),
+  "reviewedBy": zod.number().nullish(),
+  "approvedAt": zod.string().nullish(),
+  "deletedAt": zod.string().nullish(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+
+
+/**
+ * @summary Suspend a hotel
+ */
+export const SuspendHotelParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const SuspendHotelResponse = zod.object({
+  "id": zod.number(),
+  "ownerId": zod.number(),
+  "name": zod.string(),
+  "description": zod.string().nullish(),
+  "category": zod.enum(['budget', 'standard', 'premium', 'luxury']),
+  "address": zod.string().nullish(),
+  "city": zod.string().nullish(),
+  "state": zod.string().nullish(),
+  "pincode": zod.string().nullish(),
+  "googleMapLink": zod.string().nullish(),
+  "landmark": zod.string().nullish(),
+  "contactPerson": zod.string().nullish(),
+  "contactMobile": zod.string().nullish(),
+  "contactEmail": zod.string().nullish(),
+  "website": zod.string().nullish(),
+  "checkInTime": zod.string().nullish(),
+  "checkOutTime": zod.string().nullish(),
+  "totalRooms": zod.number().nullish(),
+  "policies": zod.string().nullish(),
+  "cancellationPolicy": zod.string().nullish(),
+  "amenities": zod.array(zod.string()).nullish(),
+  "coverImage": zod.string().nullish(),
+  "galleryImages": zod.array(zod.string()).nullish(),
+  "status": zod.enum(['draft', 'pending', 'approved', 'rejected', 'suspended']),
+  "rejectionReason": zod.string().nullish(),
+  "reviewedBy": zod.number().nullish(),
+  "approvedAt": zod.string().nullish(),
+  "deletedAt": zod.string().nullish(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+
+
+/**
+ * @summary Restore a soft-deleted hotel (super_admin)
+ */
+export const RestoreHotelParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const RestoreHotelResponse = zod.object({
+  "id": zod.number(),
+  "ownerId": zod.number(),
+  "name": zod.string(),
+  "description": zod.string().nullish(),
+  "category": zod.enum(['budget', 'standard', 'premium', 'luxury']),
+  "address": zod.string().nullish(),
+  "city": zod.string().nullish(),
+  "state": zod.string().nullish(),
+  "pincode": zod.string().nullish(),
+  "googleMapLink": zod.string().nullish(),
+  "landmark": zod.string().nullish(),
+  "contactPerson": zod.string().nullish(),
+  "contactMobile": zod.string().nullish(),
+  "contactEmail": zod.string().nullish(),
+  "website": zod.string().nullish(),
+  "checkInTime": zod.string().nullish(),
+  "checkOutTime": zod.string().nullish(),
+  "totalRooms": zod.number().nullish(),
+  "policies": zod.string().nullish(),
+  "cancellationPolicy": zod.string().nullish(),
+  "amenities": zod.array(zod.string()).nullish(),
+  "coverImage": zod.string().nullish(),
+  "galleryImages": zod.array(zod.string()).nullish(),
+  "status": zod.enum(['draft', 'pending', 'approved', 'rejected', 'suspended']),
+  "rejectionReason": zod.string().nullish(),
+  "reviewedBy": zod.number().nullish(),
+  "approvedAt": zod.string().nullish(),
+  "deletedAt": zod.string().nullish(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+
+

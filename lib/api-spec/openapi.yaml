@@ -24,6 +24,8 @@ tags:
     description: Platform settings
   - name: dashboard
     description: Dashboard data
+  - name: hotels
+    description: Hotel management
 
 paths:
   /healthz:
@@ -808,6 +810,266 @@ paths:
               schema:
                 $ref: "#/components/schemas/MessageResponse"
 
+  /hotels/stats:
+    get:
+      operationId: getHotelStats
+      tags: [hotels]
+      summary: Get hotel owner dashboard stats
+      responses:
+        "200":
+          description: Stats
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HotelStats"
+
+  /hotels:
+    get:
+      operationId: listHotels
+      tags: [hotels]
+      summary: List hotels
+      parameters:
+        - in: query
+          name: status
+          schema:
+            type: string
+        - in: query
+          name: search
+          schema:
+            type: string
+        - in: query
+          name: city
+          schema:
+            type: string
+        - in: query
+          name: page
+          schema:
+            type: integer
+        - in: query
+          name: limit
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Hotels list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HotelsPage"
+    post:
+      operationId: createHotel
+      tags: [hotels]
+      summary: Create a hotel
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/HotelInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Hotel"
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /hotels/{id}:
+    get:
+      operationId: getHotel
+      tags: [hotels]
+      summary: Get hotel by ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Hotel
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Hotel"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    put:
+      operationId: updateHotel
+      tags: [hotels]
+      summary: Update a hotel
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/HotelUpdate"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Hotel"
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    delete:
+      operationId: deleteHotel
+      tags: [hotels]
+      summary: Soft delete a hotel
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /hotels/{id}/submit:
+    post:
+      operationId: submitHotel
+      tags: [hotels]
+      summary: Submit hotel for approval
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Submitted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Hotel"
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /hotels/{id}/approve:
+    post:
+      operationId: approveHotel
+      tags: [hotels]
+      summary: Approve a hotel
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Approved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Hotel"
+
+  /hotels/{id}/reject:
+    post:
+      operationId: rejectHotel
+      tags: [hotels]
+      summary: Reject a hotel
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/HotelRejectInput"
+      responses:
+        "200":
+          description: Rejected
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Hotel"
+
+  /hotels/{id}/suspend:
+    post:
+      operationId: suspendHotel
+      tags: [hotels]
+      summary: Suspend a hotel
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Suspended
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Hotel"
+
+  /hotels/{id}/restore:
+    post:
+      operationId: restoreHotel
+      tags: [hotels]
+      summary: Restore a soft-deleted hotel (super_admin)
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Restored
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Hotel"
+
 components:
   schemas:
     HealthStatus:
@@ -1348,3 +1610,239 @@ components:
       required:
         - title
         - message
+
+    Hotel:
+      type: object
+      properties:
+        id:
+          type: integer
+        ownerId:
+          type: integer
+        name:
+          type: string
+        description:
+          type: ["string", "null"]
+        category:
+          type: string
+          enum: [budget, standard, premium, luxury]
+        address:
+          type: ["string", "null"]
+        city:
+          type: ["string", "null"]
+        state:
+          type: ["string", "null"]
+        pincode:
+          type: ["string", "null"]
+        googleMapLink:
+          type: ["string", "null"]
+        landmark:
+          type: ["string", "null"]
+        contactPerson:
+          type: ["string", "null"]
+        contactMobile:
+          type: ["string", "null"]
+        contactEmail:
+          type: ["string", "null"]
+        website:
+          type: ["string", "null"]
+        checkInTime:
+          type: ["string", "null"]
+        checkOutTime:
+          type: ["string", "null"]
+        totalRooms:
+          type: ["integer", "null"]
+        policies:
+          type: ["string", "null"]
+        cancellationPolicy:
+          type: ["string", "null"]
+        amenities:
+          type: ["array", "null"]
+          items:
+            type: string
+        coverImage:
+          type: ["string", "null"]
+        galleryImages:
+          type: ["array", "null"]
+          items:
+            type: string
+        status:
+          type: string
+          enum: [draft, pending, approved, rejected, suspended]
+        rejectionReason:
+          type: ["string", "null"]
+        reviewedBy:
+          type: ["integer", "null"]
+        approvedAt:
+          type: ["string", "null"]
+        deletedAt:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+      required:
+        - id
+        - ownerId
+        - name
+        - category
+        - status
+        - createdAt
+        - updatedAt
+
+    HotelInput:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        category:
+          type: string
+          enum: [budget, standard, premium, luxury]
+        address:
+          type: string
+        city:
+          type: string
+        state:
+          type: string
+        pincode:
+          type: string
+        googleMapLink:
+          type: string
+        landmark:
+          type: string
+        contactPerson:
+          type: string
+        contactMobile:
+          type: string
+        contactEmail:
+          type: string
+        website:
+          type: string
+        checkInTime:
+          type: string
+        checkOutTime:
+          type: string
+        totalRooms:
+          type: integer
+        policies:
+          type: string
+        cancellationPolicy:
+          type: string
+        amenities:
+          type: array
+          items:
+            type: string
+        coverImage:
+          type: string
+        galleryImages:
+          type: array
+          items:
+            type: string
+      required:
+        - name
+        - category
+
+    HotelUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        category:
+          type: string
+          enum: [budget, standard, premium, luxury]
+        address:
+          type: string
+        city:
+          type: string
+        state:
+          type: string
+        pincode:
+          type: string
+        googleMapLink:
+          type: string
+        landmark:
+          type: string
+        contactPerson:
+          type: string
+        contactMobile:
+          type: string
+        contactEmail:
+          type: string
+        website:
+          type: string
+        checkInTime:
+          type: string
+        checkOutTime:
+          type: string
+        totalRooms:
+          type: integer
+        policies:
+          type: string
+        cancellationPolicy:
+          type: string
+        amenities:
+          type: array
+          items:
+            type: string
+        coverImage:
+          type: string
+        galleryImages:
+          type: array
+          items:
+            type: string
+
+    HotelsPage:
+      type: object
+      properties:
+        hotels:
+          type: array
+          items:
+            $ref: "#/components/schemas/Hotel"
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+      required:
+        - hotels
+        - total
+        - page
+        - limit
+
+    HotelRejectInput:
+      type: object
+      properties:
+        reason:
+          type: string
+      required:
+        - reason
+
+    HotelStats:
+      type: object
+      properties:
+        totalHotels:
+          type: integer
+        draftHotels:
+          type: integer
+        pendingHotels:
+          type: integer
+        approvedHotels:
+          type: integer
+        rejectedHotels:
+          type: integer
+        suspendedHotels:
+          type: integer
+        deletedHotels:
+          type: integer
+      required:
+        - totalHotels
+        - draftHotels
+        - pendingHotels
+        - approvedHotels
+        - rejectedHotels
+        - suspendedHotels
+        - deletedHotels

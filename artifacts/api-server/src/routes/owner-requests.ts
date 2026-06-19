@@ -52,7 +52,7 @@ router.get("/owner-requests", requireRole("admin", "super_admin"), async (req, r
 
 // Get single owner request — admin/super_admin
 router.get("/owner-requests/:id", requireRole("admin", "super_admin"), async (req, res): Promise<void> => {
-  const id = parseInt(req.params.id, 10);
+  const id = parseInt(req.params.id as string, 10);
   const [request] = await db.select().from(ownerRequestsTable).where(eq(ownerRequestsTable.id, id));
   if (!request) {
     res.status(404).json({ error: "Request not found" });
@@ -116,7 +116,7 @@ router.post("/owner-requests", requireAuth, async (req, res): Promise<void> => {
 // Update owner request while pending — customer (own request only)
 router.put("/owner-requests/:id", requireAuth, async (req, res): Promise<void> => {
   const currentUser = (req as any).currentUser;
-  const id = parseInt(req.params.id, 10);
+  const id = parseInt(req.params.id as string, 10);
 
   const [request] = await db.select().from(ownerRequestsTable).where(eq(ownerRequestsTable.id, id));
   if (!request) {
@@ -163,7 +163,7 @@ router.put("/owner-requests/:id", requireAuth, async (req, res): Promise<void> =
 // Cancel owner request while pending — customer
 router.delete("/owner-requests/:id", requireAuth, async (req, res): Promise<void> => {
   const currentUser = (req as any).currentUser;
-  const id = parseInt(req.params.id, 10);
+  const id = parseInt(req.params.id as string, 10);
 
   const [request] = await db.select().from(ownerRequestsTable).where(eq(ownerRequestsTable.id, id));
   if (!request) {
@@ -187,7 +187,7 @@ router.delete("/owner-requests/:id", requireAuth, async (req, res): Promise<void
 
 // Approve owner request — admin/super_admin
 router.post("/owner-requests/:id/approve", requireRole("admin", "super_admin"), async (req, res): Promise<void> => {
-  const id = parseInt(req.params.id, 10);
+  const id = parseInt(req.params.id as string, 10);
   const currentUser = (req as any).currentUser;
 
   const [request] = await db.select().from(ownerRequestsTable).where(eq(ownerRequestsTable.id, id));
@@ -223,7 +223,7 @@ router.post("/owner-requests/:id/approve", requireRole("admin", "super_admin"), 
 
 // Reject owner request — admin/super_admin
 router.post("/owner-requests/:id/reject", requireRole("admin", "super_admin"), async (req, res): Promise<void> => {
-  const id = parseInt(req.params.id, 10);
+  const id = parseInt(req.params.id as string, 10);
   const { reason } = req.body;
   const currentUser = (req as any).currentUser;
 
@@ -257,7 +257,7 @@ router.post("/owner-requests/:id/reject", requireRole("admin", "super_admin"), a
 
 // Restore rejected request back to pending — super_admin only
 router.post("/owner-requests/:id/restore", requireRole("super_admin"), async (req, res): Promise<void> => {
-  const id = parseInt(req.params.id, 10);
+  const id = parseInt(req.params.id as string, 10);
   const currentUser = (req as any).currentUser;
 
   const [request] = await db.select().from(ownerRequestsTable).where(eq(ownerRequestsTable.id, id));

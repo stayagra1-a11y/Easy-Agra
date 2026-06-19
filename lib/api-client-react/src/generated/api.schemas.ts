@@ -355,6 +355,172 @@ export interface AnnouncementInput {
   message: string;
 }
 
+export type HotelCategory = typeof HotelCategory[keyof typeof HotelCategory];
+
+
+export const HotelCategory = {
+  budget: 'budget',
+  standard: 'standard',
+  premium: 'premium',
+  luxury: 'luxury',
+} as const;
+
+export type HotelStatus = typeof HotelStatus[keyof typeof HotelStatus];
+
+
+export const HotelStatus = {
+  draft: 'draft',
+  pending: 'pending',
+  approved: 'approved',
+  rejected: 'rejected',
+  suspended: 'suspended',
+} as const;
+
+export interface Hotel {
+  id: number;
+  ownerId: number;
+  name: string;
+  /** @nullable */
+  description?: string | null;
+  category: HotelCategory;
+  /** @nullable */
+  address?: string | null;
+  /** @nullable */
+  city?: string | null;
+  /** @nullable */
+  state?: string | null;
+  /** @nullable */
+  pincode?: string | null;
+  /** @nullable */
+  googleMapLink?: string | null;
+  /** @nullable */
+  landmark?: string | null;
+  /** @nullable */
+  contactPerson?: string | null;
+  /** @nullable */
+  contactMobile?: string | null;
+  /** @nullable */
+  contactEmail?: string | null;
+  /** @nullable */
+  website?: string | null;
+  /** @nullable */
+  checkInTime?: string | null;
+  /** @nullable */
+  checkOutTime?: string | null;
+  /** @nullable */
+  totalRooms?: number | null;
+  /** @nullable */
+  policies?: string | null;
+  /** @nullable */
+  cancellationPolicy?: string | null;
+  /** @nullable */
+  amenities?: string[] | null;
+  /** @nullable */
+  coverImage?: string | null;
+  /** @nullable */
+  galleryImages?: string[] | null;
+  status: HotelStatus;
+  /** @nullable */
+  rejectionReason?: string | null;
+  /** @nullable */
+  reviewedBy?: number | null;
+  /** @nullable */
+  approvedAt?: string | null;
+  /** @nullable */
+  deletedAt?: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type HotelInputCategory = typeof HotelInputCategory[keyof typeof HotelInputCategory];
+
+
+export const HotelInputCategory = {
+  budget: 'budget',
+  standard: 'standard',
+  premium: 'premium',
+  luxury: 'luxury',
+} as const;
+
+export interface HotelInput {
+  name: string;
+  description?: string;
+  category: HotelInputCategory;
+  address?: string;
+  city?: string;
+  state?: string;
+  pincode?: string;
+  googleMapLink?: string;
+  landmark?: string;
+  contactPerson?: string;
+  contactMobile?: string;
+  contactEmail?: string;
+  website?: string;
+  checkInTime?: string;
+  checkOutTime?: string;
+  totalRooms?: number;
+  policies?: string;
+  cancellationPolicy?: string;
+  amenities?: string[];
+  coverImage?: string;
+  galleryImages?: string[];
+}
+
+export type HotelUpdateCategory = typeof HotelUpdateCategory[keyof typeof HotelUpdateCategory];
+
+
+export const HotelUpdateCategory = {
+  budget: 'budget',
+  standard: 'standard',
+  premium: 'premium',
+  luxury: 'luxury',
+} as const;
+
+export interface HotelUpdate {
+  name?: string;
+  description?: string;
+  category?: HotelUpdateCategory;
+  address?: string;
+  city?: string;
+  state?: string;
+  pincode?: string;
+  googleMapLink?: string;
+  landmark?: string;
+  contactPerson?: string;
+  contactMobile?: string;
+  contactEmail?: string;
+  website?: string;
+  checkInTime?: string;
+  checkOutTime?: string;
+  totalRooms?: number;
+  policies?: string;
+  cancellationPolicy?: string;
+  amenities?: string[];
+  coverImage?: string;
+  galleryImages?: string[];
+}
+
+export interface HotelsPage {
+  hotels: Hotel[];
+  total: number;
+  page: number;
+  limit: number;
+}
+
+export interface HotelRejectInput {
+  reason: string;
+}
+
+export interface HotelStats {
+  totalHotels: number;
+  draftHotels: number;
+  pendingHotels: number;
+  approvedHotels: number;
+  rejectedHotels: number;
+  suspendedHotels: number;
+  deletedHotels: number;
+}
+
 export type ListUsersParams = {
 role?: string;
 status?: string;
@@ -378,6 +544,14 @@ limit?: number;
 export type ListActivityLogsParams = {
 userId?: number;
 actionType?: string;
+page?: number;
+limit?: number;
+};
+
+export type ListHotelsParams = {
+status?: string;
+search?: string;
+city?: string;
 page?: number;
 limit?: number;
 };
