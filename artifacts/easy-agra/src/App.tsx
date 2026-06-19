@@ -39,6 +39,8 @@ import SuperAdminOwnerRequests from "@/pages/super-admin/owner-requests";
 import HotelOwnerDashboard from "@/pages/hotel-owner/dashboard";
 import HotelOwnerHotels from "@/pages/hotel-owner/hotels";
 import HotelForm from "@/pages/hotel-owner/hotel-form";
+import HotelOwnerRooms from "@/pages/hotel-owner/rooms";
+import RoomForm from "@/pages/hotel-owner/room-form";
 import RestaurantOwnerDashboard from "@/pages/restaurant-owner/dashboard";
 import SpaOwnerDashboard from "@/pages/spa-owner/dashboard";
 
@@ -123,6 +125,9 @@ function Router() {
       <Route path="/hotel-owner/hotels/new" component={() => <ProtectedRoute component={HotelForm} allowedRoles={["hotel_owner"]} />} />
       <Route path="/hotel-owner/hotels/:id/edit" component={() => <ProtectedRoute component={HotelForm} allowedRoles={["hotel_owner"]} />} />
       <Route path="/hotel-owner/hotels" component={() => <ProtectedRoute component={HotelOwnerHotels} allowedRoles={["hotel_owner"]} />} />
+      <Route path="/hotel-owner/rooms/new" component={() => <ProtectedRoute component={RoomForm} allowedRoles={["hotel_owner"]} />} />
+      <Route path="/hotel-owner/rooms/:id/edit" component={() => <ProtectedRoute component={RoomForm} allowedRoles={["hotel_owner"]} />} />
+      <Route path="/hotel-owner/rooms" component={() => <ProtectedRoute component={HotelOwnerRooms} allowedRoles={["hotel_owner"]} />} />
       <Route path="/restaurant-owner/dashboard" component={() => <ProtectedRoute component={RestaurantOwnerDashboard} allowedRoles={["restaurant_owner"]} />} />
       <Route path="/spa-owner/dashboard" component={() => <ProtectedRoute component={SpaOwnerDashboard} allowedRoles={["spa_owner"]} />} />
 

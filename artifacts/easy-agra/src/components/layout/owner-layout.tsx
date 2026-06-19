@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { LayoutDashboard, LogOut, Map, Bell, User, Building2 } from "lucide-react";
+import { LayoutDashboard, LogOut, Map, Bell, User, Building2, BedDouble } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { useLogout, getGetMeQueryKey, useGetUnreadNotificationCount } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
@@ -24,6 +24,7 @@ const bottomNav: NavItem[] = [
   { href: "/restaurant-owner/dashboard", icon: LayoutDashboard, label: "Dashboard", roles: ["restaurant_owner"] },
   { href: "/spa-owner/dashboard", icon: LayoutDashboard, label: "Dashboard", roles: ["spa_owner"] },
   { href: "/hotel-owner/hotels", icon: Building2, label: "Hotels", roles: ["hotel_owner"] },
+  { href: "/hotel-owner/rooms", icon: BedDouble, label: "Rooms", roles: ["hotel_owner"] },
   { href: "/notifications", icon: Bell, label: "Alerts" },
   { href: "/profile", icon: User, label: "Profile" },
 ];

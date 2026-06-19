@@ -1277,3 +1277,384 @@ export const RestoreHotelResponse = zod.object({
 })
 
 
+/**
+ * @summary Room statistics
+ */
+export const GetRoomStatsQueryParams = zod.object({
+  "hotelId": zod.coerce.number().optional()
+})
+
+export const GetRoomStatsResponse = zod.object({
+  "totalRooms": zod.number(),
+  "draftRooms": zod.number(),
+  "activeRooms": zod.number(),
+  "inactiveRooms": zod.number(),
+  "maintenanceRooms": zod.number(),
+  "deletedRooms": zod.number(),
+  "totalAvailable": zod.number()
+})
+
+
+/**
+ * @summary List rooms
+ */
+export const ListRoomsQueryParams = zod.object({
+  "hotelId": zod.coerce.number().optional(),
+  "status": zod.coerce.string().optional(),
+  "search": zod.coerce.string().optional(),
+  "page": zod.coerce.number().optional(),
+  "limit": zod.coerce.number().optional()
+})
+
+export const ListRoomsResponse = zod.object({
+  "rooms": zod.array(zod.object({
+  "id": zod.number(),
+  "hotelId": zod.number(),
+  "ownerId": zod.number(),
+  "name": zod.string(),
+  "roomNumber": zod.string().nullish(),
+  "roomType": zod.enum(['standard', 'deluxe', 'premium', 'family', 'executive', 'suite']),
+  "description": zod.string().nullish(),
+  "adultsCapacity": zod.number(),
+  "childrenCapacity": zod.number(),
+  "bedType": zod.enum(['single', 'double', 'queen', 'king']),
+  "roomSize": zod.number().nullish(),
+  "roomSizeUnit": zod.enum(['sqft', 'sqm']).nullish(),
+  "basePrice": zod.number(),
+  "weekendPrice": zod.number().nullish(),
+  "holidayPrice": zod.number().nullish(),
+  "discountPercentage": zod.number(),
+  "extraGuestCharge": zod.number().nullish(),
+  "finalPrice": zod.number().nullish(),
+  "amenities": zod.array(zod.string()).nullish(),
+  "coverImage": zod.string().nullish(),
+  "galleryImages": zod.array(zod.string()).nullish(),
+  "totalRooms": zod.number(),
+  "availableRooms": zod.number(),
+  "occupiedRooms": zod.number(),
+  "blockedRooms": zod.number(),
+  "underMaintenanceRooms": zod.number(),
+  "status": zod.enum(['draft', 'active', 'inactive', 'maintenance']),
+  "deletedAt": zod.string().nullish(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})),
+  "total": zod.number(),
+  "page": zod.number(),
+  "limit": zod.number()
+})
+
+
+/**
+ * @summary Create room
+ */
+export const CreateRoomBody = zod.object({
+  "hotelId": zod.number(),
+  "name": zod.string(),
+  "roomNumber": zod.string().optional(),
+  "roomType": zod.enum(['standard', 'deluxe', 'premium', 'family', 'executive', 'suite']),
+  "description": zod.string().optional(),
+  "adultsCapacity": zod.number().optional(),
+  "childrenCapacity": zod.number().optional(),
+  "bedType": zod.enum(['single', 'double', 'queen', 'king']),
+  "roomSize": zod.number().optional(),
+  "roomSizeUnit": zod.enum(['sqft', 'sqm']).optional(),
+  "basePrice": zod.number(),
+  "weekendPrice": zod.number().optional(),
+  "holidayPrice": zod.number().optional(),
+  "discountPercentage": zod.number().optional(),
+  "extraGuestCharge": zod.number().optional(),
+  "amenities": zod.array(zod.string()).optional(),
+  "coverImage": zod.string().optional(),
+  "galleryImages": zod.array(zod.string()).optional(),
+  "totalRooms": zod.number().optional(),
+  "availableRooms": zod.number().optional(),
+  "occupiedRooms": zod.number().optional(),
+  "blockedRooms": zod.number().optional(),
+  "underMaintenanceRooms": zod.number().optional()
+})
+
+
+/**
+ * @summary Get room
+ */
+export const GetRoomParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const GetRoomResponse = zod.object({
+  "id": zod.number(),
+  "hotelId": zod.number(),
+  "ownerId": zod.number(),
+  "name": zod.string(),
+  "roomNumber": zod.string().nullish(),
+  "roomType": zod.enum(['standard', 'deluxe', 'premium', 'family', 'executive', 'suite']),
+  "description": zod.string().nullish(),
+  "adultsCapacity": zod.number(),
+  "childrenCapacity": zod.number(),
+  "bedType": zod.enum(['single', 'double', 'queen', 'king']),
+  "roomSize": zod.number().nullish(),
+  "roomSizeUnit": zod.enum(['sqft', 'sqm']).nullish(),
+  "basePrice": zod.number(),
+  "weekendPrice": zod.number().nullish(),
+  "holidayPrice": zod.number().nullish(),
+  "discountPercentage": zod.number(),
+  "extraGuestCharge": zod.number().nullish(),
+  "finalPrice": zod.number().nullish(),
+  "amenities": zod.array(zod.string()).nullish(),
+  "coverImage": zod.string().nullish(),
+  "galleryImages": zod.array(zod.string()).nullish(),
+  "totalRooms": zod.number(),
+  "availableRooms": zod.number(),
+  "occupiedRooms": zod.number(),
+  "blockedRooms": zod.number(),
+  "underMaintenanceRooms": zod.number(),
+  "status": zod.enum(['draft', 'active', 'inactive', 'maintenance']),
+  "deletedAt": zod.string().nullish(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+
+
+/**
+ * @summary Update room
+ */
+export const UpdateRoomParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const UpdateRoomBody = zod.object({
+  "name": zod.string().optional(),
+  "roomNumber": zod.string().optional(),
+  "roomType": zod.enum(['standard', 'deluxe', 'premium', 'family', 'executive', 'suite']).optional(),
+  "description": zod.string().optional(),
+  "adultsCapacity": zod.number().optional(),
+  "childrenCapacity": zod.number().optional(),
+  "bedType": zod.enum(['single', 'double', 'queen', 'king']).optional(),
+  "roomSize": zod.number().optional(),
+  "roomSizeUnit": zod.enum(['sqft', 'sqm']).optional(),
+  "basePrice": zod.number().optional(),
+  "weekendPrice": zod.number().optional(),
+  "holidayPrice": zod.number().optional(),
+  "discountPercentage": zod.number().optional(),
+  "extraGuestCharge": zod.number().optional(),
+  "amenities": zod.array(zod.string()).optional(),
+  "coverImage": zod.string().optional(),
+  "galleryImages": zod.array(zod.string()).optional(),
+  "totalRooms": zod.number().optional(),
+  "availableRooms": zod.number().optional(),
+  "occupiedRooms": zod.number().optional(),
+  "blockedRooms": zod.number().optional(),
+  "underMaintenanceRooms": zod.number().optional()
+})
+
+export const UpdateRoomResponse = zod.object({
+  "id": zod.number(),
+  "hotelId": zod.number(),
+  "ownerId": zod.number(),
+  "name": zod.string(),
+  "roomNumber": zod.string().nullish(),
+  "roomType": zod.enum(['standard', 'deluxe', 'premium', 'family', 'executive', 'suite']),
+  "description": zod.string().nullish(),
+  "adultsCapacity": zod.number(),
+  "childrenCapacity": zod.number(),
+  "bedType": zod.enum(['single', 'double', 'queen', 'king']),
+  "roomSize": zod.number().nullish(),
+  "roomSizeUnit": zod.enum(['sqft', 'sqm']).nullish(),
+  "basePrice": zod.number(),
+  "weekendPrice": zod.number().nullish(),
+  "holidayPrice": zod.number().nullish(),
+  "discountPercentage": zod.number(),
+  "extraGuestCharge": zod.number().nullish(),
+  "finalPrice": zod.number().nullish(),
+  "amenities": zod.array(zod.string()).nullish(),
+  "coverImage": zod.string().nullish(),
+  "galleryImages": zod.array(zod.string()).nullish(),
+  "totalRooms": zod.number(),
+  "availableRooms": zod.number(),
+  "occupiedRooms": zod.number(),
+  "blockedRooms": zod.number(),
+  "underMaintenanceRooms": zod.number(),
+  "status": zod.enum(['draft', 'active', 'inactive', 'maintenance']),
+  "deletedAt": zod.string().nullish(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+
+
+/**
+ * @summary Soft delete room
+ */
+export const DeleteRoomParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const DeleteRoomResponse = zod.object({
+  "message": zod.string()
+})
+
+
+/**
+ * @summary Restore deleted room (super_admin)
+ */
+export const RestoreRoomParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const RestoreRoomResponse = zod.object({
+  "id": zod.number(),
+  "hotelId": zod.number(),
+  "ownerId": zod.number(),
+  "name": zod.string(),
+  "roomNumber": zod.string().nullish(),
+  "roomType": zod.enum(['standard', 'deluxe', 'premium', 'family', 'executive', 'suite']),
+  "description": zod.string().nullish(),
+  "adultsCapacity": zod.number(),
+  "childrenCapacity": zod.number(),
+  "bedType": zod.enum(['single', 'double', 'queen', 'king']),
+  "roomSize": zod.number().nullish(),
+  "roomSizeUnit": zod.enum(['sqft', 'sqm']).nullish(),
+  "basePrice": zod.number(),
+  "weekendPrice": zod.number().nullish(),
+  "holidayPrice": zod.number().nullish(),
+  "discountPercentage": zod.number(),
+  "extraGuestCharge": zod.number().nullish(),
+  "finalPrice": zod.number().nullish(),
+  "amenities": zod.array(zod.string()).nullish(),
+  "coverImage": zod.string().nullish(),
+  "galleryImages": zod.array(zod.string()).nullish(),
+  "totalRooms": zod.number(),
+  "availableRooms": zod.number(),
+  "occupiedRooms": zod.number(),
+  "blockedRooms": zod.number(),
+  "underMaintenanceRooms": zod.number(),
+  "status": zod.enum(['draft', 'active', 'inactive', 'maintenance']),
+  "deletedAt": zod.string().nullish(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+
+
+/**
+ * @summary Activate room
+ */
+export const ActivateRoomParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const ActivateRoomResponse = zod.object({
+  "id": zod.number(),
+  "hotelId": zod.number(),
+  "ownerId": zod.number(),
+  "name": zod.string(),
+  "roomNumber": zod.string().nullish(),
+  "roomType": zod.enum(['standard', 'deluxe', 'premium', 'family', 'executive', 'suite']),
+  "description": zod.string().nullish(),
+  "adultsCapacity": zod.number(),
+  "childrenCapacity": zod.number(),
+  "bedType": zod.enum(['single', 'double', 'queen', 'king']),
+  "roomSize": zod.number().nullish(),
+  "roomSizeUnit": zod.enum(['sqft', 'sqm']).nullish(),
+  "basePrice": zod.number(),
+  "weekendPrice": zod.number().nullish(),
+  "holidayPrice": zod.number().nullish(),
+  "discountPercentage": zod.number(),
+  "extraGuestCharge": zod.number().nullish(),
+  "finalPrice": zod.number().nullish(),
+  "amenities": zod.array(zod.string()).nullish(),
+  "coverImage": zod.string().nullish(),
+  "galleryImages": zod.array(zod.string()).nullish(),
+  "totalRooms": zod.number(),
+  "availableRooms": zod.number(),
+  "occupiedRooms": zod.number(),
+  "blockedRooms": zod.number(),
+  "underMaintenanceRooms": zod.number(),
+  "status": zod.enum(['draft', 'active', 'inactive', 'maintenance']),
+  "deletedAt": zod.string().nullish(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+
+
+/**
+ * @summary Deactivate room
+ */
+export const DeactivateRoomParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const DeactivateRoomResponse = zod.object({
+  "id": zod.number(),
+  "hotelId": zod.number(),
+  "ownerId": zod.number(),
+  "name": zod.string(),
+  "roomNumber": zod.string().nullish(),
+  "roomType": zod.enum(['standard', 'deluxe', 'premium', 'family', 'executive', 'suite']),
+  "description": zod.string().nullish(),
+  "adultsCapacity": zod.number(),
+  "childrenCapacity": zod.number(),
+  "bedType": zod.enum(['single', 'double', 'queen', 'king']),
+  "roomSize": zod.number().nullish(),
+  "roomSizeUnit": zod.enum(['sqft', 'sqm']).nullish(),
+  "basePrice": zod.number(),
+  "weekendPrice": zod.number().nullish(),
+  "holidayPrice": zod.number().nullish(),
+  "discountPercentage": zod.number(),
+  "extraGuestCharge": zod.number().nullish(),
+  "finalPrice": zod.number().nullish(),
+  "amenities": zod.array(zod.string()).nullish(),
+  "coverImage": zod.string().nullish(),
+  "galleryImages": zod.array(zod.string()).nullish(),
+  "totalRooms": zod.number(),
+  "availableRooms": zod.number(),
+  "occupiedRooms": zod.number(),
+  "blockedRooms": zod.number(),
+  "underMaintenanceRooms": zod.number(),
+  "status": zod.enum(['draft', 'active', 'inactive', 'maintenance']),
+  "deletedAt": zod.string().nullish(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+
+
+/**
+ * @summary Set room to maintenance status
+ */
+export const SetRoomMaintenanceParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const SetRoomMaintenanceResponse = zod.object({
+  "id": zod.number(),
+  "hotelId": zod.number(),
+  "ownerId": zod.number(),
+  "name": zod.string(),
+  "roomNumber": zod.string().nullish(),
+  "roomType": zod.enum(['standard', 'deluxe', 'premium', 'family', 'executive', 'suite']),
+  "description": zod.string().nullish(),
+  "adultsCapacity": zod.number(),
+  "childrenCapacity": zod.number(),
+  "bedType": zod.enum(['single', 'double', 'queen', 'king']),
+  "roomSize": zod.number().nullish(),
+  "roomSizeUnit": zod.enum(['sqft', 'sqm']).nullish(),
+  "basePrice": zod.number(),
+  "weekendPrice": zod.number().nullish(),
+  "holidayPrice": zod.number().nullish(),
+  "discountPercentage": zod.number(),
+  "extraGuestCharge": zod.number().nullish(),
+  "finalPrice": zod.number().nullish(),
+  "amenities": zod.array(zod.string()).nullish(),
+  "coverImage": zod.string().nullish(),
+  "galleryImages": zod.array(zod.string()).nullish(),
+  "totalRooms": zod.number(),
+  "availableRooms": zod.number(),
+  "occupiedRooms": zod.number(),
+  "blockedRooms": zod.number(),
+  "underMaintenanceRooms": zod.number(),
+  "status": zod.enum(['draft', 'active', 'inactive', 'maintenance']),
+  "deletedAt": zod.string().nullish(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+
+

@@ -1,2 +1,4 @@
 - [Easy Agra API types](easy-agra-api-types.md) — DashboardStats is flat (no .stats wrapper); OwnerRequestRejectInput uses `reason` not `rejectionReason`; logout/markAllNotificationsRead take void not {}
 - [Easy Agra useGetMyOwnerRequest](easy-agra-query-key.md) — queryKey is required when passing custom query options; use inline `queryKey: ["getMyOwnerRequest"]`
+- [Easy Agra enum casting](easy-agra-enum-casting.md) — Orval generates separate enum types per schema (RoomInputRoomType vs RoomUpdateRoomType); cast with `as unknown as RoomUpdateRoomType` when reusing payload across create/update
+- [Easy Agra route order](easy-agra-route-order.md) — Static segments MUST be registered before dynamic ones: /rooms/stats before /rooms/:id, /hotels/stats before /hotels/:id

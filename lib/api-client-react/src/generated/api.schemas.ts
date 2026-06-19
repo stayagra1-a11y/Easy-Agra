@@ -521,6 +521,207 @@ export interface HotelStats {
   deletedHotels: number;
 }
 
+export type RoomRoomType = typeof RoomRoomType[keyof typeof RoomRoomType];
+
+
+export const RoomRoomType = {
+  standard: 'standard',
+  deluxe: 'deluxe',
+  premium: 'premium',
+  family: 'family',
+  executive: 'executive',
+  suite: 'suite',
+} as const;
+
+export type RoomBedType = typeof RoomBedType[keyof typeof RoomBedType];
+
+
+export const RoomBedType = {
+  single: 'single',
+  double: 'double',
+  queen: 'queen',
+  king: 'king',
+} as const;
+
+export type RoomRoomSizeUnit = typeof RoomRoomSizeUnit[keyof typeof RoomRoomSizeUnit] | null;
+
+
+export const RoomRoomSizeUnit = {
+  sqft: 'sqft',
+  sqm: 'sqm',
+} as const;
+
+export type RoomStatus = typeof RoomStatus[keyof typeof RoomStatus];
+
+
+export const RoomStatus = {
+  draft: 'draft',
+  active: 'active',
+  inactive: 'inactive',
+  maintenance: 'maintenance',
+} as const;
+
+export interface Room {
+  id: number;
+  hotelId: number;
+  ownerId: number;
+  name: string;
+  roomNumber?: string | null;
+  roomType: RoomRoomType;
+  description?: string | null;
+  adultsCapacity: number;
+  childrenCapacity: number;
+  bedType: RoomBedType;
+  roomSize?: number | null;
+  roomSizeUnit?: RoomRoomSizeUnit;
+  basePrice: number;
+  weekendPrice?: number | null;
+  holidayPrice?: number | null;
+  discountPercentage: number;
+  extraGuestCharge?: number | null;
+  finalPrice?: number | null;
+  amenities?: string[] | null;
+  coverImage?: string | null;
+  galleryImages?: string[] | null;
+  totalRooms: number;
+  availableRooms: number;
+  occupiedRooms: number;
+  blockedRooms: number;
+  underMaintenanceRooms: number;
+  status: RoomStatus;
+  deletedAt?: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type RoomInputRoomType = typeof RoomInputRoomType[keyof typeof RoomInputRoomType];
+
+
+export const RoomInputRoomType = {
+  standard: 'standard',
+  deluxe: 'deluxe',
+  premium: 'premium',
+  family: 'family',
+  executive: 'executive',
+  suite: 'suite',
+} as const;
+
+export type RoomInputBedType = typeof RoomInputBedType[keyof typeof RoomInputBedType];
+
+
+export const RoomInputBedType = {
+  single: 'single',
+  double: 'double',
+  queen: 'queen',
+  king: 'king',
+} as const;
+
+export type RoomInputRoomSizeUnit = typeof RoomInputRoomSizeUnit[keyof typeof RoomInputRoomSizeUnit];
+
+
+export const RoomInputRoomSizeUnit = {
+  sqft: 'sqft',
+  sqm: 'sqm',
+} as const;
+
+export interface RoomInput {
+  hotelId: number;
+  name: string;
+  roomNumber?: string;
+  roomType: RoomInputRoomType;
+  description?: string;
+  adultsCapacity?: number;
+  childrenCapacity?: number;
+  bedType: RoomInputBedType;
+  roomSize?: number;
+  roomSizeUnit?: RoomInputRoomSizeUnit;
+  basePrice: number;
+  weekendPrice?: number;
+  holidayPrice?: number;
+  discountPercentage?: number;
+  extraGuestCharge?: number;
+  amenities?: string[];
+  coverImage?: string;
+  galleryImages?: string[];
+  totalRooms?: number;
+  availableRooms?: number;
+  occupiedRooms?: number;
+  blockedRooms?: number;
+  underMaintenanceRooms?: number;
+}
+
+export type RoomUpdateRoomType = typeof RoomUpdateRoomType[keyof typeof RoomUpdateRoomType];
+
+
+export const RoomUpdateRoomType = {
+  standard: 'standard',
+  deluxe: 'deluxe',
+  premium: 'premium',
+  family: 'family',
+  executive: 'executive',
+  suite: 'suite',
+} as const;
+
+export type RoomUpdateBedType = typeof RoomUpdateBedType[keyof typeof RoomUpdateBedType];
+
+
+export const RoomUpdateBedType = {
+  single: 'single',
+  double: 'double',
+  queen: 'queen',
+  king: 'king',
+} as const;
+
+export type RoomUpdateRoomSizeUnit = typeof RoomUpdateRoomSizeUnit[keyof typeof RoomUpdateRoomSizeUnit];
+
+
+export const RoomUpdateRoomSizeUnit = {
+  sqft: 'sqft',
+  sqm: 'sqm',
+} as const;
+
+export interface RoomUpdate {
+  name?: string;
+  roomNumber?: string;
+  roomType?: RoomUpdateRoomType;
+  description?: string;
+  adultsCapacity?: number;
+  childrenCapacity?: number;
+  bedType?: RoomUpdateBedType;
+  roomSize?: number;
+  roomSizeUnit?: RoomUpdateRoomSizeUnit;
+  basePrice?: number;
+  weekendPrice?: number;
+  holidayPrice?: number;
+  discountPercentage?: number;
+  extraGuestCharge?: number;
+  amenities?: string[];
+  coverImage?: string;
+  galleryImages?: string[];
+  totalRooms?: number;
+  availableRooms?: number;
+  occupiedRooms?: number;
+  blockedRooms?: number;
+  underMaintenanceRooms?: number;
+}
+
+export interface RoomsPage {
+  rooms: Room[];
+  total: number;
+  page: number;
+  limit: number;
+}
+
+export interface RoomStats {
+  totalRooms: number;
+  draftRooms: number;
+  activeRooms: number;
+  inactiveRooms: number;
+  maintenanceRooms: number;
+  deletedRooms: number;
+  totalAvailable: number;
+}
+
 export type ListUsersParams = {
 role?: string;
 status?: string;
@@ -552,6 +753,18 @@ export type ListHotelsParams = {
 status?: string;
 search?: string;
 city?: string;
+page?: number;
+limit?: number;
+};
+
+export type GetRoomStatsParams = {
+hotelId?: number;
+};
+
+export type ListRoomsParams = {
+hotelId?: number;
+status?: string;
+search?: string;
 page?: number;
 limit?: number;
 };

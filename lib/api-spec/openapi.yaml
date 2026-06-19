@@ -26,6 +26,8 @@ tags:
     description: Dashboard data
   - name: hotels
     description: Hotel management
+  - name: rooms
+    description: Room management
 
 paths:
   /healthz:
@@ -1070,6 +1072,230 @@ paths:
               schema:
                 $ref: "#/components/schemas/Hotel"
 
+  /rooms/stats:
+    get:
+      operationId: getRoomStats
+      tags: [rooms]
+      summary: Room statistics
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: hotelId
+          in: query
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Stats
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RoomStats"
+
+  /rooms:
+    get:
+      operationId: listRooms
+      tags: [rooms]
+      summary: List rooms
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: hotelId
+          in: query
+          schema:
+            type: integer
+        - name: status
+          in: query
+          schema:
+            type: string
+        - name: search
+          in: query
+          schema:
+            type: string
+        - name: page
+          in: query
+          schema:
+            type: integer
+        - name: limit
+          in: query
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Rooms list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RoomsPage"
+    post:
+      operationId: createRoom
+      tags: [rooms]
+      summary: Create room
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RoomInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Room"
+
+  /rooms/{id}:
+    get:
+      operationId: getRoom
+      tags: [rooms]
+      summary: Get room
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Room
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Room"
+    put:
+      operationId: updateRoom
+      tags: [rooms]
+      summary: Update room
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RoomUpdate"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Room"
+    delete:
+      operationId: deleteRoom
+      tags: [rooms]
+      summary: Soft delete room
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+
+  /rooms/{id}/restore:
+    post:
+      operationId: restoreRoom
+      tags: [rooms]
+      summary: Restore deleted room (super_admin)
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Restored
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Room"
+
+  /rooms/{id}/activate:
+    post:
+      operationId: activateRoom
+      tags: [rooms]
+      summary: Activate room
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Activated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Room"
+
+  /rooms/{id}/deactivate:
+    post:
+      operationId: deactivateRoom
+      tags: [rooms]
+      summary: Deactivate room
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Deactivated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Room"
+
+  /rooms/{id}/maintenance:
+    post:
+      operationId: setRoomMaintenance
+      tags: [rooms]
+      summary: Set room to maintenance status
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Set to maintenance
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Room"
+
 components:
   schemas:
     HealthStatus:
@@ -1846,3 +2072,269 @@ components:
         - rejectedHotels
         - suspendedHotels
         - deletedHotels
+
+    Room:
+      type: object
+      properties:
+        id:
+          type: integer
+        hotelId:
+          type: integer
+        ownerId:
+          type: integer
+        name:
+          type: string
+        roomNumber:
+          type: string
+          nullable: true
+        roomType:
+          type: string
+          enum: [standard, deluxe, premium, family, executive, suite]
+        description:
+          type: string
+          nullable: true
+        adultsCapacity:
+          type: integer
+        childrenCapacity:
+          type: integer
+        bedType:
+          type: string
+          enum: [single, double, queen, king]
+        roomSize:
+          type: number
+          nullable: true
+        roomSizeUnit:
+          type: string
+          enum: [sqft, sqm]
+          nullable: true
+        basePrice:
+          type: number
+        weekendPrice:
+          type: number
+          nullable: true
+        holidayPrice:
+          type: number
+          nullable: true
+        discountPercentage:
+          type: number
+        extraGuestCharge:
+          type: number
+          nullable: true
+        finalPrice:
+          type: number
+          nullable: true
+        amenities:
+          type: array
+          items:
+            type: string
+          nullable: true
+        coverImage:
+          type: string
+          nullable: true
+        galleryImages:
+          type: array
+          items:
+            type: string
+          nullable: true
+        totalRooms:
+          type: integer
+        availableRooms:
+          type: integer
+        occupiedRooms:
+          type: integer
+        blockedRooms:
+          type: integer
+        underMaintenanceRooms:
+          type: integer
+        status:
+          type: string
+          enum: [draft, active, inactive, maintenance]
+        deletedAt:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+      required:
+        - id
+        - hotelId
+        - ownerId
+        - name
+        - roomType
+        - adultsCapacity
+        - childrenCapacity
+        - bedType
+        - basePrice
+        - discountPercentage
+        - totalRooms
+        - availableRooms
+        - occupiedRooms
+        - blockedRooms
+        - underMaintenanceRooms
+        - status
+        - createdAt
+        - updatedAt
+
+    RoomInput:
+      type: object
+      properties:
+        hotelId:
+          type: integer
+        name:
+          type: string
+        roomNumber:
+          type: string
+        roomType:
+          type: string
+          enum: [standard, deluxe, premium, family, executive, suite]
+        description:
+          type: string
+        adultsCapacity:
+          type: integer
+        childrenCapacity:
+          type: integer
+        bedType:
+          type: string
+          enum: [single, double, queen, king]
+        roomSize:
+          type: number
+        roomSizeUnit:
+          type: string
+          enum: [sqft, sqm]
+        basePrice:
+          type: number
+        weekendPrice:
+          type: number
+        holidayPrice:
+          type: number
+        discountPercentage:
+          type: number
+        extraGuestCharge:
+          type: number
+        amenities:
+          type: array
+          items:
+            type: string
+        coverImage:
+          type: string
+        galleryImages:
+          type: array
+          items:
+            type: string
+        totalRooms:
+          type: integer
+        availableRooms:
+          type: integer
+        occupiedRooms:
+          type: integer
+        blockedRooms:
+          type: integer
+        underMaintenanceRooms:
+          type: integer
+      required:
+        - hotelId
+        - name
+        - roomType
+        - bedType
+        - basePrice
+
+    RoomUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+        roomNumber:
+          type: string
+        roomType:
+          type: string
+          enum: [standard, deluxe, premium, family, executive, suite]
+        description:
+          type: string
+        adultsCapacity:
+          type: integer
+        childrenCapacity:
+          type: integer
+        bedType:
+          type: string
+          enum: [single, double, queen, king]
+        roomSize:
+          type: number
+        roomSizeUnit:
+          type: string
+          enum: [sqft, sqm]
+        basePrice:
+          type: number
+        weekendPrice:
+          type: number
+        holidayPrice:
+          type: number
+        discountPercentage:
+          type: number
+        extraGuestCharge:
+          type: number
+        amenities:
+          type: array
+          items:
+            type: string
+        coverImage:
+          type: string
+        galleryImages:
+          type: array
+          items:
+            type: string
+        totalRooms:
+          type: integer
+        availableRooms:
+          type: integer
+        occupiedRooms:
+          type: integer
+        blockedRooms:
+          type: integer
+        underMaintenanceRooms:
+          type: integer
+
+    RoomsPage:
+      type: object
+      properties:
+        rooms:
+          type: array
+          items:
+            $ref: "#/components/schemas/Room"
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+      required:
+        - rooms
+        - total
+        - page
+        - limit
+
+    RoomStats:
+      type: object
+      properties:
+        totalRooms:
+          type: integer
+        draftRooms:
+          type: integer
+        activeRooms:
+          type: integer
+        inactiveRooms:
+          type: integer
+        maintenanceRooms:
+          type: integer
+        deletedRooms:
+          type: integer
+        totalAvailable:
+          type: integer
+      required:
+        - totalRooms
+        - draftRooms
+        - activeRooms
+        - inactiveRooms
+        - maintenanceRooms
+        - deletedRooms
+        - totalAvailable
