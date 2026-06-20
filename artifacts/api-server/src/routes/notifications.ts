@@ -75,6 +75,21 @@ router.post("/notifications/:id/read", requireAuth, async (req, res): Promise<vo
   res.json({ ...updated, createdAt: updated.createdAt.toISOString() });
 });
 
+// Delete a notification
+router.delete("/notifications/:id", requireAuth, async (req, res): Promise<void> => {
+  const raw = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+  const id = parseInt(raw, 10);
+  const currentUser = (req as any).currentUser;
+
+  const [deleted] = await db
+    .delete(notificationsTable)
+    .where(and(eq(notificationsTable.id, id), eq(notificationsTable.userId, currentUser.id)))
+    .returning();
+
+  if (!deleted) { res.status(404).json({ error: "Notification not found" }); return; }
+  res.json({ message: "Notification deleted" });
+});
+
 // Send announcement — super_admin only
 router.post("/announcements", requireRole("super_admin"), async (req, res): Promise<void> => {
   const { title, message } = req.body;

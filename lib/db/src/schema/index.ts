@@ -17,3 +17,4 @@ export * from "./support_tickets";
 export * from "./cancellations";
 export * from "./trip_recommendations";
 export * from "./coupons";
+export * from "./push_subscriptions";

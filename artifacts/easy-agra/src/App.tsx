@@ -6,6 +6,8 @@ import { AuthProvider } from "@/providers/auth-provider";
 import { useAuth } from "@/hooks/use-auth";
 import NotFound from "@/pages/not-found";
 import { Loader2 } from "lucide-react";
+import { OfflineBanner } from "@/components/offline-banner";
+import { PwaInstallBanner } from "@/components/pwa-install-banner";
 
 // Auth
 import Login from "@/pages/auth/login";
@@ -323,9 +325,11 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
+        <OfflineBanner />
         <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
           <AuthProvider>
             <Router />
+            <PwaInstallBanner />
           </AuthProvider>
         </WouterRouter>
         <Toaster />

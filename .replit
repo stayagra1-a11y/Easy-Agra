@@ -33,3 +33,10 @@ externalPort = 3000
 
 [nix]
 channel = "stable-25_05"
+
+[userenv]
+
+[userenv.shared]
+VAPID_PUBLIC_KEY = "BKakbZ513JKm_vCDWLyF5iIyl8lTVKbP8vJ1yv0PRO7SQm7VhyxynR-GcAWhFGJnodT_o0rRyY3H9c2dnITcaw8"
+VAPID_PRIVATE_KEY = "sWtdZVhCE_3nG7wzeqvn50M-wBs0OT1IYRVVUUuga4A"
+VAPID_SUBJECT = "mailto:admin@easyagra.in"
