@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { Home, Bell, User, Settings, LogOut, Map, CalendarDays, Star, Utensils, Sparkles, Landmark, IndianRupee, LifeBuoy, ReceiptText, Menu, Building2, ChevronRight, X } from "lucide-react";
+import { Home, Bell, User, Settings, LogOut, Map, CalendarDays, Star, Utensils, Sparkles, Landmark, IndianRupee, LifeBuoy, ReceiptText, Menu, Building2, ChevronRight, X, ShieldCheck, FileText, Phone } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { useGetUnreadNotificationCount, useLogout, getGetMeQueryKey } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
@@ -46,6 +46,12 @@ export function CustomerLayout({ children }: { children: React.ReactNode }) {
     { href: "/support/tickets", icon: LifeBuoy, label: "Help & Support" },
     { href: "/settings", icon: Settings, label: "Settings" },
     { href: "/become-owner", icon: Building2, label: "List Your Business", highlight: true },
+  ];
+
+  const infoLinks = [
+    { href: "/support/tickets", icon: Phone, label: "Contact Us" },
+    { href: "/privacy", icon: ShieldCheck, label: "Privacy Policy" },
+    { href: "/terms", icon: FileText, label: "Terms of Use" },
   ];
 
   return (
@@ -127,6 +133,22 @@ export function CustomerLayout({ children }: { children: React.ReactNode }) {
                 <ChevronRight className="h-4 w-4 text-muted-foreground" />
               </Link>
             ))}
+
+            {/* Info links section */}
+            <div className="mt-2 pt-2 border-t border-border mx-3">
+              <p className="text-xs text-muted-foreground uppercase font-semibold px-2 py-2 tracking-wide">Information</p>
+              {infoLinks.map(({ href, icon: Icon, label }: any) => (
+                <Link
+                  key={href}
+                  href={href}
+                  onClick={() => setMenuOpen(false)}
+                  className="flex items-center gap-3 px-2 py-3 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors"
+                >
+                  <Icon className="h-4 w-4" />
+                  <span className="text-sm">{label}</span>
+                </Link>
+              ))}
+            </div>
           </nav>
 
           {/* Logout */}

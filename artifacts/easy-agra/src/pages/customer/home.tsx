@@ -188,15 +188,6 @@ export default function CustomerHome() {
           </div>
         )}
 
-        {/* Support links */}
-        <div className="border-t border-border pt-4">
-          <div className="flex justify-center gap-6 text-xs text-muted-foreground">
-            <Link href="/help" className="hover:text-primary">Help Center</Link>
-            <Link href="/contact" className="hover:text-primary">Contact Us</Link>
-            <Link href="/privacy" className="hover:text-primary">Privacy</Link>
-            <Link href="/terms" className="hover:text-primary">Terms</Link>
-          </div>
-        </div>
       </div>
     </CustomerLayout>
   );
