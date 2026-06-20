@@ -72,6 +72,7 @@ import AdminSpas from "@/pages/admin/admin-spas";
 // Customer - spas
 import CustomerSpas from "@/pages/customer/spas";
 import CustomerHotels from "@/pages/customer/hotels";
+import HotelDetail from "@/pages/customer/hotel-detail";
 import SpaDetail from "@/pages/customer/spa-detail";
 import BookSpa from "@/pages/customer/book-spa";
 import MySpaAppointments from "@/pages/customer/my-spa-appointments";
@@ -223,6 +224,7 @@ function Router() {
       <Route path="/customer/write-review/:bookingId" component={() => <ProtectedRoute component={WriteReview} allowedRoles={["customer"]} />} />
       <Route path="/customer/reviews" component={() => <ProtectedRoute component={MyReviews} allowedRoles={["customer"]} />} />
       <Route path="/hotels" component={() => <ProtectedRoute component={CustomerHotels} allowedRoles={["customer"]} />} />
+      <Route path="/hotels/:id" component={() => <ProtectedRoute component={HotelDetail} allowedRoles={["customer"]} />} />
       <Route path="/restaurants" component={() => <ProtectedRoute component={CustomerRestaurants} allowedRoles={["customer"]} />} />
       <Route path="/restaurants/:id" component={() => <ProtectedRoute component={RestaurantDetail} allowedRoles={["customer"]} />} />
       <Route path="/reservations/new" component={() => <ProtectedRoute component={MakeReservation} allowedRoles={["customer"]} />} />

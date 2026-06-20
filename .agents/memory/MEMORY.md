@@ -2,3 +2,4 @@
 - [Tourist Places system](tourist-places.md) — route order, numeric serialization, and seeding patterns for the tourist places module
 - [Orval duplicate export fix](orval-duplicate-export.md) — inline requestBody in OpenAPI causes duplicate type exports; always use named $ref schemas
 - [apiRequest typing](api-request-typing.md) — frontend api-request.ts accepts unknown body; extended to support object body auto-serialization
+- [Auth system](auth-system.md) — email verification + Google OAuth architecture, env vars, and graceful fallback behavior
