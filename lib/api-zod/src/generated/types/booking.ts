@@ -19,6 +19,8 @@ export interface Booking {
   nights: number;
   adultsCount: number;
   childrenCount: number;
+  earlyCheckIn?: boolean;
+  earlyCheckInAmount?: number;
   baseAmount: number;
   discountAmount: number;
   taxAmount: number;

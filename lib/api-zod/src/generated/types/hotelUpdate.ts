@@ -29,4 +29,7 @@ export interface HotelUpdate {
   amenities?: string[];
   coverImage?: string;
   galleryImages?: string[];
+  earlyCheckInEnabled?: boolean;
+  earlyCheckInTime?: string;
+  earlyCheckInPrice?: number;
 }

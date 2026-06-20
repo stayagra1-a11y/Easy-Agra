@@ -36,6 +36,7 @@ function parseNum(v: string | null | undefined): number {
 function serializeBooking(b: BookingRow) {
   return {
     ...b,
+    earlyCheckInAmount: parseNum(b.earlyCheckInAmount as any),
     baseAmount: parseNum(b.baseAmount as any),
     discountAmount: parseNum(b.discountAmount as any),
     taxAmount: parseNum(b.taxAmount as any),
@@ -325,6 +326,7 @@ router.post(
       adultsCount,
       childrenCount,
       customerNotes,
+      earlyCheckIn,
     } = req.body;
 
     if (!hotelId || !roomId || !checkInDate || !checkOutDate) {
@@ -360,8 +362,15 @@ router.post(
     const baseAmount = pricePerNight * nights;
     const discountAmount = 0;
     const taxRate = 18;
+
+    // Early check-in
+    const wantsEarlyCheckIn = Boolean(earlyCheckIn) && hotel.earlyCheckInEnabled;
+    const earlyCheckInAmount = wantsEarlyCheckIn && hotel.earlyCheckInPrice
+      ? parseFloat(String(hotel.earlyCheckInPrice))
+      : 0;
+
     const taxAmount = (baseAmount - discountAmount) * (taxRate / 100);
-    const finalAmount = baseAmount - discountAmount + taxAmount;
+    const finalAmount = baseAmount - discountAmount + taxAmount + earlyCheckInAmount;
 
     // Generate temp booking ref, will update after insert
     const tempRef = `EAB-TEMP-${Date.now()}`;
@@ -379,6 +388,8 @@ router.post(
         nights,
         adultsCount: adultsCount ? parseInt(String(adultsCount), 10) : 1,
         childrenCount: childrenCount ? parseInt(String(childrenCount), 10) : 0,
+        earlyCheckIn: wantsEarlyCheckIn,
+        earlyCheckInAmount: String(earlyCheckInAmount.toFixed(2)),
         baseAmount: String(baseAmount.toFixed(2)),
         discountAmount: "0",
         taxAmount: String(taxAmount.toFixed(2)),

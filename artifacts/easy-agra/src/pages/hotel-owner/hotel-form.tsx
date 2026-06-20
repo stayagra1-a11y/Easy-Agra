@@ -10,7 +10,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, Building2, MapPin, Phone, Info, Wifi, Image, Save, Send, Loader2, IndianRupee } from "lucide-react";
+import { ArrowLeft, Building2, MapPin, Phone, Info, Wifi, Image, Save, Send, Loader2, IndianRupee, Clock } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
 import { UpiSettingsCard } from "@/components/upi-settings-card";
 import { uploadToCloudinary } from "@/lib/cloudinary";
 import { Link, useLocation, useParams } from "wouter";
@@ -136,6 +137,9 @@ type FormData = {
   amenities: string[];
   coverImage: string;
   galleryImages: string[];
+  earlyCheckInEnabled: boolean;
+  earlyCheckInTime: string;
+  earlyCheckInPrice: string;
 };
 
 const EMPTY_FORM: FormData = {
@@ -145,6 +149,7 @@ const EMPTY_FORM: FormData = {
   checkInTime: "14:00", checkOutTime: "11:00",
   totalRooms: "", policies: "", cancellationPolicy: "",
   amenities: [], coverImage: "", galleryImages: [],
+  earlyCheckInEnabled: false, earlyCheckInTime: "", earlyCheckInPrice: "",
 };
 
 export default function HotelForm() {
@@ -186,6 +191,9 @@ export default function HotelForm() {
         amenities: existingHotel.amenities || [],
         coverImage: existingHotel.coverImage || "",
         galleryImages: existingHotel.galleryImages || [],
+        earlyCheckInEnabled: (existingHotel as any).earlyCheckInEnabled ?? false,
+        earlyCheckInTime: (existingHotel as any).earlyCheckInTime || "",
+        earlyCheckInPrice: (existingHotel as any).earlyCheckInPrice?.toString() || "",
       });
     }
   }, [existingHotel, isEdit]);
@@ -216,7 +224,10 @@ export default function HotelForm() {
     amenities: form.amenities,
     coverImage: form.coverImage || undefined,
     galleryImages: form.galleryImages,
-  });
+    earlyCheckInEnabled: form.earlyCheckInEnabled,
+    earlyCheckInTime: form.earlyCheckInTime || undefined,
+    earlyCheckInPrice: form.earlyCheckInPrice ? parseFloat(form.earlyCheckInPrice) : undefined,
+  } as any);
 
   const createMutation = useCreateHotel({
     mutation: {
@@ -363,6 +374,43 @@ export default function HotelForm() {
                   <Label className="text-xs">Cancellation Policy</Label>
                   <Textarea placeholder="Free cancellation up to 24 hours before check-in..." value={form.cancellationPolicy} onChange={setField("cancellationPolicy")} rows={3} />
                 </div>
+              </CardContent>
+            </Card>
+
+            {/* Early Check-in */}
+            <Card>
+              <CardHeader className="pb-2 pt-4 px-4">
+                <CardTitle className="text-sm font-semibold flex items-center gap-2">
+                  <Clock className="h-4 w-4 text-primary" /> Early Check-in (Optional)
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="px-4 pb-4 space-y-3">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium">Allow Early Check-in</p>
+                    <p className="text-xs text-muted-foreground">Guests can request early check-in for extra charge</p>
+                  </div>
+                  <Switch
+                    checked={form.earlyCheckInEnabled}
+                    onCheckedChange={(v) => setForm((f) => ({ ...f, earlyCheckInEnabled: v }))}
+                  />
+                </div>
+                {form.earlyCheckInEnabled && (
+                  <>
+                    <div className="space-y-1">
+                      <Label className="text-xs">Early Check-in Time</Label>
+                      <Input type="time" value={form.earlyCheckInTime} onChange={setField("earlyCheckInTime")} placeholder="e.g. 08:00" />
+                    </div>
+                    <div className="space-y-1">
+                      <Label className="text-xs">Early Check-in Charge (₹)</Label>
+                      <div className="relative">
+                        <IndianRupee className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                        <Input type="number" className="pl-8" placeholder="e.g. 500" min={0} value={form.earlyCheckInPrice} onChange={setField("earlyCheckInPrice")} />
+                      </div>
+                      <p className="text-xs text-muted-foreground">One-time charge added to booking total</p>
+                    </div>
+                  </>
+                )}
               </CardContent>
             </Card>
           </TabsContent>

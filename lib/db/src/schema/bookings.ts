@@ -6,6 +6,7 @@ import {
   integer,
   pgEnum,
   numeric,
+  boolean,
 } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod/v4";
@@ -44,6 +45,9 @@ export const bookingsTable = pgTable("bookings", {
   nights: integer("nights").notNull(),
   adultsCount: integer("adults_count").notNull().default(1),
   childrenCount: integer("children_count").notNull().default(0),
+
+  earlyCheckIn: boolean("early_check_in").notNull().default(false),
+  earlyCheckInAmount: numeric("early_check_in_amount", { precision: 10, scale: 2 }).notNull().default("0"),
 
   baseAmount: numeric("base_amount", { precision: 12, scale: 2 }).notNull(),
   discountAmount: numeric("discount_amount", { precision: 12, scale: 2 })

@@ -52,6 +52,12 @@ export interface Hotel {
   /** @nullable */
   galleryImages?: string[] | null;
   /** @nullable */
+  earlyCheckInEnabled?: boolean | null;
+  /** @nullable */
+  earlyCheckInTime?: string | null;
+  /** @nullable */
+  earlyCheckInPrice?: number | null;
+  /** @nullable */
   upiId?: string | null;
   /** @nullable */
   upiQrImage?: string | null;

@@ -114,10 +114,10 @@ function Gallery({ images, name }: { images: string[]; name: string }) {
 
 // ── Booking Modal ─────────────────────────────────────────────────────────────
 function BookingModal({
-  room, hotelId, hotelName, onClose, onSuccess,
+  room, hotelId, hotelName, hotel, onClose, onSuccess,
 }: {
   room: Room; hotelId: number; hotelName: string;
-  onClose: () => void; onSuccess: (ref: string) => void;
+  hotel: any; onClose: () => void; onSuccess: (ref: string) => void;
 }) {
   const { toast } = useToast();
   const today = new Date().toISOString().split("T")[0];
@@ -127,14 +127,21 @@ function BookingModal({
   const [adults, setAdults] = useState(1);
   const [children, setChildren] = useState(0);
   const [notes, setNotes] = useState("");
+  const [earlyCheckIn, setEarlyCheckIn] = useState(false);
+
+  const hotelEarlyEnabled = Boolean(hotel?.earlyCheckInEnabled);
+  const earlyPrice = hotelEarlyEnabled && hotel?.earlyCheckInPrice
+    ? parseFloat(String(hotel.earlyCheckInPrice))
+    : 0;
 
   const nights = Math.max(0, Math.ceil(
     (new Date(checkOut).getTime() - new Date(checkIn).getTime()) / 86400000
   ));
   const pricePerNight = room.finalPrice ?? room.basePrice;
   const baseAmt = pricePerNight * nights;
+  const earlyAmt = earlyCheckIn && hotelEarlyEnabled ? earlyPrice : 0;
   const tax = baseAmt * 0.18;
-  const total = baseAmt + tax;
+  const total = baseAmt + tax + earlyAmt;
 
   const mutation = useMutation({
     mutationFn: () => apiRequest("/api/bookings", {
@@ -142,6 +149,7 @@ function BookingModal({
       body: JSON.stringify({
         hotelId, roomId: room.id, checkInDate: checkIn, checkOutDate: checkOut,
         adultsCount: adults, childrenCount: children, customerNotes: notes,
+        earlyCheckIn: earlyCheckIn && hotelEarlyEnabled,
       }),
     }),
     onSuccess: (data: any) => onSuccess(data.bookingRef),
@@ -217,6 +225,24 @@ function BookingModal({
             />
           </div>
 
+          {/* Early Check-in toggle */}
+          {hotelEarlyEnabled && earlyPrice > 0 && (
+            <div
+              onClick={() => setEarlyCheckIn((v) => !v)}
+              className={`flex items-center justify-between rounded-xl border px-3 py-2.5 cursor-pointer transition-colors ${earlyCheckIn ? "border-primary bg-primary/5" : "border-border"}`}
+            >
+              <div>
+                <p className="text-sm font-medium">Early Check-in</p>
+                <p className="text-xs text-muted-foreground">
+                  {hotel?.earlyCheckInTime ? `From ${hotel.earlyCheckInTime}` : "Earlier than standard time"} · +₹{earlyPrice.toLocaleString("en-IN")}
+                </p>
+              </div>
+              <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${earlyCheckIn ? "border-primary bg-primary" : "border-muted-foreground/40"}`}>
+                {earlyCheckIn && <span className="text-white text-[10px] font-bold">✓</span>}
+              </div>
+            </div>
+          )}
+
           {/* Price summary */}
           {nights > 0 && (
             <div className="bg-muted/50 rounded-xl p-3 space-y-1.5 text-sm">
@@ -224,6 +250,12 @@ function BookingModal({
                 <span className="text-muted-foreground">₹{pricePerNight.toLocaleString("en-IN")} × {nights} night{nights !== 1 ? "s" : ""}</span>
                 <span>₹{baseAmt.toLocaleString("en-IN", { maximumFractionDigits: 0 })}</span>
               </div>
+              {earlyAmt > 0 && (
+                <div className="flex justify-between text-muted-foreground">
+                  <span>Early check-in</span>
+                  <span>₹{earlyAmt.toLocaleString("en-IN", { maximumFractionDigits: 0 })}</span>
+                </div>
+              )}
               <div className="flex justify-between text-muted-foreground">
                 <span>GST (18%)</span>
                 <span>₹{tax.toLocaleString("en-IN", { maximumFractionDigits: 0 })}</span>
@@ -540,6 +572,7 @@ export default function HotelDetail() {
           room={selectedRoom}
           hotelId={hotelId}
           hotelName={hotel.name}
+          hotel={hotel}
           onClose={() => setSelectedRoom(null)}
           onSuccess={(ref) => { setSelectedRoom(null); setBookingSuccess(ref); }}
         />

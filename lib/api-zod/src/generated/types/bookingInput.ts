@@ -14,4 +14,5 @@ export interface BookingInput {
   adultsCount?: number;
   childrenCount?: number;
   customerNotes?: string;
+  earlyCheckIn?: boolean;
 }

@@ -421,6 +421,12 @@ export interface Hotel {
   /** @nullable */
   galleryImages?: string[] | null;
   /** @nullable */
+  earlyCheckInEnabled?: boolean | null;
+  /** @nullable */
+  earlyCheckInTime?: string | null;
+  /** @nullable */
+  earlyCheckInPrice?: number | null;
+  /** @nullable */
   upiId?: string | null;
   /** @nullable */
   upiQrImage?: string | null;
@@ -469,6 +475,9 @@ export interface HotelInput {
   amenities?: string[];
   coverImage?: string;
   galleryImages?: string[];
+  earlyCheckInEnabled?: boolean;
+  earlyCheckInTime?: string;
+  earlyCheckInPrice?: number;
 }
 
 export type HotelUpdateCategory = typeof HotelUpdateCategory[keyof typeof HotelUpdateCategory];
@@ -503,6 +512,9 @@ export interface HotelUpdate {
   amenities?: string[];
   coverImage?: string;
   galleryImages?: string[];
+  earlyCheckInEnabled?: boolean;
+  earlyCheckInTime?: string;
+  earlyCheckInPrice?: number;
 }
 
 export interface HotelsPage {
@@ -751,6 +763,8 @@ export interface Booking {
   nights: number;
   adultsCount: number;
   childrenCount: number;
+  earlyCheckIn?: boolean;
+  earlyCheckInAmount?: number;
   baseAmount: number;
   discountAmount: number;
   taxAmount: number;
@@ -780,6 +794,7 @@ export interface BookingInput {
   adultsCount?: number;
   childrenCount?: number;
   customerNotes?: string;
+  earlyCheckIn?: boolean;
 }
 
 export interface BookingRejectInput {

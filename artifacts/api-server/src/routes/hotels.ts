@@ -179,6 +179,7 @@ router.put("/hotels/:id", requireAuth, async (req, res): Promise<void> => {
     contactPerson, contactMobile, contactEmail, website,
     checkInTime, checkOutTime, totalRooms, policies, cancellationPolicy,
     amenities, coverImage, galleryImages,
+    earlyCheckInEnabled, earlyCheckInTime, earlyCheckInPrice,
   } = req.body;
 
   const updates: Partial<typeof hotelsTable.$inferInsert> = {};
@@ -203,6 +204,9 @@ router.put("/hotels/:id", requireAuth, async (req, res): Promise<void> => {
   if (amenities !== undefined) updates.amenities = Array.isArray(amenities) ? amenities : [];
   if (coverImage !== undefined) updates.coverImage = coverImage || null;
   if (galleryImages !== undefined) updates.galleryImages = Array.isArray(galleryImages) ? galleryImages : [];
+  if (earlyCheckInEnabled !== undefined) updates.earlyCheckInEnabled = Boolean(earlyCheckInEnabled);
+  if (earlyCheckInTime !== undefined) updates.earlyCheckInTime = earlyCheckInTime || null;
+  if (earlyCheckInPrice !== undefined) updates.earlyCheckInPrice = earlyCheckInPrice != null ? String(parseFloat(String(earlyCheckInPrice)).toFixed(2)) : null;
 
   const [updated] = await db.update(hotelsTable).set(updates).where(eq(hotelsTable.id, id)).returning();
   await logActivity(req, "hotel_updated", `Hotel "${updated.name}" updated`, cu.id, cu.role);

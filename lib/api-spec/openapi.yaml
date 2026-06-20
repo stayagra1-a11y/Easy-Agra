@@ -5063,6 +5063,12 @@ components:
           type: ["array", "null"]
           items:
             type: string
+        earlyCheckInEnabled:
+          type: ["boolean", "null"]
+        earlyCheckInTime:
+          type: ["string", "null"]
+        earlyCheckInPrice:
+          type: ["number", "null"]
         upiId:
           type: ["string", "null"]
         upiQrImage:
@@ -5141,6 +5147,12 @@ components:
           type: array
           items:
             type: string
+        earlyCheckInEnabled:
+          type: boolean
+        earlyCheckInTime:
+          type: string
+        earlyCheckInPrice:
+          type: number
       required:
         - name
         - category
@@ -5195,6 +5207,12 @@ components:
           type: array
           items:
             type: string
+        earlyCheckInEnabled:
+          type: boolean
+        earlyCheckInTime:
+          type: string
+        earlyCheckInPrice:
+          type: number
 
     HotelsPage:
       type: object
@@ -5540,6 +5558,10 @@ components:
           type: integer
         childrenCount:
           type: integer
+        earlyCheckIn:
+          type: boolean
+        earlyCheckInAmount:
+          type: number
         baseAmount:
           type: number
         discountAmount:
@@ -5628,6 +5650,8 @@ components:
           type: integer
         customerNotes:
           type: string
+        earlyCheckIn:
+          type: boolean
       required:
         - hotelId
         - roomId

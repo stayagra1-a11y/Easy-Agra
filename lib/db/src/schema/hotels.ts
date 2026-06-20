@@ -6,6 +6,8 @@ import {
   integer,
   pgEnum,
   jsonb,
+  boolean,
+  numeric,
 } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod/v4";
@@ -57,6 +59,10 @@ export const hotelsTable = pgTable("hotels", {
   amenities: jsonb("amenities").$type<string[]>(),
   coverImage: text("cover_image"),
   galleryImages: jsonb("gallery_images").$type<string[]>(),
+
+  earlyCheckInEnabled: boolean("early_check_in_enabled").notNull().default(false),
+  earlyCheckInTime: text("early_check_in_time"),
+  earlyCheckInPrice: numeric("early_check_in_price", { precision: 10, scale: 2 }),
 
   upiId: text("upi_id"),
   upiQrImage: text("upi_qr_image"),
