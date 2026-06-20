@@ -38,6 +38,8 @@ tags:
     description: Spa service management
   - name: spa-appointments
     description: Spa appointment booking
+  - name: tourist-places
+    description: Tourist places management
 
 paths:
   /healthz:
@@ -2789,6 +2791,383 @@ paths:
               schema:
                 $ref: "#/components/schemas/SpaAppointmentDetail"
 
+  /tourist-places:
+    get:
+      operationId: listTouristPlaces
+      tags: [tourist-places]
+      summary: List tourist places (public)
+      parameters:
+        - name: page
+          in: query
+          schema: { type: integer, default: 1 }
+        - name: limit
+          in: query
+          schema: { type: integer, default: 20 }
+        - name: search
+          in: query
+          schema: { type: string }
+        - name: city
+          in: query
+          schema: { type: string }
+        - name: featured
+          in: query
+          schema: { type: boolean }
+      responses:
+        "200":
+          description: List of tourist places
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TouristPlacesPage"
+    post:
+      operationId: createTouristPlace
+      tags: [tourist-places]
+      summary: Create a tourist place (admin)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TouristPlaceInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TouristPlace"
+
+  /tourist-places/seed:
+    post:
+      operationId: seedTouristPlaces
+      tags: [tourist-places]
+      summary: Seed demo tourist places (super_admin)
+      responses:
+        "200":
+          description: Seeded
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: { type: string }
+                  count: { type: integer }
+                required: [message, count]
+
+  /tourist-places/{id}:
+    get:
+      operationId: getTouristPlace
+      tags: [tourist-places]
+      summary: Get tourist place detail (public)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: Tourist place detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TouristPlaceDetail"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    put:
+      operationId: updateTouristPlace
+      tags: [tourist-places]
+      summary: Update a tourist place (admin)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TouristPlaceInput"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TouristPlace"
+    delete:
+      operationId: deleteTouristPlace
+      tags: [tourist-places]
+      summary: Delete a tourist place (admin)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean }
+                required: [success]
+
+  /tourist-places/{id}/images:
+    post:
+      operationId: addTouristPlaceImage
+      tags: [tourist-places]
+      summary: Add image to tourist place (admin)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TouristPlaceImageInput"
+      responses:
+        "201":
+          description: Image added
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TouristPlaceImage"
+
+  /tourist-places/{id}/images/reorder:
+    post:
+      operationId: reorderTouristPlaceImages
+      tags: [tourist-places]
+      summary: Reorder images (admin)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReorderImagesInput"
+      responses:
+        "200":
+          description: Reordered
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean }
+                required: [success]
+
+  /tourist-places/images/{imageId}:
+    put:
+      operationId: updateTouristPlaceImage
+      tags: [tourist-places]
+      summary: Update image metadata (admin)
+      parameters:
+        - name: imageId
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TouristPlaceImageInput"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TouristPlaceImage"
+    delete:
+      operationId: deleteTouristPlaceImage
+      tags: [tourist-places]
+      summary: Delete image (admin)
+      parameters:
+        - name: imageId
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean }
+                required: [success]
+
+  /tourist-places/images/{imageId}/feature:
+    put:
+      operationId: setFeaturedTouristPlaceImage
+      tags: [tourist-places]
+      summary: Set image as featured (admin)
+      parameters:
+        - name: imageId
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: Featured set
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean }
+                required: [success]
+
+  /tourist-places/{id}/tips:
+    post:
+      operationId: addTouristPlaceTip
+      tags: [tourist-places]
+      summary: Add visitor tip (admin)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TouristPlaceTipInput"
+      responses:
+        "201":
+          description: Tip added
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TouristPlaceTip"
+
+  /tourist-places/tips/{tipId}:
+    put:
+      operationId: updateTouristPlaceTip
+      tags: [tourist-places]
+      summary: Update visitor tip (admin)
+      parameters:
+        - name: tipId
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TouristPlaceTipInput"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TouristPlaceTip"
+    delete:
+      operationId: deleteTouristPlaceTip
+      tags: [tourist-places]
+      summary: Delete visitor tip (admin)
+      parameters:
+        - name: tipId
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean }
+                required: [success]
+
+  /tourist-places/{id}/distances:
+    post:
+      operationId: addTouristPlaceDistance
+      tags: [tourist-places]
+      summary: Add distance info (admin)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TouristPlaceDistanceInput"
+      responses:
+        "201":
+          description: Distance added
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TouristPlaceDistance"
+
+  /tourist-places/distances/{distId}:
+    put:
+      operationId: updateTouristPlaceDistance
+      tags: [tourist-places]
+      summary: Update distance info (admin)
+      parameters:
+        - name: distId
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TouristPlaceDistanceInput"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TouristPlaceDistance"
+    delete:
+      operationId: deleteTouristPlaceDistance
+      tags: [tourist-places]
+      summary: Delete distance info (admin)
+      parameters:
+        - name: distId
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean }
+                required: [success]
+
 components:
   schemas:
     HealthStatus:
@@ -5138,3 +5517,410 @@ components:
         - total
         - page
         - limit
+
+    TouristPlace:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        slug:
+          type: string
+        shortDescription:
+          type: string
+          nullable: true
+        description:
+          type: string
+          nullable: true
+        historicalInfo:
+          type: string
+          nullable: true
+        openingTime:
+          type: string
+          nullable: true
+        closingTime:
+          type: string
+          nullable: true
+        ticketPriceIndian:
+          type: string
+          nullable: true
+        ticketPriceForeign:
+          type: string
+          nullable: true
+        ticketPriceChild:
+          type: string
+          nullable: true
+        bestTimeToVisit:
+          type: string
+          nullable: true
+        address:
+          type: string
+          nullable: true
+        googleMapsLink:
+          type: string
+          nullable: true
+        latitude:
+          type: string
+          nullable: true
+        longitude:
+          type: string
+          nullable: true
+        city:
+          type: string
+        state:
+          type: string
+        country:
+          type: string
+        isActive:
+          type: boolean
+        isFeatured:
+          type: boolean
+        sortOrder:
+          type: integer
+        coverImageUrl:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+      required:
+        - id
+        - name
+        - slug
+        - city
+        - state
+        - country
+        - isActive
+        - isFeatured
+        - sortOrder
+        - createdAt
+        - updatedAt
+
+    TouristPlaceImage:
+      type: object
+      properties:
+        id:
+          type: integer
+        placeId:
+          type: integer
+        imageUrl:
+          type: string
+        caption:
+          type: string
+          nullable: true
+        altText:
+          type: string
+          nullable: true
+        imageType:
+          type: string
+          enum: [cover, gallery]
+        isFeatured:
+          type: boolean
+        sortOrder:
+          type: integer
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+      required:
+        - id
+        - placeId
+        - imageUrl
+        - imageType
+        - isFeatured
+        - sortOrder
+        - createdAt
+        - updatedAt
+
+    TouristPlaceImageInput:
+      type: object
+      properties:
+        imageUrl:
+          type: string
+        caption:
+          type: string
+          nullable: true
+        altText:
+          type: string
+          nullable: true
+        imageType:
+          type: string
+          enum: [cover, gallery]
+        isFeatured:
+          type: boolean
+        sortOrder:
+          type: integer
+      required:
+        - imageUrl
+
+    TouristPlaceTip:
+      type: object
+      properties:
+        id:
+          type: integer
+        placeId:
+          type: integer
+        tip:
+          type: string
+        category:
+          type: string
+          nullable: true
+        sortOrder:
+          type: integer
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+      required:
+        - id
+        - placeId
+        - tip
+        - sortOrder
+        - createdAt
+        - updatedAt
+
+    TouristPlaceTipInput:
+      type: object
+      properties:
+        tip:
+          type: string
+        category:
+          type: string
+          nullable: true
+        sortOrder:
+          type: integer
+      required:
+        - tip
+
+    TouristPlaceDistance:
+      type: object
+      properties:
+        id:
+          type: integer
+        placeId:
+          type: integer
+        fromLocation:
+          type: string
+        locationType:
+          type: string
+          enum: [railway_station, airport, bus_stand, city_center]
+        distanceKm:
+          type: string
+          nullable: true
+        estimatedTimeMinutes:
+          type: integer
+          nullable: true
+        createdAt:
+          type: string
+      required:
+        - id
+        - placeId
+        - fromLocation
+        - locationType
+        - createdAt
+
+    TouristPlaceDistanceInput:
+      type: object
+      properties:
+        fromLocation:
+          type: string
+        locationType:
+          type: string
+          enum: [railway_station, airport, bus_stand, city_center]
+        distanceKm:
+          type: string
+          nullable: true
+        estimatedTimeMinutes:
+          type: integer
+          nullable: true
+      required:
+        - fromLocation
+        - locationType
+
+    TouristPlaceDetail:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        slug:
+          type: string
+        shortDescription:
+          type: string
+          nullable: true
+        description:
+          type: string
+          nullable: true
+        historicalInfo:
+          type: string
+          nullable: true
+        openingTime:
+          type: string
+          nullable: true
+        closingTime:
+          type: string
+          nullable: true
+        ticketPriceIndian:
+          type: string
+          nullable: true
+        ticketPriceForeign:
+          type: string
+          nullable: true
+        ticketPriceChild:
+          type: string
+          nullable: true
+        bestTimeToVisit:
+          type: string
+          nullable: true
+        address:
+          type: string
+          nullable: true
+        googleMapsLink:
+          type: string
+          nullable: true
+        latitude:
+          type: string
+          nullable: true
+        longitude:
+          type: string
+          nullable: true
+        city:
+          type: string
+        state:
+          type: string
+        country:
+          type: string
+        isActive:
+          type: boolean
+        isFeatured:
+          type: boolean
+        sortOrder:
+          type: integer
+        coverImageUrl:
+          type: string
+          nullable: true
+        images:
+          type: array
+          items:
+            $ref: "#/components/schemas/TouristPlaceImage"
+        tips:
+          type: array
+          items:
+            $ref: "#/components/schemas/TouristPlaceTip"
+        distances:
+          type: array
+          items:
+            $ref: "#/components/schemas/TouristPlaceDistance"
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+      required:
+        - id
+        - name
+        - slug
+        - city
+        - state
+        - country
+        - isActive
+        - isFeatured
+        - sortOrder
+        - images
+        - tips
+        - distances
+        - createdAt
+        - updatedAt
+
+    TouristPlaceInput:
+      type: object
+      properties:
+        name:
+          type: string
+        slug:
+          type: string
+        shortDescription:
+          type: string
+          nullable: true
+        description:
+          type: string
+          nullable: true
+        historicalInfo:
+          type: string
+          nullable: true
+        openingTime:
+          type: string
+          nullable: true
+        closingTime:
+          type: string
+          nullable: true
+        ticketPriceIndian:
+          type: string
+          nullable: true
+        ticketPriceForeign:
+          type: string
+          nullable: true
+        ticketPriceChild:
+          type: string
+          nullable: true
+        bestTimeToVisit:
+          type: string
+          nullable: true
+        address:
+          type: string
+          nullable: true
+        googleMapsLink:
+          type: string
+          nullable: true
+        latitude:
+          type: string
+          nullable: true
+        longitude:
+          type: string
+          nullable: true
+        city:
+          type: string
+        state:
+          type: string
+        country:
+          type: string
+        isActive:
+          type: boolean
+        isFeatured:
+          type: boolean
+        sortOrder:
+          type: integer
+      required:
+        - name
+        - slug
+
+    TouristPlacesPage:
+      type: object
+      properties:
+        places:
+          type: array
+          items:
+            $ref: "#/components/schemas/TouristPlaceDetail"
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+      required:
+        - places
+        - total
+        - page
+        - limit
+
+    ReorderImagesInput:
+      type: object
+      properties:
+        imageIds:
+          type: array
+          items:
+            type: integer
+      required:
+        - imageIds

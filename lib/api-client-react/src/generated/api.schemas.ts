@@ -1312,6 +1312,191 @@ export interface SpaAppointmentsPage {
   limit: number;
 }
 
+export interface TouristPlace {
+  id: number;
+  name: string;
+  slug: string;
+  shortDescription?: string | null;
+  description?: string | null;
+  historicalInfo?: string | null;
+  openingTime?: string | null;
+  closingTime?: string | null;
+  ticketPriceIndian?: string | null;
+  ticketPriceForeign?: string | null;
+  ticketPriceChild?: string | null;
+  bestTimeToVisit?: string | null;
+  address?: string | null;
+  googleMapsLink?: string | null;
+  latitude?: string | null;
+  longitude?: string | null;
+  city: string;
+  state: string;
+  country: string;
+  isActive: boolean;
+  isFeatured: boolean;
+  sortOrder: number;
+  coverImageUrl?: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type TouristPlaceImageImageType = typeof TouristPlaceImageImageType[keyof typeof TouristPlaceImageImageType];
+
+
+export const TouristPlaceImageImageType = {
+  cover: 'cover',
+  gallery: 'gallery',
+} as const;
+
+export interface TouristPlaceImage {
+  id: number;
+  placeId: number;
+  imageUrl: string;
+  caption?: string | null;
+  altText?: string | null;
+  imageType: TouristPlaceImageImageType;
+  isFeatured: boolean;
+  sortOrder: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type TouristPlaceImageInputImageType = typeof TouristPlaceImageInputImageType[keyof typeof TouristPlaceImageInputImageType];
+
+
+export const TouristPlaceImageInputImageType = {
+  cover: 'cover',
+  gallery: 'gallery',
+} as const;
+
+export interface TouristPlaceImageInput {
+  imageUrl: string;
+  caption?: string | null;
+  altText?: string | null;
+  imageType?: TouristPlaceImageInputImageType;
+  isFeatured?: boolean;
+  sortOrder?: number;
+}
+
+export interface TouristPlaceTip {
+  id: number;
+  placeId: number;
+  tip: string;
+  category?: string | null;
+  sortOrder: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface TouristPlaceTipInput {
+  tip: string;
+  category?: string | null;
+  sortOrder?: number;
+}
+
+export type TouristPlaceDistanceLocationType = typeof TouristPlaceDistanceLocationType[keyof typeof TouristPlaceDistanceLocationType];
+
+
+export const TouristPlaceDistanceLocationType = {
+  railway_station: 'railway_station',
+  airport: 'airport',
+  bus_stand: 'bus_stand',
+  city_center: 'city_center',
+} as const;
+
+export interface TouristPlaceDistance {
+  id: number;
+  placeId: number;
+  fromLocation: string;
+  locationType: TouristPlaceDistanceLocationType;
+  distanceKm?: string | null;
+  estimatedTimeMinutes?: number | null;
+  createdAt: string;
+}
+
+export type TouristPlaceDistanceInputLocationType = typeof TouristPlaceDistanceInputLocationType[keyof typeof TouristPlaceDistanceInputLocationType];
+
+
+export const TouristPlaceDistanceInputLocationType = {
+  railway_station: 'railway_station',
+  airport: 'airport',
+  bus_stand: 'bus_stand',
+  city_center: 'city_center',
+} as const;
+
+export interface TouristPlaceDistanceInput {
+  fromLocation: string;
+  locationType: TouristPlaceDistanceInputLocationType;
+  distanceKm?: string | null;
+  estimatedTimeMinutes?: number | null;
+}
+
+export interface TouristPlaceDetail {
+  id: number;
+  name: string;
+  slug: string;
+  shortDescription?: string | null;
+  description?: string | null;
+  historicalInfo?: string | null;
+  openingTime?: string | null;
+  closingTime?: string | null;
+  ticketPriceIndian?: string | null;
+  ticketPriceForeign?: string | null;
+  ticketPriceChild?: string | null;
+  bestTimeToVisit?: string | null;
+  address?: string | null;
+  googleMapsLink?: string | null;
+  latitude?: string | null;
+  longitude?: string | null;
+  city: string;
+  state: string;
+  country: string;
+  isActive: boolean;
+  isFeatured: boolean;
+  sortOrder: number;
+  coverImageUrl?: string | null;
+  images: TouristPlaceImage[];
+  tips: TouristPlaceTip[];
+  distances: TouristPlaceDistance[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface TouristPlaceInput {
+  name: string;
+  slug: string;
+  shortDescription?: string | null;
+  description?: string | null;
+  historicalInfo?: string | null;
+  openingTime?: string | null;
+  closingTime?: string | null;
+  ticketPriceIndian?: string | null;
+  ticketPriceForeign?: string | null;
+  ticketPriceChild?: string | null;
+  bestTimeToVisit?: string | null;
+  address?: string | null;
+  googleMapsLink?: string | null;
+  latitude?: string | null;
+  longitude?: string | null;
+  city?: string;
+  state?: string;
+  country?: string;
+  isActive?: boolean;
+  isFeatured?: boolean;
+  sortOrder?: number;
+}
+
+export interface TouristPlacesPage {
+  places: TouristPlaceDetail[];
+  total: number;
+  page: number;
+  limit: number;
+}
+
+export interface ReorderImagesInput {
+  imageIds: number[];
+}
+
 export type ListUsersParams = {
 role?: string;
 status?: string;
@@ -1453,5 +1638,42 @@ spaId?: number;
 status?: string;
 page?: number;
 limit?: number;
+};
+
+export type ListTouristPlacesParams = {
+page?: number;
+limit?: number;
+search?: string;
+city?: string;
+featured?: boolean;
+};
+
+export type SeedTouristPlaces200 = {
+  message: string;
+  count: number;
+};
+
+export type DeleteTouristPlace200 = {
+  success: boolean;
+};
+
+export type ReorderTouristPlaceImages200 = {
+  success: boolean;
+};
+
+export type DeleteTouristPlaceImage200 = {
+  success: boolean;
+};
+
+export type SetFeaturedTouristPlaceImage200 = {
+  success: boolean;
+};
+
+export type DeleteTouristPlaceTip200 = {
+  success: boolean;
+};
+
+export type DeleteTouristPlaceDistance200 = {
+  success: boolean;
 };
 

@@ -39,6 +39,10 @@ import type {
   DeleteSpa200,
   DeleteSpaService200,
   DeleteTable200,
+  DeleteTouristPlace200,
+  DeleteTouristPlaceDistance200,
+  DeleteTouristPlaceImage200,
+  DeleteTouristPlaceTip200,
   EligibleBooking,
   ErrorResponse,
   ForgotPasswordInput,
@@ -63,6 +67,7 @@ import type {
   ListRestaurantsParams,
   ListReviewsParams,
   ListRoomsParams,
+  ListTouristPlacesParams,
   ListUsersParams,
   LoginInput,
   MenuItemDetail,
@@ -80,6 +85,8 @@ import type {
   PlatformSettingsUpdate,
   RegisterInput,
   RemoveReview200,
+  ReorderImagesInput,
+  ReorderTouristPlaceImages200,
   ReportReview200,
   ReservationDetail,
   ReservationInput,
@@ -101,6 +108,8 @@ import type {
   RoomStats,
   RoomUpdate,
   RoomsPage,
+  SeedTouristPlaces200,
+  SetFeaturedTouristPlaceImage200,
   Spa,
   SpaAppointmentDetail,
   SpaAppointmentInput,
@@ -114,6 +123,16 @@ import type {
   TableDetail,
   TableInput,
   TopRatedHotel,
+  TouristPlace,
+  TouristPlaceDetail,
+  TouristPlaceDistance,
+  TouristPlaceDistanceInput,
+  TouristPlaceImage,
+  TouristPlaceImageInput,
+  TouristPlaceInput,
+  TouristPlaceTip,
+  TouristPlaceTipInput,
+  TouristPlacesPage,
   UnreadCount,
   User,
   UserRoleUpdate,
@@ -9300,5 +9319,1233 @@ export const useCancelSpaAppointment = <TError = ErrorType<unknown>,
         TContext
       > => {
       return useMutation(getCancelSpaAppointmentMutationOptions(options));
+    }
+
+export const getListTouristPlacesUrl = (params?: ListTouristPlacesParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/tourist-places?${stringifiedParams}` : `/api/tourist-places`
+}
+
+/**
+ * @summary List tourist places (public)
+ */
+export const listTouristPlaces = async (params?: ListTouristPlacesParams, options?: RequestInit): Promise<TouristPlacesPage> => {
+
+  return customFetch<TouristPlacesPage>(getListTouristPlacesUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListTouristPlacesQueryKey = (params?: ListTouristPlacesParams,) => {
+    return [
+    `/api/tourist-places`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getListTouristPlacesQueryOptions = <TData = Awaited<ReturnType<typeof listTouristPlaces>>, TError = ErrorType<unknown>>(params?: ListTouristPlacesParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listTouristPlaces>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListTouristPlacesQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listTouristPlaces>>> = ({ signal }) => listTouristPlaces(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listTouristPlaces>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListTouristPlacesQueryResult = NonNullable<Awaited<ReturnType<typeof listTouristPlaces>>>
+export type ListTouristPlacesQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary List tourist places (public)
+ */
+
+export function useListTouristPlaces<TData = Awaited<ReturnType<typeof listTouristPlaces>>, TError = ErrorType<unknown>>(
+ params?: ListTouristPlacesParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listTouristPlaces>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListTouristPlacesQueryOptions(params,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getCreateTouristPlaceUrl = () => {
+
+
+
+
+  return `/api/tourist-places`
+}
+
+/**
+ * @summary Create a tourist place (admin)
+ */
+export const createTouristPlace = async (touristPlaceInput: TouristPlaceInput, options?: RequestInit): Promise<TouristPlace> => {
+
+  return customFetch<TouristPlace>(getCreateTouristPlaceUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      touristPlaceInput,)
+  }
+);}
+
+
+
+
+export const getCreateTouristPlaceMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createTouristPlace>>, TError,{data: BodyType<TouristPlaceInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createTouristPlace>>, TError,{data: BodyType<TouristPlaceInput>}, TContext> => {
+
+const mutationKey = ['createTouristPlace'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createTouristPlace>>, {data: BodyType<TouristPlaceInput>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  createTouristPlace(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateTouristPlaceMutationResult = NonNullable<Awaited<ReturnType<typeof createTouristPlace>>>
+    export type CreateTouristPlaceMutationBody = BodyType<TouristPlaceInput>
+    export type CreateTouristPlaceMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Create a tourist place (admin)
+ */
+export const useCreateTouristPlace = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createTouristPlace>>, TError,{data: BodyType<TouristPlaceInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof createTouristPlace>>,
+        TError,
+        {data: BodyType<TouristPlaceInput>},
+        TContext
+      > => {
+      return useMutation(getCreateTouristPlaceMutationOptions(options));
+    }
+
+export const getSeedTouristPlacesUrl = () => {
+
+
+
+
+  return `/api/tourist-places/seed`
+}
+
+/**
+ * @summary Seed demo tourist places (super_admin)
+ */
+export const seedTouristPlaces = async ( options?: RequestInit): Promise<SeedTouristPlaces200> => {
+
+  return customFetch<SeedTouristPlaces200>(getSeedTouristPlacesUrl(),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+export const getSeedTouristPlacesMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof seedTouristPlaces>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof seedTouristPlaces>>, TError,void, TContext> => {
+
+const mutationKey = ['seedTouristPlaces'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof seedTouristPlaces>>, void> = () => {
+
+
+          return  seedTouristPlaces(requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type SeedTouristPlacesMutationResult = NonNullable<Awaited<ReturnType<typeof seedTouristPlaces>>>
+
+    export type SeedTouristPlacesMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Seed demo tourist places (super_admin)
+ */
+export const useSeedTouristPlaces = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof seedTouristPlaces>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof seedTouristPlaces>>,
+        TError,
+        void,
+        TContext
+      > => {
+      return useMutation(getSeedTouristPlacesMutationOptions(options));
+    }
+
+export const getGetTouristPlaceUrl = (id: number,) => {
+
+
+
+
+  return `/api/tourist-places/${id}`
+}
+
+/**
+ * @summary Get tourist place detail (public)
+ */
+export const getTouristPlace = async (id: number, options?: RequestInit): Promise<TouristPlaceDetail> => {
+
+  return customFetch<TouristPlaceDetail>(getGetTouristPlaceUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetTouristPlaceQueryKey = (id: number,) => {
+    return [
+    `/api/tourist-places/${id}`
+    ] as const;
+    }
+
+
+export const getGetTouristPlaceQueryOptions = <TData = Awaited<ReturnType<typeof getTouristPlace>>, TError = ErrorType<ErrorResponse>>(id: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getTouristPlace>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetTouristPlaceQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getTouristPlace>>> = ({ signal }) => getTouristPlace(id, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: !!(id), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getTouristPlace>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetTouristPlaceQueryResult = NonNullable<Awaited<ReturnType<typeof getTouristPlace>>>
+export type GetTouristPlaceQueryError = ErrorType<ErrorResponse>
+
+
+/**
+ * @summary Get tourist place detail (public)
+ */
+
+export function useGetTouristPlace<TData = Awaited<ReturnType<typeof getTouristPlace>>, TError = ErrorType<ErrorResponse>>(
+ id: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getTouristPlace>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetTouristPlaceQueryOptions(id,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getUpdateTouristPlaceUrl = (id: number,) => {
+
+
+
+
+  return `/api/tourist-places/${id}`
+}
+
+/**
+ * @summary Update a tourist place (admin)
+ */
+export const updateTouristPlace = async (id: number,
+    touristPlaceInput: TouristPlaceInput, options?: RequestInit): Promise<TouristPlace> => {
+
+  return customFetch<TouristPlace>(getUpdateTouristPlaceUrl(id),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      touristPlaceInput,)
+  }
+);}
+
+
+
+
+export const getUpdateTouristPlaceMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateTouristPlace>>, TError,{id: number;data: BodyType<TouristPlaceInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateTouristPlace>>, TError,{id: number;data: BodyType<TouristPlaceInput>}, TContext> => {
+
+const mutationKey = ['updateTouristPlace'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateTouristPlace>>, {id: number;data: BodyType<TouristPlaceInput>}> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  updateTouristPlace(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateTouristPlaceMutationResult = NonNullable<Awaited<ReturnType<typeof updateTouristPlace>>>
+    export type UpdateTouristPlaceMutationBody = BodyType<TouristPlaceInput>
+    export type UpdateTouristPlaceMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Update a tourist place (admin)
+ */
+export const useUpdateTouristPlace = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateTouristPlace>>, TError,{id: number;data: BodyType<TouristPlaceInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof updateTouristPlace>>,
+        TError,
+        {id: number;data: BodyType<TouristPlaceInput>},
+        TContext
+      > => {
+      return useMutation(getUpdateTouristPlaceMutationOptions(options));
+    }
+
+export const getDeleteTouristPlaceUrl = (id: number,) => {
+
+
+
+
+  return `/api/tourist-places/${id}`
+}
+
+/**
+ * @summary Delete a tourist place (admin)
+ */
+export const deleteTouristPlace = async (id: number, options?: RequestInit): Promise<DeleteTouristPlace200> => {
+
+  return customFetch<DeleteTouristPlace200>(getDeleteTouristPlaceUrl(id),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+export const getDeleteTouristPlaceMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteTouristPlace>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteTouristPlace>>, TError,{id: number}, TContext> => {
+
+const mutationKey = ['deleteTouristPlace'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteTouristPlace>>, {id: number}> = (props) => {
+          const {id} = props ?? {};
+
+          return  deleteTouristPlace(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteTouristPlaceMutationResult = NonNullable<Awaited<ReturnType<typeof deleteTouristPlace>>>
+
+    export type DeleteTouristPlaceMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Delete a tourist place (admin)
+ */
+export const useDeleteTouristPlace = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteTouristPlace>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof deleteTouristPlace>>,
+        TError,
+        {id: number},
+        TContext
+      > => {
+      return useMutation(getDeleteTouristPlaceMutationOptions(options));
+    }
+
+export const getAddTouristPlaceImageUrl = (id: number,) => {
+
+
+
+
+  return `/api/tourist-places/${id}/images`
+}
+
+/**
+ * @summary Add image to tourist place (admin)
+ */
+export const addTouristPlaceImage = async (id: number,
+    touristPlaceImageInput: TouristPlaceImageInput, options?: RequestInit): Promise<TouristPlaceImage> => {
+
+  return customFetch<TouristPlaceImage>(getAddTouristPlaceImageUrl(id),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      touristPlaceImageInput,)
+  }
+);}
+
+
+
+
+export const getAddTouristPlaceImageMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof addTouristPlaceImage>>, TError,{id: number;data: BodyType<TouristPlaceImageInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof addTouristPlaceImage>>, TError,{id: number;data: BodyType<TouristPlaceImageInput>}, TContext> => {
+
+const mutationKey = ['addTouristPlaceImage'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof addTouristPlaceImage>>, {id: number;data: BodyType<TouristPlaceImageInput>}> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  addTouristPlaceImage(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type AddTouristPlaceImageMutationResult = NonNullable<Awaited<ReturnType<typeof addTouristPlaceImage>>>
+    export type AddTouristPlaceImageMutationBody = BodyType<TouristPlaceImageInput>
+    export type AddTouristPlaceImageMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Add image to tourist place (admin)
+ */
+export const useAddTouristPlaceImage = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof addTouristPlaceImage>>, TError,{id: number;data: BodyType<TouristPlaceImageInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof addTouristPlaceImage>>,
+        TError,
+        {id: number;data: BodyType<TouristPlaceImageInput>},
+        TContext
+      > => {
+      return useMutation(getAddTouristPlaceImageMutationOptions(options));
+    }
+
+export const getReorderTouristPlaceImagesUrl = (id: number,) => {
+
+
+
+
+  return `/api/tourist-places/${id}/images/reorder`
+}
+
+/**
+ * @summary Reorder images (admin)
+ */
+export const reorderTouristPlaceImages = async (id: number,
+    reorderImagesInput: ReorderImagesInput, options?: RequestInit): Promise<ReorderTouristPlaceImages200> => {
+
+  return customFetch<ReorderTouristPlaceImages200>(getReorderTouristPlaceImagesUrl(id),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      reorderImagesInput,)
+  }
+);}
+
+
+
+
+export const getReorderTouristPlaceImagesMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof reorderTouristPlaceImages>>, TError,{id: number;data: BodyType<ReorderImagesInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof reorderTouristPlaceImages>>, TError,{id: number;data: BodyType<ReorderImagesInput>}, TContext> => {
+
+const mutationKey = ['reorderTouristPlaceImages'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof reorderTouristPlaceImages>>, {id: number;data: BodyType<ReorderImagesInput>}> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  reorderTouristPlaceImages(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ReorderTouristPlaceImagesMutationResult = NonNullable<Awaited<ReturnType<typeof reorderTouristPlaceImages>>>
+    export type ReorderTouristPlaceImagesMutationBody = BodyType<ReorderImagesInput>
+    export type ReorderTouristPlaceImagesMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Reorder images (admin)
+ */
+export const useReorderTouristPlaceImages = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof reorderTouristPlaceImages>>, TError,{id: number;data: BodyType<ReorderImagesInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof reorderTouristPlaceImages>>,
+        TError,
+        {id: number;data: BodyType<ReorderImagesInput>},
+        TContext
+      > => {
+      return useMutation(getReorderTouristPlaceImagesMutationOptions(options));
+    }
+
+export const getUpdateTouristPlaceImageUrl = (imageId: number,) => {
+
+
+
+
+  return `/api/tourist-places/images/${imageId}`
+}
+
+/**
+ * @summary Update image metadata (admin)
+ */
+export const updateTouristPlaceImage = async (imageId: number,
+    touristPlaceImageInput: TouristPlaceImageInput, options?: RequestInit): Promise<TouristPlaceImage> => {
+
+  return customFetch<TouristPlaceImage>(getUpdateTouristPlaceImageUrl(imageId),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      touristPlaceImageInput,)
+  }
+);}
+
+
+
+
+export const getUpdateTouristPlaceImageMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateTouristPlaceImage>>, TError,{imageId: number;data: BodyType<TouristPlaceImageInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateTouristPlaceImage>>, TError,{imageId: number;data: BodyType<TouristPlaceImageInput>}, TContext> => {
+
+const mutationKey = ['updateTouristPlaceImage'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateTouristPlaceImage>>, {imageId: number;data: BodyType<TouristPlaceImageInput>}> = (props) => {
+          const {imageId,data} = props ?? {};
+
+          return  updateTouristPlaceImage(imageId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateTouristPlaceImageMutationResult = NonNullable<Awaited<ReturnType<typeof updateTouristPlaceImage>>>
+    export type UpdateTouristPlaceImageMutationBody = BodyType<TouristPlaceImageInput>
+    export type UpdateTouristPlaceImageMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Update image metadata (admin)
+ */
+export const useUpdateTouristPlaceImage = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateTouristPlaceImage>>, TError,{imageId: number;data: BodyType<TouristPlaceImageInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof updateTouristPlaceImage>>,
+        TError,
+        {imageId: number;data: BodyType<TouristPlaceImageInput>},
+        TContext
+      > => {
+      return useMutation(getUpdateTouristPlaceImageMutationOptions(options));
+    }
+
+export const getDeleteTouristPlaceImageUrl = (imageId: number,) => {
+
+
+
+
+  return `/api/tourist-places/images/${imageId}`
+}
+
+/**
+ * @summary Delete image (admin)
+ */
+export const deleteTouristPlaceImage = async (imageId: number, options?: RequestInit): Promise<DeleteTouristPlaceImage200> => {
+
+  return customFetch<DeleteTouristPlaceImage200>(getDeleteTouristPlaceImageUrl(imageId),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+export const getDeleteTouristPlaceImageMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteTouristPlaceImage>>, TError,{imageId: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteTouristPlaceImage>>, TError,{imageId: number}, TContext> => {
+
+const mutationKey = ['deleteTouristPlaceImage'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteTouristPlaceImage>>, {imageId: number}> = (props) => {
+          const {imageId} = props ?? {};
+
+          return  deleteTouristPlaceImage(imageId,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteTouristPlaceImageMutationResult = NonNullable<Awaited<ReturnType<typeof deleteTouristPlaceImage>>>
+
+    export type DeleteTouristPlaceImageMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Delete image (admin)
+ */
+export const useDeleteTouristPlaceImage = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteTouristPlaceImage>>, TError,{imageId: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof deleteTouristPlaceImage>>,
+        TError,
+        {imageId: number},
+        TContext
+      > => {
+      return useMutation(getDeleteTouristPlaceImageMutationOptions(options));
+    }
+
+export const getSetFeaturedTouristPlaceImageUrl = (imageId: number,) => {
+
+
+
+
+  return `/api/tourist-places/images/${imageId}/feature`
+}
+
+/**
+ * @summary Set image as featured (admin)
+ */
+export const setFeaturedTouristPlaceImage = async (imageId: number, options?: RequestInit): Promise<SetFeaturedTouristPlaceImage200> => {
+
+  return customFetch<SetFeaturedTouristPlaceImage200>(getSetFeaturedTouristPlaceImageUrl(imageId),
+  {
+    ...options,
+    method: 'PUT'
+
+
+  }
+);}
+
+
+
+
+export const getSetFeaturedTouristPlaceImageMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof setFeaturedTouristPlaceImage>>, TError,{imageId: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof setFeaturedTouristPlaceImage>>, TError,{imageId: number}, TContext> => {
+
+const mutationKey = ['setFeaturedTouristPlaceImage'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof setFeaturedTouristPlaceImage>>, {imageId: number}> = (props) => {
+          const {imageId} = props ?? {};
+
+          return  setFeaturedTouristPlaceImage(imageId,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type SetFeaturedTouristPlaceImageMutationResult = NonNullable<Awaited<ReturnType<typeof setFeaturedTouristPlaceImage>>>
+
+    export type SetFeaturedTouristPlaceImageMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Set image as featured (admin)
+ */
+export const useSetFeaturedTouristPlaceImage = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof setFeaturedTouristPlaceImage>>, TError,{imageId: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof setFeaturedTouristPlaceImage>>,
+        TError,
+        {imageId: number},
+        TContext
+      > => {
+      return useMutation(getSetFeaturedTouristPlaceImageMutationOptions(options));
+    }
+
+export const getAddTouristPlaceTipUrl = (id: number,) => {
+
+
+
+
+  return `/api/tourist-places/${id}/tips`
+}
+
+/**
+ * @summary Add visitor tip (admin)
+ */
+export const addTouristPlaceTip = async (id: number,
+    touristPlaceTipInput: TouristPlaceTipInput, options?: RequestInit): Promise<TouristPlaceTip> => {
+
+  return customFetch<TouristPlaceTip>(getAddTouristPlaceTipUrl(id),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      touristPlaceTipInput,)
+  }
+);}
+
+
+
+
+export const getAddTouristPlaceTipMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof addTouristPlaceTip>>, TError,{id: number;data: BodyType<TouristPlaceTipInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof addTouristPlaceTip>>, TError,{id: number;data: BodyType<TouristPlaceTipInput>}, TContext> => {
+
+const mutationKey = ['addTouristPlaceTip'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof addTouristPlaceTip>>, {id: number;data: BodyType<TouristPlaceTipInput>}> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  addTouristPlaceTip(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type AddTouristPlaceTipMutationResult = NonNullable<Awaited<ReturnType<typeof addTouristPlaceTip>>>
+    export type AddTouristPlaceTipMutationBody = BodyType<TouristPlaceTipInput>
+    export type AddTouristPlaceTipMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Add visitor tip (admin)
+ */
+export const useAddTouristPlaceTip = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof addTouristPlaceTip>>, TError,{id: number;data: BodyType<TouristPlaceTipInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof addTouristPlaceTip>>,
+        TError,
+        {id: number;data: BodyType<TouristPlaceTipInput>},
+        TContext
+      > => {
+      return useMutation(getAddTouristPlaceTipMutationOptions(options));
+    }
+
+export const getUpdateTouristPlaceTipUrl = (tipId: number,) => {
+
+
+
+
+  return `/api/tourist-places/tips/${tipId}`
+}
+
+/**
+ * @summary Update visitor tip (admin)
+ */
+export const updateTouristPlaceTip = async (tipId: number,
+    touristPlaceTipInput: TouristPlaceTipInput, options?: RequestInit): Promise<TouristPlaceTip> => {
+
+  return customFetch<TouristPlaceTip>(getUpdateTouristPlaceTipUrl(tipId),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      touristPlaceTipInput,)
+  }
+);}
+
+
+
+
+export const getUpdateTouristPlaceTipMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateTouristPlaceTip>>, TError,{tipId: number;data: BodyType<TouristPlaceTipInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateTouristPlaceTip>>, TError,{tipId: number;data: BodyType<TouristPlaceTipInput>}, TContext> => {
+
+const mutationKey = ['updateTouristPlaceTip'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateTouristPlaceTip>>, {tipId: number;data: BodyType<TouristPlaceTipInput>}> = (props) => {
+          const {tipId,data} = props ?? {};
+
+          return  updateTouristPlaceTip(tipId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateTouristPlaceTipMutationResult = NonNullable<Awaited<ReturnType<typeof updateTouristPlaceTip>>>
+    export type UpdateTouristPlaceTipMutationBody = BodyType<TouristPlaceTipInput>
+    export type UpdateTouristPlaceTipMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Update visitor tip (admin)
+ */
+export const useUpdateTouristPlaceTip = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateTouristPlaceTip>>, TError,{tipId: number;data: BodyType<TouristPlaceTipInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof updateTouristPlaceTip>>,
+        TError,
+        {tipId: number;data: BodyType<TouristPlaceTipInput>},
+        TContext
+      > => {
+      return useMutation(getUpdateTouristPlaceTipMutationOptions(options));
+    }
+
+export const getDeleteTouristPlaceTipUrl = (tipId: number,) => {
+
+
+
+
+  return `/api/tourist-places/tips/${tipId}`
+}
+
+/**
+ * @summary Delete visitor tip (admin)
+ */
+export const deleteTouristPlaceTip = async (tipId: number, options?: RequestInit): Promise<DeleteTouristPlaceTip200> => {
+
+  return customFetch<DeleteTouristPlaceTip200>(getDeleteTouristPlaceTipUrl(tipId),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+export const getDeleteTouristPlaceTipMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteTouristPlaceTip>>, TError,{tipId: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteTouristPlaceTip>>, TError,{tipId: number}, TContext> => {
+
+const mutationKey = ['deleteTouristPlaceTip'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteTouristPlaceTip>>, {tipId: number}> = (props) => {
+          const {tipId} = props ?? {};
+
+          return  deleteTouristPlaceTip(tipId,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteTouristPlaceTipMutationResult = NonNullable<Awaited<ReturnType<typeof deleteTouristPlaceTip>>>
+
+    export type DeleteTouristPlaceTipMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Delete visitor tip (admin)
+ */
+export const useDeleteTouristPlaceTip = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteTouristPlaceTip>>, TError,{tipId: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof deleteTouristPlaceTip>>,
+        TError,
+        {tipId: number},
+        TContext
+      > => {
+      return useMutation(getDeleteTouristPlaceTipMutationOptions(options));
+    }
+
+export const getAddTouristPlaceDistanceUrl = (id: number,) => {
+
+
+
+
+  return `/api/tourist-places/${id}/distances`
+}
+
+/**
+ * @summary Add distance info (admin)
+ */
+export const addTouristPlaceDistance = async (id: number,
+    touristPlaceDistanceInput: TouristPlaceDistanceInput, options?: RequestInit): Promise<TouristPlaceDistance> => {
+
+  return customFetch<TouristPlaceDistance>(getAddTouristPlaceDistanceUrl(id),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      touristPlaceDistanceInput,)
+  }
+);}
+
+
+
+
+export const getAddTouristPlaceDistanceMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof addTouristPlaceDistance>>, TError,{id: number;data: BodyType<TouristPlaceDistanceInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof addTouristPlaceDistance>>, TError,{id: number;data: BodyType<TouristPlaceDistanceInput>}, TContext> => {
+
+const mutationKey = ['addTouristPlaceDistance'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof addTouristPlaceDistance>>, {id: number;data: BodyType<TouristPlaceDistanceInput>}> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  addTouristPlaceDistance(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type AddTouristPlaceDistanceMutationResult = NonNullable<Awaited<ReturnType<typeof addTouristPlaceDistance>>>
+    export type AddTouristPlaceDistanceMutationBody = BodyType<TouristPlaceDistanceInput>
+    export type AddTouristPlaceDistanceMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Add distance info (admin)
+ */
+export const useAddTouristPlaceDistance = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof addTouristPlaceDistance>>, TError,{id: number;data: BodyType<TouristPlaceDistanceInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof addTouristPlaceDistance>>,
+        TError,
+        {id: number;data: BodyType<TouristPlaceDistanceInput>},
+        TContext
+      > => {
+      return useMutation(getAddTouristPlaceDistanceMutationOptions(options));
+    }
+
+export const getUpdateTouristPlaceDistanceUrl = (distId: number,) => {
+
+
+
+
+  return `/api/tourist-places/distances/${distId}`
+}
+
+/**
+ * @summary Update distance info (admin)
+ */
+export const updateTouristPlaceDistance = async (distId: number,
+    touristPlaceDistanceInput: TouristPlaceDistanceInput, options?: RequestInit): Promise<TouristPlaceDistance> => {
+
+  return customFetch<TouristPlaceDistance>(getUpdateTouristPlaceDistanceUrl(distId),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      touristPlaceDistanceInput,)
+  }
+);}
+
+
+
+
+export const getUpdateTouristPlaceDistanceMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateTouristPlaceDistance>>, TError,{distId: number;data: BodyType<TouristPlaceDistanceInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateTouristPlaceDistance>>, TError,{distId: number;data: BodyType<TouristPlaceDistanceInput>}, TContext> => {
+
+const mutationKey = ['updateTouristPlaceDistance'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateTouristPlaceDistance>>, {distId: number;data: BodyType<TouristPlaceDistanceInput>}> = (props) => {
+          const {distId,data} = props ?? {};
+
+          return  updateTouristPlaceDistance(distId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateTouristPlaceDistanceMutationResult = NonNullable<Awaited<ReturnType<typeof updateTouristPlaceDistance>>>
+    export type UpdateTouristPlaceDistanceMutationBody = BodyType<TouristPlaceDistanceInput>
+    export type UpdateTouristPlaceDistanceMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Update distance info (admin)
+ */
+export const useUpdateTouristPlaceDistance = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateTouristPlaceDistance>>, TError,{distId: number;data: BodyType<TouristPlaceDistanceInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof updateTouristPlaceDistance>>,
+        TError,
+        {distId: number;data: BodyType<TouristPlaceDistanceInput>},
+        TContext
+      > => {
+      return useMutation(getUpdateTouristPlaceDistanceMutationOptions(options));
+    }
+
+export const getDeleteTouristPlaceDistanceUrl = (distId: number,) => {
+
+
+
+
+  return `/api/tourist-places/distances/${distId}`
+}
+
+/**
+ * @summary Delete distance info (admin)
+ */
+export const deleteTouristPlaceDistance = async (distId: number, options?: RequestInit): Promise<DeleteTouristPlaceDistance200> => {
+
+  return customFetch<DeleteTouristPlaceDistance200>(getDeleteTouristPlaceDistanceUrl(distId),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+export const getDeleteTouristPlaceDistanceMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteTouristPlaceDistance>>, TError,{distId: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteTouristPlaceDistance>>, TError,{distId: number}, TContext> => {
+
+const mutationKey = ['deleteTouristPlaceDistance'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteTouristPlaceDistance>>, {distId: number}> = (props) => {
+          const {distId} = props ?? {};
+
+          return  deleteTouristPlaceDistance(distId,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteTouristPlaceDistanceMutationResult = NonNullable<Awaited<ReturnType<typeof deleteTouristPlaceDistance>>>
+
+    export type DeleteTouristPlaceDistanceMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Delete distance info (admin)
+ */
+export const useDeleteTouristPlaceDistance = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteTouristPlaceDistance>>, TError,{distId: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof deleteTouristPlaceDistance>>,
+        TError,
+        {distId: number},
+        TContext
+      > => {
+      return useMutation(getDeleteTouristPlaceDistanceMutationOptions(options));
     }
 

@@ -3679,3 +3679,445 @@ export const CancelSpaAppointmentResponse = zod.object({
 })
 
 
+/**
+ * @summary List tourist places (public)
+ */
+export const listTouristPlacesQueryPageDefault = 1;
+export const listTouristPlacesQueryLimitDefault = 20;
+
+export const ListTouristPlacesQueryParams = zod.object({
+  "page": zod.coerce.number().default(listTouristPlacesQueryPageDefault),
+  "limit": zod.coerce.number().default(listTouristPlacesQueryLimitDefault),
+  "search": zod.coerce.string().optional(),
+  "city": zod.coerce.string().optional(),
+  "featured": zod.coerce.boolean().optional()
+})
+
+export const ListTouristPlacesResponse = zod.object({
+  "places": zod.array(zod.object({
+  "id": zod.number(),
+  "name": zod.string(),
+  "slug": zod.string(),
+  "shortDescription": zod.string().nullish(),
+  "description": zod.string().nullish(),
+  "historicalInfo": zod.string().nullish(),
+  "openingTime": zod.string().nullish(),
+  "closingTime": zod.string().nullish(),
+  "ticketPriceIndian": zod.string().nullish(),
+  "ticketPriceForeign": zod.string().nullish(),
+  "ticketPriceChild": zod.string().nullish(),
+  "bestTimeToVisit": zod.string().nullish(),
+  "address": zod.string().nullish(),
+  "googleMapsLink": zod.string().nullish(),
+  "latitude": zod.string().nullish(),
+  "longitude": zod.string().nullish(),
+  "city": zod.string(),
+  "state": zod.string(),
+  "country": zod.string(),
+  "isActive": zod.boolean(),
+  "isFeatured": zod.boolean(),
+  "sortOrder": zod.number(),
+  "coverImageUrl": zod.string().nullish(),
+  "images": zod.array(zod.object({
+  "id": zod.number(),
+  "placeId": zod.number(),
+  "imageUrl": zod.string(),
+  "caption": zod.string().nullish(),
+  "altText": zod.string().nullish(),
+  "imageType": zod.enum(['cover', 'gallery']),
+  "isFeatured": zod.boolean(),
+  "sortOrder": zod.number(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})),
+  "tips": zod.array(zod.object({
+  "id": zod.number(),
+  "placeId": zod.number(),
+  "tip": zod.string(),
+  "category": zod.string().nullish(),
+  "sortOrder": zod.number(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})),
+  "distances": zod.array(zod.object({
+  "id": zod.number(),
+  "placeId": zod.number(),
+  "fromLocation": zod.string(),
+  "locationType": zod.enum(['railway_station', 'airport', 'bus_stand', 'city_center']),
+  "distanceKm": zod.string().nullish(),
+  "estimatedTimeMinutes": zod.number().nullish(),
+  "createdAt": zod.string()
+})),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})),
+  "total": zod.number(),
+  "page": zod.number(),
+  "limit": zod.number()
+})
+
+
+/**
+ * @summary Create a tourist place (admin)
+ */
+export const CreateTouristPlaceBody = zod.object({
+  "name": zod.string(),
+  "slug": zod.string(),
+  "shortDescription": zod.string().nullish(),
+  "description": zod.string().nullish(),
+  "historicalInfo": zod.string().nullish(),
+  "openingTime": zod.string().nullish(),
+  "closingTime": zod.string().nullish(),
+  "ticketPriceIndian": zod.string().nullish(),
+  "ticketPriceForeign": zod.string().nullish(),
+  "ticketPriceChild": zod.string().nullish(),
+  "bestTimeToVisit": zod.string().nullish(),
+  "address": zod.string().nullish(),
+  "googleMapsLink": zod.string().nullish(),
+  "latitude": zod.string().nullish(),
+  "longitude": zod.string().nullish(),
+  "city": zod.string().optional(),
+  "state": zod.string().optional(),
+  "country": zod.string().optional(),
+  "isActive": zod.boolean().optional(),
+  "isFeatured": zod.boolean().optional(),
+  "sortOrder": zod.number().optional()
+})
+
+
+/**
+ * @summary Seed demo tourist places (super_admin)
+ */
+export const SeedTouristPlacesResponse = zod.object({
+  "message": zod.string(),
+  "count": zod.number()
+})
+
+
+/**
+ * @summary Get tourist place detail (public)
+ */
+export const GetTouristPlaceParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const GetTouristPlaceResponse = zod.object({
+  "id": zod.number(),
+  "name": zod.string(),
+  "slug": zod.string(),
+  "shortDescription": zod.string().nullish(),
+  "description": zod.string().nullish(),
+  "historicalInfo": zod.string().nullish(),
+  "openingTime": zod.string().nullish(),
+  "closingTime": zod.string().nullish(),
+  "ticketPriceIndian": zod.string().nullish(),
+  "ticketPriceForeign": zod.string().nullish(),
+  "ticketPriceChild": zod.string().nullish(),
+  "bestTimeToVisit": zod.string().nullish(),
+  "address": zod.string().nullish(),
+  "googleMapsLink": zod.string().nullish(),
+  "latitude": zod.string().nullish(),
+  "longitude": zod.string().nullish(),
+  "city": zod.string(),
+  "state": zod.string(),
+  "country": zod.string(),
+  "isActive": zod.boolean(),
+  "isFeatured": zod.boolean(),
+  "sortOrder": zod.number(),
+  "coverImageUrl": zod.string().nullish(),
+  "images": zod.array(zod.object({
+  "id": zod.number(),
+  "placeId": zod.number(),
+  "imageUrl": zod.string(),
+  "caption": zod.string().nullish(),
+  "altText": zod.string().nullish(),
+  "imageType": zod.enum(['cover', 'gallery']),
+  "isFeatured": zod.boolean(),
+  "sortOrder": zod.number(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})),
+  "tips": zod.array(zod.object({
+  "id": zod.number(),
+  "placeId": zod.number(),
+  "tip": zod.string(),
+  "category": zod.string().nullish(),
+  "sortOrder": zod.number(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})),
+  "distances": zod.array(zod.object({
+  "id": zod.number(),
+  "placeId": zod.number(),
+  "fromLocation": zod.string(),
+  "locationType": zod.enum(['railway_station', 'airport', 'bus_stand', 'city_center']),
+  "distanceKm": zod.string().nullish(),
+  "estimatedTimeMinutes": zod.number().nullish(),
+  "createdAt": zod.string()
+})),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+
+
+/**
+ * @summary Update a tourist place (admin)
+ */
+export const UpdateTouristPlaceParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const UpdateTouristPlaceBody = zod.object({
+  "name": zod.string(),
+  "slug": zod.string(),
+  "shortDescription": zod.string().nullish(),
+  "description": zod.string().nullish(),
+  "historicalInfo": zod.string().nullish(),
+  "openingTime": zod.string().nullish(),
+  "closingTime": zod.string().nullish(),
+  "ticketPriceIndian": zod.string().nullish(),
+  "ticketPriceForeign": zod.string().nullish(),
+  "ticketPriceChild": zod.string().nullish(),
+  "bestTimeToVisit": zod.string().nullish(),
+  "address": zod.string().nullish(),
+  "googleMapsLink": zod.string().nullish(),
+  "latitude": zod.string().nullish(),
+  "longitude": zod.string().nullish(),
+  "city": zod.string().optional(),
+  "state": zod.string().optional(),
+  "country": zod.string().optional(),
+  "isActive": zod.boolean().optional(),
+  "isFeatured": zod.boolean().optional(),
+  "sortOrder": zod.number().optional()
+})
+
+export const UpdateTouristPlaceResponse = zod.object({
+  "id": zod.number(),
+  "name": zod.string(),
+  "slug": zod.string(),
+  "shortDescription": zod.string().nullish(),
+  "description": zod.string().nullish(),
+  "historicalInfo": zod.string().nullish(),
+  "openingTime": zod.string().nullish(),
+  "closingTime": zod.string().nullish(),
+  "ticketPriceIndian": zod.string().nullish(),
+  "ticketPriceForeign": zod.string().nullish(),
+  "ticketPriceChild": zod.string().nullish(),
+  "bestTimeToVisit": zod.string().nullish(),
+  "address": zod.string().nullish(),
+  "googleMapsLink": zod.string().nullish(),
+  "latitude": zod.string().nullish(),
+  "longitude": zod.string().nullish(),
+  "city": zod.string(),
+  "state": zod.string(),
+  "country": zod.string(),
+  "isActive": zod.boolean(),
+  "isFeatured": zod.boolean(),
+  "sortOrder": zod.number(),
+  "coverImageUrl": zod.string().nullish(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+
+
+/**
+ * @summary Delete a tourist place (admin)
+ */
+export const DeleteTouristPlaceParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const DeleteTouristPlaceResponse = zod.object({
+  "success": zod.boolean()
+})
+
+
+/**
+ * @summary Add image to tourist place (admin)
+ */
+export const AddTouristPlaceImageParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const AddTouristPlaceImageBody = zod.object({
+  "imageUrl": zod.string(),
+  "caption": zod.string().nullish(),
+  "altText": zod.string().nullish(),
+  "imageType": zod.enum(['cover', 'gallery']).optional(),
+  "isFeatured": zod.boolean().optional(),
+  "sortOrder": zod.number().optional()
+})
+
+
+/**
+ * @summary Reorder images (admin)
+ */
+export const ReorderTouristPlaceImagesParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const ReorderTouristPlaceImagesBody = zod.object({
+  "imageIds": zod.array(zod.number())
+})
+
+export const ReorderTouristPlaceImagesResponse = zod.object({
+  "success": zod.boolean()
+})
+
+
+/**
+ * @summary Update image metadata (admin)
+ */
+export const UpdateTouristPlaceImageParams = zod.object({
+  "imageId": zod.coerce.number()
+})
+
+export const UpdateTouristPlaceImageBody = zod.object({
+  "imageUrl": zod.string(),
+  "caption": zod.string().nullish(),
+  "altText": zod.string().nullish(),
+  "imageType": zod.enum(['cover', 'gallery']).optional(),
+  "isFeatured": zod.boolean().optional(),
+  "sortOrder": zod.number().optional()
+})
+
+export const UpdateTouristPlaceImageResponse = zod.object({
+  "id": zod.number(),
+  "placeId": zod.number(),
+  "imageUrl": zod.string(),
+  "caption": zod.string().nullish(),
+  "altText": zod.string().nullish(),
+  "imageType": zod.enum(['cover', 'gallery']),
+  "isFeatured": zod.boolean(),
+  "sortOrder": zod.number(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+
+
+/**
+ * @summary Delete image (admin)
+ */
+export const DeleteTouristPlaceImageParams = zod.object({
+  "imageId": zod.coerce.number()
+})
+
+export const DeleteTouristPlaceImageResponse = zod.object({
+  "success": zod.boolean()
+})
+
+
+/**
+ * @summary Set image as featured (admin)
+ */
+export const SetFeaturedTouristPlaceImageParams = zod.object({
+  "imageId": zod.coerce.number()
+})
+
+export const SetFeaturedTouristPlaceImageResponse = zod.object({
+  "success": zod.boolean()
+})
+
+
+/**
+ * @summary Add visitor tip (admin)
+ */
+export const AddTouristPlaceTipParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const AddTouristPlaceTipBody = zod.object({
+  "tip": zod.string(),
+  "category": zod.string().nullish(),
+  "sortOrder": zod.number().optional()
+})
+
+
+/**
+ * @summary Update visitor tip (admin)
+ */
+export const UpdateTouristPlaceTipParams = zod.object({
+  "tipId": zod.coerce.number()
+})
+
+export const UpdateTouristPlaceTipBody = zod.object({
+  "tip": zod.string(),
+  "category": zod.string().nullish(),
+  "sortOrder": zod.number().optional()
+})
+
+export const UpdateTouristPlaceTipResponse = zod.object({
+  "id": zod.number(),
+  "placeId": zod.number(),
+  "tip": zod.string(),
+  "category": zod.string().nullish(),
+  "sortOrder": zod.number(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+
+
+/**
+ * @summary Delete visitor tip (admin)
+ */
+export const DeleteTouristPlaceTipParams = zod.object({
+  "tipId": zod.coerce.number()
+})
+
+export const DeleteTouristPlaceTipResponse = zod.object({
+  "success": zod.boolean()
+})
+
+
+/**
+ * @summary Add distance info (admin)
+ */
+export const AddTouristPlaceDistanceParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const AddTouristPlaceDistanceBody = zod.object({
+  "fromLocation": zod.string(),
+  "locationType": zod.enum(['railway_station', 'airport', 'bus_stand', 'city_center']),
+  "distanceKm": zod.string().nullish(),
+  "estimatedTimeMinutes": zod.number().nullish()
+})
+
+
+/**
+ * @summary Update distance info (admin)
+ */
+export const UpdateTouristPlaceDistanceParams = zod.object({
+  "distId": zod.coerce.number()
+})
+
+export const UpdateTouristPlaceDistanceBody = zod.object({
+  "fromLocation": zod.string(),
+  "locationType": zod.enum(['railway_station', 'airport', 'bus_stand', 'city_center']),
+  "distanceKm": zod.string().nullish(),
+  "estimatedTimeMinutes": zod.number().nullish()
+})
+
+export const UpdateTouristPlaceDistanceResponse = zod.object({
+  "id": zod.number(),
+  "placeId": zod.number(),
+  "fromLocation": zod.string(),
+  "locationType": zod.enum(['railway_station', 'airport', 'bus_stand', 'city_center']),
+  "distanceKm": zod.string().nullish(),
+  "estimatedTimeMinutes": zod.number().nullish(),
+  "createdAt": zod.string()
+})
+
+
+/**
+ * @summary Delete distance info (admin)
+ */
+export const DeleteTouristPlaceDistanceParams = zod.object({
+  "distId": zod.coerce.number()
+})
+
+export const DeleteTouristPlaceDistanceResponse = zod.object({
+  "success": zod.boolean()
+})
+
+
