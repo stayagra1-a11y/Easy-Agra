@@ -132,20 +132,20 @@ export default function WriteReview() {
 
   const overallRating = ratings.overallRating ?? 0;
 
-  function handlePhotoUpload(e: React.ChangeEvent<HTMLInputElement>) {
+  async function handlePhotoUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const files = Array.from(e.target.files ?? []);
     if (photos.length + files.length > 5) {
       toast({ title: "Max 5 photos", description: "You can upload up to 5 photos", variant: "destructive" });
       return;
     }
-    files.forEach((file) => {
-      const reader = new FileReader();
-      reader.onload = (ev) => {
-        setPhotos((prev) => [...prev, ev.target?.result as string]);
-      };
-      reader.readAsDataURL(file);
-    });
     e.target.value = "";
+    try {
+      const { uploadToCloudinary } = await import("@/lib/cloudinary");
+      const urls = await Promise.all(files.map((f) => uploadToCloudinary(f)));
+      setPhotos((prev) => [...prev, ...urls]);
+    } catch {
+      toast({ title: "Upload failed", description: "Could not upload photo", variant: "destructive" });
+    }
   }
 
   function removePhoto(i: number) {

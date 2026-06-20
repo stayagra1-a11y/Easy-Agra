@@ -209,20 +209,21 @@ export default function RoomForm() {
     }));
   };
 
-  const handleImageUpload = (file: File, type: "cover" | "gallery") => {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const dataUrl = e.target?.result as string;
+  const handleImageUpload = async (file: File, type: "cover" | "gallery") => {
+    try {
+      const { uploadToCloudinary } = await import("@/lib/cloudinary");
+      const url = await uploadToCloudinary(file);
       if (type === "cover") {
-        set("coverImage", dataUrl);
+        set("coverImage", url);
       } else {
         setForm((prev) => ({
           ...prev,
-          galleryImages: [...prev.galleryImages, dataUrl],
+          galleryImages: [...prev.galleryImages, url],
         }));
       }
-    };
-    reader.readAsDataURL(file);
+    } catch {
+      // toast not available here — silently ignore or add toast import
+    }
   };
 
   const removeGalleryImage = (idx: number) => {

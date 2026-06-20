@@ -111,13 +111,17 @@ export default function MenuManagement() {
     setDialogOpen(true);
   }
 
-  function handlePhotoUpload(e: React.ChangeEvent<HTMLInputElement>) {
+  async function handlePhotoUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (ev) => setForm((f) => ({ ...f, itemPhoto: ev.target?.result as string }));
-    reader.readAsDataURL(file);
     e.target.value = "";
+    try {
+      const { uploadToCloudinary } = await import("@/lib/cloudinary");
+      const url = await uploadToCloudinary(file);
+      setForm((f) => ({ ...f, itemPhoto: url }));
+    } catch {
+      toast({ title: "Upload failed", variant: "destructive" });
+    }
   }
 
   function handleSave() {

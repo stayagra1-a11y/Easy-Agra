@@ -12,6 +12,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ArrowLeft, Building2, MapPin, Phone, Info, Wifi, Image, Save, Send, Loader2, IndianRupee } from "lucide-react";
 import { UpiSettingsCard } from "@/components/upi-settings-card";
+import { uploadToCloudinary } from "@/lib/cloudinary";
 import { Link, useLocation, useParams } from "wouter";
 import { useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
@@ -33,21 +34,26 @@ function ImageUpload({
   multiple?: boolean;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = useState(false);
+  const { toast } = useToast();
 
-  const handleFiles = (files: FileList | null) => {
+  const handleFiles = async (files: FileList | null) => {
     if (!files) return;
-    Array.from(files).forEach((file) => {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const result = e.target?.result as string;
-        if (multiple) {
-          onChange([...((value as string[]) || []), result]);
-        } else {
-          onChange(result);
-        }
-      };
-      reader.readAsDataURL(file);
-    });
+    setUploading(true);
+    try {
+      const uploads = await Promise.all(
+        Array.from(files).map((f) => uploadToCloudinary(f))
+      );
+      if (multiple) {
+        onChange([...((value as string[]) || []), ...uploads]);
+      } else {
+        onChange(uploads[0]);
+      }
+    } catch {
+      toast({ title: "Upload failed", description: "Could not upload image. Please try again.", variant: "destructive" });
+    } finally {
+      setUploading(false);
+    }
   };
 
   if (multiple) {

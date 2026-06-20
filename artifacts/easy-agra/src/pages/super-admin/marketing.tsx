@@ -36,13 +36,9 @@ async function apiFetch(path: string, options?: RequestInit) {
   return res.json();
 }
 
-function fileToBase64(file: File): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result as string);
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
-  });
+async function fileToBase64(file: File): Promise<string> {
+  const { uploadToCloudinary } = await import("@/lib/cloudinary");
+  return uploadToCloudinary(file);
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

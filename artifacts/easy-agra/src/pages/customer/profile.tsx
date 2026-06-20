@@ -42,20 +42,18 @@ export default function Profile() {
     }
   };
 
-  const handlePhoto = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handlePhoto = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file || !user) return;
-    const reader = new FileReader();
-    reader.onloadend = async () => {
-      try {
-        const updated = await photoMutation.mutateAsync({ id: user.id, data: { photoUrl: reader.result as string } });
-        queryClient.setQueryData(getGetMeQueryKey(), updated);
-        toast({ title: "Photo updated" });
-      } catch {
-        toast({ title: "Error", description: "Failed to upload photo", variant: "destructive" });
-      }
-    };
-    reader.readAsDataURL(file);
+    try {
+      const { uploadToCloudinary } = await import("@/lib/cloudinary");
+      const url = await uploadToCloudinary(file);
+      const updated = await photoMutation.mutateAsync({ id: user.id, data: { photoUrl: url } });
+      queryClient.setQueryData(getGetMeQueryKey(), updated);
+      toast({ title: "Photo updated" });
+    } catch {
+      toast({ title: "Error", description: "Failed to upload photo", variant: "destructive" });
+    }
   };
 
   const statusColors: Record<string, string> = {

@@ -97,28 +97,33 @@ export default function RestaurantForm() {
     setForm((f) => ({ ...f, [key]: value }));
   }
 
-  function handleCoverUpload(e: React.ChangeEvent<HTMLInputElement>) {
+  async function handleCoverUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (ev) => set("coverPhoto", ev.target?.result as string);
-    reader.readAsDataURL(file);
     e.target.value = "";
+    try {
+      const { uploadToCloudinary } = await import("@/lib/cloudinary");
+      const url = await uploadToCloudinary(file);
+      set("coverPhoto", url);
+    } catch {
+      toast({ title: "Upload failed", variant: "destructive" });
+    }
   }
 
-  function handleGalleryUpload(e: React.ChangeEvent<HTMLInputElement>) {
+  async function handleGalleryUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const files = Array.from(e.target.files ?? []);
     if (form.galleryPhotos.length + files.length > 8) {
       toast({ title: "Max 8 gallery photos", variant: "destructive" });
       return;
     }
-    files.forEach((file) => {
-      const reader = new FileReader();
-      reader.onload = (ev) =>
-        setForm((f) => ({ ...f, galleryPhotos: [...f.galleryPhotos, ev.target?.result as string] }));
-      reader.readAsDataURL(file);
-    });
     e.target.value = "";
+    try {
+      const { uploadToCloudinary } = await import("@/lib/cloudinary");
+      const urls = await Promise.all(files.map((f) => uploadToCloudinary(f)));
+      setForm((f) => ({ ...f, galleryPhotos: [...f.galleryPhotos, ...urls] }));
+    } catch {
+      toast({ title: "Upload failed", variant: "destructive" });
+    }
   }
 
   function removeGalleryPhoto(i: number) {

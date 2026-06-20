@@ -51,13 +51,9 @@ const statusConfig: Record<string, { icon: any; color: string; title: string; de
   },
 };
 
-function fileToBase64(file: File): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = () => resolve(reader.result as string);
-    reader.onerror = reject;
-  });
+async function fileToBase64(file: File): Promise<string> {
+  const { uploadToCloudinary } = await import("@/lib/cloudinary");
+  return uploadToCloudinary(file);
 }
 
 interface FormState {
