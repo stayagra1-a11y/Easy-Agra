@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { LayoutDashboard, LogOut, Map, Bell, User, Building2, BedDouble, Star, Utensils, CalendarCheck, Sparkles, IndianRupee, TrendingUp, CalendarX } from "lucide-react";
+import { LayoutDashboard, LogOut, Map, Bell, User, Building2, BedDouble, Star, Utensils, CalendarCheck, Sparkles, IndianRupee, TrendingUp, CalendarX, ClipboardList } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { useLogout, getGetMeQueryKey, useGetUnreadNotificationCount } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
@@ -25,6 +25,7 @@ const bottomNav: NavItem[] = [
   { href: "/spa-owner/dashboard", icon: LayoutDashboard, label: "Dashboard", roles: ["spa_owner"] },
   { href: "/hotel-owner/hotels", icon: Building2, label: "Hotels", roles: ["hotel_owner"] },
   { href: "/hotel-owner/rooms", icon: BedDouble, label: "Rooms", roles: ["hotel_owner"] },
+  { href: "/hotel-owner/bookings", icon: ClipboardList, label: "Bookings", roles: ["hotel_owner"] },
   { href: "/hotel-owner/reviews", icon: Star, label: "Reviews", roles: ["hotel_owner"] },
   { href: "/hotel-owner/payments", icon: IndianRupee, label: "Payments", roles: ["hotel_owner"] },
   { href: "/hotel-owner/earnings", icon: TrendingUp, label: "Earnings", roles: ["hotel_owner"] },

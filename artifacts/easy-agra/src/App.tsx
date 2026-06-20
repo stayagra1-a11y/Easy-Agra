@@ -56,6 +56,7 @@ import HotelForm from "@/pages/hotel-owner/hotel-form";
 import HotelOwnerRooms from "@/pages/hotel-owner/rooms";
 import RoomForm from "@/pages/hotel-owner/room-form";
 import HotelReviews from "@/pages/hotel-owner/hotel-reviews";
+import HotelOwnerBookings from "@/pages/hotel-owner/owner-bookings";
 import RestaurantOwnerDashboard from "@/pages/restaurant-owner/dashboard";
 import OwnerRestaurants from "@/pages/restaurant-owner/restaurants";
 import RestaurantForm from "@/pages/restaurant-owner/restaurant-form";
@@ -238,6 +239,7 @@ function Router() {
       <Route path="/hotel-owner/rooms/new" component={() => <ProtectedRoute component={RoomForm} allowedRoles={["hotel_owner"]} />} />
       <Route path="/hotel-owner/rooms/:id/edit" component={() => <ProtectedRoute component={RoomForm} allowedRoles={["hotel_owner"]} />} />
       <Route path="/hotel-owner/rooms" component={() => <ProtectedRoute component={HotelOwnerRooms} allowedRoles={["hotel_owner"]} />} />
+      <Route path="/hotel-owner/bookings" component={() => <ProtectedRoute component={HotelOwnerBookings} allowedRoles={["hotel_owner"]} />} />
       <Route path="/hotel-owner/reviews" component={() => <ProtectedRoute component={HotelReviews} allowedRoles={["hotel_owner"]} />} />
       <Route path="/hotel-owner/payments" component={() => <ProtectedRoute component={HotelOwnerPayments} allowedRoles={["hotel_owner"]} />} />
       <Route path="/hotel-owner/earnings" component={() => <ProtectedRoute component={HotelOwnerEarnings} allowedRoles={["hotel_owner"]} />} />
