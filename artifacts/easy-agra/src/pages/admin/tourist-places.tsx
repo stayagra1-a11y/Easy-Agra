@@ -43,7 +43,7 @@ export default function AdminTouristPlaces() {
   const handleSeed = async () => {
     setSeeding(true);
     try {
-      const result = await apiRequest("/tourist-places/seed", { method: "POST" }) as any;
+      const result = await apiRequest("/api/tourist-places/seed", { method: "POST" }) as any;
       toast({
         title: result.count > 0 ? "Seeded successfully!" : "Already seeded",
         description: result.message,
@@ -60,7 +60,7 @@ export default function AdminTouristPlaces() {
     if (!deleteId) return;
     setDeleting(true);
     try {
-      await apiRequest(`/tourist-places/${deleteId}`, { method: "DELETE" });
+      await apiRequest(`/api/tourist-places/${deleteId}`, { method: "DELETE" });
       toast({ title: "Deleted", description: "Tourist place removed successfully" });
       queryClient.invalidateQueries({ queryKey: ["/tourist-places"] });
     } catch {
@@ -140,7 +140,7 @@ export default function AdminTouristPlaces() {
               const imageCount = (place as any).images?.length ?? 0;
 
               return (
-                <Card key={place.id} className="overflow-hidden hover:shadow-md transition-shadow">
+                <Card key={place.id} className="overflow-hidden hover:shadow-md transition-shadow cursor-pointer" onClick={() => window.location.href = `/admin/tourist-places/${place.id}/photos`}>
                   <div className="flex gap-0">
                     {/* Thumbnail */}
                     <div className="w-32 sm:w-48 shrink-0 relative bg-muted">
@@ -206,7 +206,7 @@ export default function AdminTouristPlaces() {
                         </span>
                       </div>
 
-                      <div className="flex gap-2 mt-3 flex-wrap">
+                      <div className="flex gap-2 mt-3 flex-wrap" onClick={(e) => e.stopPropagation()}>
                         <Link href={`/admin/tourist-places/${place.id}/photos`}>
                           <Button size="sm" variant="outline" className="gap-1.5 border-primary/40 text-primary hover:bg-primary/5">
                             <Images className="h-3.5 w-3.5" />
@@ -223,7 +223,7 @@ export default function AdminTouristPlaces() {
                           size="sm"
                           variant="outline"
                           className="gap-1.5 text-destructive border-destructive/40 hover:bg-destructive/5"
-                          onClick={() => setDeleteId(place.id)}
+                          onClick={(e) => { e.stopPropagation(); setDeleteId(place.id); }}
                         >
                           <Trash2 className="h-3.5 w-3.5" />
                           Delete
