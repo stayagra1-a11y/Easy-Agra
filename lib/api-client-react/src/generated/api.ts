@@ -22,7 +22,9 @@ import type {
 import type {
   ActivityLog,
   ActivityLogsPage,
+  AddTicketMessageBody,
   AnnouncementInput,
+  AssignTicketBody,
   AuthResponse,
   Booking,
   BookingAnalytics,
@@ -35,17 +37,21 @@ import type {
   CommissionConfig,
   ConfirmPaymentInput,
   CreatePaymentInput,
+  CreateSupportTicketBody,
+  CreateTripBody,
   DashboardStats,
   DeleteMenuItem200,
   DeleteRestaurant200,
   DeleteReview200,
   DeleteSpa200,
   DeleteSpaService200,
+  DeleteSupportTicket200,
   DeleteTable200,
   DeleteTouristPlace200,
   DeleteTouristPlaceDistance200,
   DeleteTouristPlaceImage200,
   DeleteTouristPlaceTip200,
+  DeleteTrip200,
   EligibleBooking,
   ErrorResponse,
   FailPaymentInput,
@@ -94,7 +100,11 @@ import type {
   ListRestaurantsParams,
   ListReviewsParams,
   ListRoomsParams,
+  ListSupportTickets200,
+  ListSupportTicketsParams,
   ListTouristPlacesParams,
+  ListTrips200,
+  ListTripsParams,
   ListUsersParams,
   LoginInput,
   MenuItemDetail,
@@ -161,8 +171,12 @@ import type {
   SpaStats,
   SpaStatusUpdate,
   SpasPage,
+  SupportAnalytics,
+  SupportTicket,
+  SupportTicketDetail,
   TableDetail,
   TableInput,
+  TicketMessage,
   TopRatedHotel,
   TouristPlace,
   TouristPlaceDetail,
@@ -174,8 +188,11 @@ import type {
   TouristPlaceTip,
   TouristPlaceTipInput,
   TouristPlacesPage,
+  TripPlan,
   UnreadCount,
   UpdateCommissionConfigInput,
+  UpdateTicketStatusBody,
+  UpdateTripBody,
   User,
   UserRoleUpdate,
   UserStatusUpdate,
@@ -12917,6 +12934,1185 @@ export function useGetReportsEarnings<TData = Awaited<ReturnType<typeof getRepor
  ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
 
   const queryOptions = getGetReportsEarningsQueryOptions(params,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getListTripsUrl = (params?: ListTripsParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/trips?${stringifiedParams}` : `/api/trips`
+}
+
+/**
+ * @summary List customer trips
+ */
+export const listTrips = async (params?: ListTripsParams, options?: RequestInit): Promise<ListTrips200> => {
+
+  return customFetch<ListTrips200>(getListTripsUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListTripsQueryKey = (params?: ListTripsParams,) => {
+    return [
+    `/api/trips`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getListTripsQueryOptions = <TData = Awaited<ReturnType<typeof listTrips>>, TError = ErrorType<unknown>>(params?: ListTripsParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listTrips>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListTripsQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listTrips>>> = ({ signal }) => listTrips(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listTrips>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListTripsQueryResult = NonNullable<Awaited<ReturnType<typeof listTrips>>>
+export type ListTripsQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary List customer trips
+ */
+
+export function useListTrips<TData = Awaited<ReturnType<typeof listTrips>>, TError = ErrorType<unknown>>(
+ params?: ListTripsParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listTrips>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListTripsQueryOptions(params,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getCreateTripUrl = () => {
+
+
+
+
+  return `/api/trips`
+}
+
+/**
+ * @summary Create a trip plan
+ */
+export const createTrip = async (createTripBody: CreateTripBody, options?: RequestInit): Promise<TripPlan> => {
+
+  return customFetch<TripPlan>(getCreateTripUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      createTripBody,)
+  }
+);}
+
+
+
+
+export const getCreateTripMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createTrip>>, TError,{data: BodyType<CreateTripBody>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createTrip>>, TError,{data: BodyType<CreateTripBody>}, TContext> => {
+
+const mutationKey = ['createTrip'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createTrip>>, {data: BodyType<CreateTripBody>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  createTrip(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateTripMutationResult = NonNullable<Awaited<ReturnType<typeof createTrip>>>
+    export type CreateTripMutationBody = BodyType<CreateTripBody>
+    export type CreateTripMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Create a trip plan
+ */
+export const useCreateTrip = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createTrip>>, TError,{data: BodyType<CreateTripBody>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof createTrip>>,
+        TError,
+        {data: BodyType<CreateTripBody>},
+        TContext
+      > => {
+      return useMutation(getCreateTripMutationOptions(options));
+    }
+
+export const getGetTripUrl = (ref: string,) => {
+
+
+
+
+  return `/api/trips/${ref}`
+}
+
+/**
+ * @summary Get a trip plan by ref
+ */
+export const getTrip = async (ref: string, options?: RequestInit): Promise<TripPlan> => {
+
+  return customFetch<TripPlan>(getGetTripUrl(ref),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetTripQueryKey = (ref: string,) => {
+    return [
+    `/api/trips/${ref}`
+    ] as const;
+    }
+
+
+export const getGetTripQueryOptions = <TData = Awaited<ReturnType<typeof getTrip>>, TError = ErrorType<unknown>>(ref: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getTrip>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetTripQueryKey(ref);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getTrip>>> = ({ signal }) => getTrip(ref, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: !!(ref), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getTrip>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetTripQueryResult = NonNullable<Awaited<ReturnType<typeof getTrip>>>
+export type GetTripQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Get a trip plan by ref
+ */
+
+export function useGetTrip<TData = Awaited<ReturnType<typeof getTrip>>, TError = ErrorType<unknown>>(
+ ref: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getTrip>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetTripQueryOptions(ref,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getUpdateTripUrl = (ref: string,) => {
+
+
+
+
+  return `/api/trips/${ref}`
+}
+
+/**
+ * @summary Update a trip plan
+ */
+export const updateTrip = async (ref: string,
+    updateTripBody: UpdateTripBody, options?: RequestInit): Promise<TripPlan> => {
+
+  return customFetch<TripPlan>(getUpdateTripUrl(ref),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      updateTripBody,)
+  }
+);}
+
+
+
+
+export const getUpdateTripMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateTrip>>, TError,{ref: string;data: BodyType<UpdateTripBody>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateTrip>>, TError,{ref: string;data: BodyType<UpdateTripBody>}, TContext> => {
+
+const mutationKey = ['updateTrip'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateTrip>>, {ref: string;data: BodyType<UpdateTripBody>}> = (props) => {
+          const {ref,data} = props ?? {};
+
+          return  updateTrip(ref,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateTripMutationResult = NonNullable<Awaited<ReturnType<typeof updateTrip>>>
+    export type UpdateTripMutationBody = BodyType<UpdateTripBody>
+    export type UpdateTripMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Update a trip plan
+ */
+export const useUpdateTrip = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateTrip>>, TError,{ref: string;data: BodyType<UpdateTripBody>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof updateTrip>>,
+        TError,
+        {ref: string;data: BodyType<UpdateTripBody>},
+        TContext
+      > => {
+      return useMutation(getUpdateTripMutationOptions(options));
+    }
+
+export const getDeleteTripUrl = (ref: string,) => {
+
+
+
+
+  return `/api/trips/${ref}`
+}
+
+/**
+ * @summary Delete a trip plan
+ */
+export const deleteTrip = async (ref: string, options?: RequestInit): Promise<DeleteTrip200> => {
+
+  return customFetch<DeleteTrip200>(getDeleteTripUrl(ref),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+export const getDeleteTripMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteTrip>>, TError,{ref: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteTrip>>, TError,{ref: string}, TContext> => {
+
+const mutationKey = ['deleteTrip'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteTrip>>, {ref: string}> = (props) => {
+          const {ref} = props ?? {};
+
+          return  deleteTrip(ref,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteTripMutationResult = NonNullable<Awaited<ReturnType<typeof deleteTrip>>>
+
+    export type DeleteTripMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Delete a trip plan
+ */
+export const useDeleteTrip = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteTrip>>, TError,{ref: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof deleteTrip>>,
+        TError,
+        {ref: string},
+        TContext
+      > => {
+      return useMutation(getDeleteTripMutationOptions(options));
+    }
+
+export const getCancelTripUrl = (ref: string,) => {
+
+
+
+
+  return `/api/trips/${ref}/cancel`
+}
+
+/**
+ * @summary Cancel a trip plan
+ */
+export const cancelTrip = async (ref: string, options?: RequestInit): Promise<TripPlan> => {
+
+  return customFetch<TripPlan>(getCancelTripUrl(ref),
+  {
+    ...options,
+    method: 'PATCH'
+
+
+  }
+);}
+
+
+
+
+export const getCancelTripMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof cancelTrip>>, TError,{ref: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof cancelTrip>>, TError,{ref: string}, TContext> => {
+
+const mutationKey = ['cancelTrip'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof cancelTrip>>, {ref: string}> = (props) => {
+          const {ref} = props ?? {};
+
+          return  cancelTrip(ref,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CancelTripMutationResult = NonNullable<Awaited<ReturnType<typeof cancelTrip>>>
+
+    export type CancelTripMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Cancel a trip plan
+ */
+export const useCancelTrip = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof cancelTrip>>, TError,{ref: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof cancelTrip>>,
+        TError,
+        {ref: string},
+        TContext
+      > => {
+      return useMutation(getCancelTripMutationOptions(options));
+    }
+
+export const getListSupportTicketsUrl = (params?: ListSupportTicketsParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/support/tickets?${stringifiedParams}` : `/api/support/tickets`
+}
+
+/**
+ * @summary List support tickets
+ */
+export const listSupportTickets = async (params?: ListSupportTicketsParams, options?: RequestInit): Promise<ListSupportTickets200> => {
+
+  return customFetch<ListSupportTickets200>(getListSupportTicketsUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListSupportTicketsQueryKey = (params?: ListSupportTicketsParams,) => {
+    return [
+    `/api/support/tickets`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getListSupportTicketsQueryOptions = <TData = Awaited<ReturnType<typeof listSupportTickets>>, TError = ErrorType<unknown>>(params?: ListSupportTicketsParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listSupportTickets>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListSupportTicketsQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listSupportTickets>>> = ({ signal }) => listSupportTickets(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listSupportTickets>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListSupportTicketsQueryResult = NonNullable<Awaited<ReturnType<typeof listSupportTickets>>>
+export type ListSupportTicketsQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary List support tickets
+ */
+
+export function useListSupportTickets<TData = Awaited<ReturnType<typeof listSupportTickets>>, TError = ErrorType<unknown>>(
+ params?: ListSupportTicketsParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listSupportTickets>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListSupportTicketsQueryOptions(params,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getCreateSupportTicketUrl = () => {
+
+
+
+
+  return `/api/support/tickets`
+}
+
+/**
+ * @summary Create a support ticket
+ */
+export const createSupportTicket = async (createSupportTicketBody: CreateSupportTicketBody, options?: RequestInit): Promise<SupportTicket> => {
+
+  return customFetch<SupportTicket>(getCreateSupportTicketUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      createSupportTicketBody,)
+  }
+);}
+
+
+
+
+export const getCreateSupportTicketMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createSupportTicket>>, TError,{data: BodyType<CreateSupportTicketBody>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createSupportTicket>>, TError,{data: BodyType<CreateSupportTicketBody>}, TContext> => {
+
+const mutationKey = ['createSupportTicket'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createSupportTicket>>, {data: BodyType<CreateSupportTicketBody>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  createSupportTicket(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateSupportTicketMutationResult = NonNullable<Awaited<ReturnType<typeof createSupportTicket>>>
+    export type CreateSupportTicketMutationBody = BodyType<CreateSupportTicketBody>
+    export type CreateSupportTicketMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Create a support ticket
+ */
+export const useCreateSupportTicket = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createSupportTicket>>, TError,{data: BodyType<CreateSupportTicketBody>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof createSupportTicket>>,
+        TError,
+        {data: BodyType<CreateSupportTicketBody>},
+        TContext
+      > => {
+      return useMutation(getCreateSupportTicketMutationOptions(options));
+    }
+
+export const getGetSupportTicketUrl = (ref: string,) => {
+
+
+
+
+  return `/api/support/tickets/${ref}`
+}
+
+/**
+ * @summary Get ticket detail with messages
+ */
+export const getSupportTicket = async (ref: string, options?: RequestInit): Promise<SupportTicketDetail> => {
+
+  return customFetch<SupportTicketDetail>(getGetSupportTicketUrl(ref),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetSupportTicketQueryKey = (ref: string,) => {
+    return [
+    `/api/support/tickets/${ref}`
+    ] as const;
+    }
+
+
+export const getGetSupportTicketQueryOptions = <TData = Awaited<ReturnType<typeof getSupportTicket>>, TError = ErrorType<unknown>>(ref: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getSupportTicket>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetSupportTicketQueryKey(ref);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getSupportTicket>>> = ({ signal }) => getSupportTicket(ref, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: !!(ref), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getSupportTicket>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetSupportTicketQueryResult = NonNullable<Awaited<ReturnType<typeof getSupportTicket>>>
+export type GetSupportTicketQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Get ticket detail with messages
+ */
+
+export function useGetSupportTicket<TData = Awaited<ReturnType<typeof getSupportTicket>>, TError = ErrorType<unknown>>(
+ ref: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getSupportTicket>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetSupportTicketQueryOptions(ref,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getDeleteSupportTicketUrl = (ref: string,) => {
+
+
+
+
+  return `/api/support/tickets/${ref}`
+}
+
+/**
+ * @summary Delete a ticket (super_admin only)
+ */
+export const deleteSupportTicket = async (ref: string, options?: RequestInit): Promise<DeleteSupportTicket200> => {
+
+  return customFetch<DeleteSupportTicket200>(getDeleteSupportTicketUrl(ref),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+export const getDeleteSupportTicketMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteSupportTicket>>, TError,{ref: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteSupportTicket>>, TError,{ref: string}, TContext> => {
+
+const mutationKey = ['deleteSupportTicket'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteSupportTicket>>, {ref: string}> = (props) => {
+          const {ref} = props ?? {};
+
+          return  deleteSupportTicket(ref,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteSupportTicketMutationResult = NonNullable<Awaited<ReturnType<typeof deleteSupportTicket>>>
+
+    export type DeleteSupportTicketMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Delete a ticket (super_admin only)
+ */
+export const useDeleteSupportTicket = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteSupportTicket>>, TError,{ref: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof deleteSupportTicket>>,
+        TError,
+        {ref: string},
+        TContext
+      > => {
+      return useMutation(getDeleteSupportTicketMutationOptions(options));
+    }
+
+export const getAddTicketMessageUrl = (ref: string,) => {
+
+
+
+
+  return `/api/support/tickets/${ref}/messages`
+}
+
+/**
+ * @summary Add a message to a ticket
+ */
+export const addTicketMessage = async (ref: string,
+    addTicketMessageBody: AddTicketMessageBody, options?: RequestInit): Promise<TicketMessage> => {
+
+  return customFetch<TicketMessage>(getAddTicketMessageUrl(ref),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      addTicketMessageBody,)
+  }
+);}
+
+
+
+
+export const getAddTicketMessageMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof addTicketMessage>>, TError,{ref: string;data: BodyType<AddTicketMessageBody>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof addTicketMessage>>, TError,{ref: string;data: BodyType<AddTicketMessageBody>}, TContext> => {
+
+const mutationKey = ['addTicketMessage'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof addTicketMessage>>, {ref: string;data: BodyType<AddTicketMessageBody>}> = (props) => {
+          const {ref,data} = props ?? {};
+
+          return  addTicketMessage(ref,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type AddTicketMessageMutationResult = NonNullable<Awaited<ReturnType<typeof addTicketMessage>>>
+    export type AddTicketMessageMutationBody = BodyType<AddTicketMessageBody>
+    export type AddTicketMessageMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Add a message to a ticket
+ */
+export const useAddTicketMessage = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof addTicketMessage>>, TError,{ref: string;data: BodyType<AddTicketMessageBody>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof addTicketMessage>>,
+        TError,
+        {ref: string;data: BodyType<AddTicketMessageBody>},
+        TContext
+      > => {
+      return useMutation(getAddTicketMessageMutationOptions(options));
+    }
+
+export const getUpdateTicketStatusUrl = (ref: string,) => {
+
+
+
+
+  return `/api/support/tickets/${ref}/status`
+}
+
+/**
+ * @summary Update ticket status (admin)
+ */
+export const updateTicketStatus = async (ref: string,
+    updateTicketStatusBody: UpdateTicketStatusBody, options?: RequestInit): Promise<SupportTicket> => {
+
+  return customFetch<SupportTicket>(getUpdateTicketStatusUrl(ref),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      updateTicketStatusBody,)
+  }
+);}
+
+
+
+
+export const getUpdateTicketStatusMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateTicketStatus>>, TError,{ref: string;data: BodyType<UpdateTicketStatusBody>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateTicketStatus>>, TError,{ref: string;data: BodyType<UpdateTicketStatusBody>}, TContext> => {
+
+const mutationKey = ['updateTicketStatus'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateTicketStatus>>, {ref: string;data: BodyType<UpdateTicketStatusBody>}> = (props) => {
+          const {ref,data} = props ?? {};
+
+          return  updateTicketStatus(ref,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateTicketStatusMutationResult = NonNullable<Awaited<ReturnType<typeof updateTicketStatus>>>
+    export type UpdateTicketStatusMutationBody = BodyType<UpdateTicketStatusBody>
+    export type UpdateTicketStatusMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Update ticket status (admin)
+ */
+export const useUpdateTicketStatus = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateTicketStatus>>, TError,{ref: string;data: BodyType<UpdateTicketStatusBody>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof updateTicketStatus>>,
+        TError,
+        {ref: string;data: BodyType<UpdateTicketStatusBody>},
+        TContext
+      > => {
+      return useMutation(getUpdateTicketStatusMutationOptions(options));
+    }
+
+export const getAssignTicketUrl = (ref: string,) => {
+
+
+
+
+  return `/api/support/tickets/${ref}/assign`
+}
+
+/**
+ * @summary Assign ticket to admin
+ */
+export const assignTicket = async (ref: string,
+    assignTicketBody: AssignTicketBody, options?: RequestInit): Promise<SupportTicket> => {
+
+  return customFetch<SupportTicket>(getAssignTicketUrl(ref),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      assignTicketBody,)
+  }
+);}
+
+
+
+
+export const getAssignTicketMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof assignTicket>>, TError,{ref: string;data: BodyType<AssignTicketBody>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof assignTicket>>, TError,{ref: string;data: BodyType<AssignTicketBody>}, TContext> => {
+
+const mutationKey = ['assignTicket'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof assignTicket>>, {ref: string;data: BodyType<AssignTicketBody>}> = (props) => {
+          const {ref,data} = props ?? {};
+
+          return  assignTicket(ref,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type AssignTicketMutationResult = NonNullable<Awaited<ReturnType<typeof assignTicket>>>
+    export type AssignTicketMutationBody = BodyType<AssignTicketBody>
+    export type AssignTicketMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Assign ticket to admin
+ */
+export const useAssignTicket = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof assignTicket>>, TError,{ref: string;data: BodyType<AssignTicketBody>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof assignTicket>>,
+        TError,
+        {ref: string;data: BodyType<AssignTicketBody>},
+        TContext
+      > => {
+      return useMutation(getAssignTicketMutationOptions(options));
+    }
+
+export const getCloseTicketUrl = (ref: string,) => {
+
+
+
+
+  return `/api/support/tickets/${ref}/close`
+}
+
+/**
+ * @summary Close a ticket
+ */
+export const closeTicket = async (ref: string, options?: RequestInit): Promise<SupportTicket> => {
+
+  return customFetch<SupportTicket>(getCloseTicketUrl(ref),
+  {
+    ...options,
+    method: 'PATCH'
+
+
+  }
+);}
+
+
+
+
+export const getCloseTicketMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof closeTicket>>, TError,{ref: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof closeTicket>>, TError,{ref: string}, TContext> => {
+
+const mutationKey = ['closeTicket'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof closeTicket>>, {ref: string}> = (props) => {
+          const {ref} = props ?? {};
+
+          return  closeTicket(ref,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CloseTicketMutationResult = NonNullable<Awaited<ReturnType<typeof closeTicket>>>
+
+    export type CloseTicketMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Close a ticket
+ */
+export const useCloseTicket = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof closeTicket>>, TError,{ref: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof closeTicket>>,
+        TError,
+        {ref: string},
+        TContext
+      > => {
+      return useMutation(getCloseTicketMutationOptions(options));
+    }
+
+export const getReopenTicketUrl = (ref: string,) => {
+
+
+
+
+  return `/api/support/tickets/${ref}/reopen`
+}
+
+/**
+ * @summary Reopen a closed ticket (super_admin)
+ */
+export const reopenTicket = async (ref: string, options?: RequestInit): Promise<SupportTicket> => {
+
+  return customFetch<SupportTicket>(getReopenTicketUrl(ref),
+  {
+    ...options,
+    method: 'PATCH'
+
+
+  }
+);}
+
+
+
+
+export const getReopenTicketMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof reopenTicket>>, TError,{ref: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof reopenTicket>>, TError,{ref: string}, TContext> => {
+
+const mutationKey = ['reopenTicket'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof reopenTicket>>, {ref: string}> = (props) => {
+          const {ref} = props ?? {};
+
+          return  reopenTicket(ref,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ReopenTicketMutationResult = NonNullable<Awaited<ReturnType<typeof reopenTicket>>>
+
+    export type ReopenTicketMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Reopen a closed ticket (super_admin)
+ */
+export const useReopenTicket = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof reopenTicket>>, TError,{ref: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof reopenTicket>>,
+        TError,
+        {ref: string},
+        TContext
+      > => {
+      return useMutation(getReopenTicketMutationOptions(options));
+    }
+
+export const getGetSupportAnalyticsUrl = () => {
+
+
+
+
+  return `/api/support/analytics`
+}
+
+/**
+ * @summary Support ticket analytics (admin)
+ */
+export const getSupportAnalytics = async ( options?: RequestInit): Promise<SupportAnalytics> => {
+
+  return customFetch<SupportAnalytics>(getGetSupportAnalyticsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetSupportAnalyticsQueryKey = () => {
+    return [
+    `/api/support/analytics`
+    ] as const;
+    }
+
+
+export const getGetSupportAnalyticsQueryOptions = <TData = Awaited<ReturnType<typeof getSupportAnalytics>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getSupportAnalytics>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetSupportAnalyticsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getSupportAnalytics>>> = ({ signal }) => getSupportAnalytics({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getSupportAnalytics>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetSupportAnalyticsQueryResult = NonNullable<Awaited<ReturnType<typeof getSupportAnalytics>>>
+export type GetSupportAnalyticsQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Support ticket analytics (admin)
+ */
+
+export function useGetSupportAnalytics<TData = Awaited<ReturnType<typeof getSupportAnalytics>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getSupportAnalytics>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetSupportAnalyticsQueryOptions(options)
 
   const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
 

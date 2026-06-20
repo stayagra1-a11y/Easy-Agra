@@ -2030,6 +2030,197 @@ export interface RevenueReport {
   rows: RevenueReportRowsItem[];
 }
 
+export type TripPlanTravelType = typeof TripPlanTravelType[keyof typeof TripPlanTravelType];
+
+
+export const TripPlanTravelType = {
+  solo: 'solo',
+  couple: 'couple',
+  family: 'family',
+  friends: 'friends',
+  business: 'business',
+} as const;
+
+export type TripPlanBudgetCategory = typeof TripPlanBudgetCategory[keyof typeof TripPlanBudgetCategory];
+
+
+export const TripPlanBudgetCategory = {
+  budget: 'budget',
+  standard: 'standard',
+  premium: 'premium',
+  luxury: 'luxury',
+} as const;
+
+export type TripPlanStatus = typeof TripPlanStatus[keyof typeof TripPlanStatus];
+
+
+export const TripPlanStatus = {
+  draft: 'draft',
+  upcoming: 'upcoming',
+  ongoing: 'ongoing',
+  completed: 'completed',
+  cancelled: 'cancelled',
+} as const;
+
+export interface TripPlan {
+  id: number;
+  tripRef: string;
+  customerId: number;
+  title?: string | null;
+  arrivalDate: string;
+  departureDate: string;
+  days: number;
+  adults: number;
+  children: number;
+  budget: number;
+  travelType: TripPlanTravelType;
+  interests: string[];
+  budgetCategory: TripPlanBudgetCategory;
+  status: TripPlanStatus;
+  notes?: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type CreateTripBodyTravelType = typeof CreateTripBodyTravelType[keyof typeof CreateTripBodyTravelType];
+
+
+export const CreateTripBodyTravelType = {
+  solo: 'solo',
+  couple: 'couple',
+  family: 'family',
+  friends: 'friends',
+  business: 'business',
+} as const;
+
+export type CreateTripBodyBudgetCategory = typeof CreateTripBodyBudgetCategory[keyof typeof CreateTripBodyBudgetCategory];
+
+
+export const CreateTripBodyBudgetCategory = {
+  budget: 'budget',
+  standard: 'standard',
+  premium: 'premium',
+  luxury: 'luxury',
+} as const;
+
+export interface CreateTripBody {
+  title?: string | null;
+  arrivalDate: string;
+  departureDate: string;
+  days: number;
+  adults: number;
+  children?: number;
+  budget: number;
+  travelType: CreateTripBodyTravelType;
+  interests: string[];
+  budgetCategory: CreateTripBodyBudgetCategory;
+  notes?: string | null;
+}
+
+export type UpdateTripBodyTravelType = typeof UpdateTripBodyTravelType[keyof typeof UpdateTripBodyTravelType];
+
+
+export const UpdateTripBodyTravelType = {
+  solo: 'solo',
+  couple: 'couple',
+  family: 'family',
+  friends: 'friends',
+  business: 'business',
+} as const;
+
+export type UpdateTripBodyBudgetCategory = typeof UpdateTripBodyBudgetCategory[keyof typeof UpdateTripBodyBudgetCategory];
+
+
+export const UpdateTripBodyBudgetCategory = {
+  budget: 'budget',
+  standard: 'standard',
+  premium: 'premium',
+  luxury: 'luxury',
+} as const;
+
+export interface UpdateTripBody {
+  title?: string | null;
+  arrivalDate?: string;
+  departureDate?: string;
+  days?: number;
+  adults?: number;
+  children?: number;
+  budget?: number;
+  travelType?: UpdateTripBodyTravelType;
+  interests?: string[];
+  budgetCategory?: UpdateTripBodyBudgetCategory;
+  notes?: string | null;
+}
+
+export interface SupportTicket {
+  id: number;
+  ticketRef: string;
+  userId: number;
+  subject: string;
+  category: string;
+  priority: string;
+  status: string;
+  description: string;
+  assignedTo?: number | null;
+  userFullName?: string | null;
+  userEmail?: string | null;
+  resolvedAt?: string | null;
+  closedAt?: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface TicketMessage {
+  id: number;
+  ticketId: number;
+  senderId: number;
+  senderName: string;
+  senderRole?: string | null;
+  message: string;
+  attachmentUrl?: string | null;
+  isInternal: boolean;
+  createdAt: string;
+}
+
+export type SupportTicketDetail = SupportTicket & ({
+  messages: TicketMessage[];
+  assignedToName?: string | null;
+});
+
+export interface CreateSupportTicketBody {
+  subject: string;
+  category: string;
+  priority?: string;
+  description: string;
+}
+
+export interface AddTicketMessageBody {
+  message: string;
+  attachmentUrl?: string | null;
+  isInternal?: boolean;
+}
+
+export type SupportAnalyticsByCategoryItem = {
+  category: string;
+  count: number;
+};
+
+export type SupportAnalyticsByPriorityItem = {
+  priority: string;
+  count: number;
+};
+
+export interface SupportAnalytics {
+  total: number;
+  open: number;
+  inProgress: number;
+  waitingForCustomer: number;
+  resolved: number;
+  closed: number;
+  byCategory: SupportAnalyticsByCategoryItem[];
+  byPriority: SupportAnalyticsByPriorityItem[];
+}
+
 export type ListUsersParams = {
 role?: string;
 status?: string;
@@ -2339,5 +2530,50 @@ export type GetReportsEarningsParams = {
 from?: string;
 to?: string;
 ownerId?: number;
+};
+
+export type ListTripsParams = {
+status?: string;
+page?: number;
+limit?: number;
+};
+
+export type ListTrips200 = {
+  trips: TripPlan[];
+  total: number;
+  page: number;
+  limit: number;
+};
+
+export type DeleteTrip200 = {
+  success: boolean;
+};
+
+export type ListSupportTicketsParams = {
+status?: string;
+priority?: string;
+category?: string;
+search?: string;
+page?: number;
+limit?: number;
+};
+
+export type ListSupportTickets200 = {
+  tickets: SupportTicket[];
+  total: number;
+  page: number;
+  limit: number;
+};
+
+export type DeleteSupportTicket200 = {
+  success: boolean;
+};
+
+export type UpdateTicketStatusBody = {
+  status: string;
+};
+
+export type AssignTicketBody = {
+  assignedTo: number | null;
 };
 

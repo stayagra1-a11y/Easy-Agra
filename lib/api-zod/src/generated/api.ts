@@ -5309,3 +5309,417 @@ export const GetReportsEarningsResponse = zod.object({
 })
 
 
+/**
+ * @summary List customer trips
+ */
+export const listTripsQueryPageDefault = 1;
+export const listTripsQueryLimitDefault = 20;
+
+export const ListTripsQueryParams = zod.object({
+  "status": zod.coerce.string().optional(),
+  "page": zod.coerce.number().default(listTripsQueryPageDefault),
+  "limit": zod.coerce.number().default(listTripsQueryLimitDefault)
+})
+
+export const ListTripsResponse = zod.object({
+  "trips": zod.array(zod.object({
+  "id": zod.number(),
+  "tripRef": zod.string(),
+  "customerId": zod.number(),
+  "title": zod.string().nullish(),
+  "arrivalDate": zod.string(),
+  "departureDate": zod.string(),
+  "days": zod.number(),
+  "adults": zod.number(),
+  "children": zod.number(),
+  "budget": zod.number(),
+  "travelType": zod.enum(['solo', 'couple', 'family', 'friends', 'business']),
+  "interests": zod.array(zod.string()),
+  "budgetCategory": zod.enum(['budget', 'standard', 'premium', 'luxury']),
+  "status": zod.enum(['draft', 'upcoming', 'ongoing', 'completed', 'cancelled']),
+  "notes": zod.string().nullish(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})),
+  "total": zod.number(),
+  "page": zod.number(),
+  "limit": zod.number()
+})
+
+
+/**
+ * @summary Create a trip plan
+ */
+export const CreateTripBody = zod.object({
+  "title": zod.string().nullish(),
+  "arrivalDate": zod.string(),
+  "departureDate": zod.string(),
+  "days": zod.number(),
+  "adults": zod.number(),
+  "children": zod.number().optional(),
+  "budget": zod.number(),
+  "travelType": zod.enum(['solo', 'couple', 'family', 'friends', 'business']),
+  "interests": zod.array(zod.string()),
+  "budgetCategory": zod.enum(['budget', 'standard', 'premium', 'luxury']),
+  "notes": zod.string().nullish()
+})
+
+
+/**
+ * @summary Get a trip plan by ref
+ */
+export const GetTripParams = zod.object({
+  "ref": zod.coerce.string()
+})
+
+export const GetTripResponse = zod.object({
+  "id": zod.number(),
+  "tripRef": zod.string(),
+  "customerId": zod.number(),
+  "title": zod.string().nullish(),
+  "arrivalDate": zod.string(),
+  "departureDate": zod.string(),
+  "days": zod.number(),
+  "adults": zod.number(),
+  "children": zod.number(),
+  "budget": zod.number(),
+  "travelType": zod.enum(['solo', 'couple', 'family', 'friends', 'business']),
+  "interests": zod.array(zod.string()),
+  "budgetCategory": zod.enum(['budget', 'standard', 'premium', 'luxury']),
+  "status": zod.enum(['draft', 'upcoming', 'ongoing', 'completed', 'cancelled']),
+  "notes": zod.string().nullish(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+
+
+/**
+ * @summary Update a trip plan
+ */
+export const UpdateTripParams = zod.object({
+  "ref": zod.coerce.string()
+})
+
+export const UpdateTripBody = zod.object({
+  "title": zod.string().nullish(),
+  "arrivalDate": zod.string().optional(),
+  "departureDate": zod.string().optional(),
+  "days": zod.number().optional(),
+  "adults": zod.number().optional(),
+  "children": zod.number().optional(),
+  "budget": zod.number().optional(),
+  "travelType": zod.enum(['solo', 'couple', 'family', 'friends', 'business']).optional(),
+  "interests": zod.array(zod.string()).optional(),
+  "budgetCategory": zod.enum(['budget', 'standard', 'premium', 'luxury']).optional(),
+  "notes": zod.string().nullish()
+})
+
+export const UpdateTripResponse = zod.object({
+  "id": zod.number(),
+  "tripRef": zod.string(),
+  "customerId": zod.number(),
+  "title": zod.string().nullish(),
+  "arrivalDate": zod.string(),
+  "departureDate": zod.string(),
+  "days": zod.number(),
+  "adults": zod.number(),
+  "children": zod.number(),
+  "budget": zod.number(),
+  "travelType": zod.enum(['solo', 'couple', 'family', 'friends', 'business']),
+  "interests": zod.array(zod.string()),
+  "budgetCategory": zod.enum(['budget', 'standard', 'premium', 'luxury']),
+  "status": zod.enum(['draft', 'upcoming', 'ongoing', 'completed', 'cancelled']),
+  "notes": zod.string().nullish(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+
+
+/**
+ * @summary Delete a trip plan
+ */
+export const DeleteTripParams = zod.object({
+  "ref": zod.coerce.string()
+})
+
+export const DeleteTripResponse = zod.object({
+  "success": zod.boolean()
+})
+
+
+/**
+ * @summary Cancel a trip plan
+ */
+export const CancelTripParams = zod.object({
+  "ref": zod.coerce.string()
+})
+
+export const CancelTripResponse = zod.object({
+  "id": zod.number(),
+  "tripRef": zod.string(),
+  "customerId": zod.number(),
+  "title": zod.string().nullish(),
+  "arrivalDate": zod.string(),
+  "departureDate": zod.string(),
+  "days": zod.number(),
+  "adults": zod.number(),
+  "children": zod.number(),
+  "budget": zod.number(),
+  "travelType": zod.enum(['solo', 'couple', 'family', 'friends', 'business']),
+  "interests": zod.array(zod.string()),
+  "budgetCategory": zod.enum(['budget', 'standard', 'premium', 'luxury']),
+  "status": zod.enum(['draft', 'upcoming', 'ongoing', 'completed', 'cancelled']),
+  "notes": zod.string().nullish(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+
+
+/**
+ * @summary List support tickets
+ */
+export const listSupportTicketsQueryPageDefault = 1;
+export const listSupportTicketsQueryLimitDefault = 20;
+
+export const ListSupportTicketsQueryParams = zod.object({
+  "status": zod.coerce.string().optional(),
+  "priority": zod.coerce.string().optional(),
+  "category": zod.coerce.string().optional(),
+  "search": zod.coerce.string().optional(),
+  "page": zod.coerce.number().default(listSupportTicketsQueryPageDefault),
+  "limit": zod.coerce.number().default(listSupportTicketsQueryLimitDefault)
+})
+
+export const ListSupportTicketsResponse = zod.object({
+  "tickets": zod.array(zod.object({
+  "id": zod.number(),
+  "ticketRef": zod.string(),
+  "userId": zod.number(),
+  "subject": zod.string(),
+  "category": zod.string(),
+  "priority": zod.string(),
+  "status": zod.string(),
+  "description": zod.string(),
+  "assignedTo": zod.number().nullish(),
+  "userFullName": zod.string().nullish(),
+  "userEmail": zod.string().nullish(),
+  "resolvedAt": zod.string().nullish(),
+  "closedAt": zod.string().nullish(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})),
+  "total": zod.number(),
+  "page": zod.number(),
+  "limit": zod.number()
+})
+
+
+/**
+ * @summary Create a support ticket
+ */
+export const CreateSupportTicketBody = zod.object({
+  "subject": zod.string(),
+  "category": zod.string(),
+  "priority": zod.string().optional(),
+  "description": zod.string()
+})
+
+
+/**
+ * @summary Get ticket detail with messages
+ */
+export const GetSupportTicketParams = zod.object({
+  "ref": zod.coerce.string()
+})
+
+export const GetSupportTicketResponse = zod.object({
+  "id": zod.number(),
+  "ticketRef": zod.string(),
+  "userId": zod.number(),
+  "subject": zod.string(),
+  "category": zod.string(),
+  "priority": zod.string(),
+  "status": zod.string(),
+  "description": zod.string(),
+  "assignedTo": zod.number().nullish(),
+  "userFullName": zod.string().nullish(),
+  "userEmail": zod.string().nullish(),
+  "resolvedAt": zod.string().nullish(),
+  "closedAt": zod.string().nullish(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+}).and(zod.object({
+  "messages": zod.array(zod.object({
+  "id": zod.number(),
+  "ticketId": zod.number(),
+  "senderId": zod.number(),
+  "senderName": zod.string(),
+  "senderRole": zod.string().nullish(),
+  "message": zod.string(),
+  "attachmentUrl": zod.string().nullish(),
+  "isInternal": zod.boolean(),
+  "createdAt": zod.string()
+})),
+  "assignedToName": zod.string().nullish()
+}))
+
+
+/**
+ * @summary Delete a ticket (super_admin only)
+ */
+export const DeleteSupportTicketParams = zod.object({
+  "ref": zod.coerce.string()
+})
+
+export const DeleteSupportTicketResponse = zod.object({
+  "success": zod.boolean()
+})
+
+
+/**
+ * @summary Add a message to a ticket
+ */
+export const AddTicketMessageParams = zod.object({
+  "ref": zod.coerce.string()
+})
+
+export const AddTicketMessageBody = zod.object({
+  "message": zod.string(),
+  "attachmentUrl": zod.string().nullish(),
+  "isInternal": zod.boolean().optional()
+})
+
+
+/**
+ * @summary Update ticket status (admin)
+ */
+export const UpdateTicketStatusParams = zod.object({
+  "ref": zod.coerce.string()
+})
+
+export const UpdateTicketStatusBody = zod.object({
+  "status": zod.string()
+})
+
+export const UpdateTicketStatusResponse = zod.object({
+  "id": zod.number(),
+  "ticketRef": zod.string(),
+  "userId": zod.number(),
+  "subject": zod.string(),
+  "category": zod.string(),
+  "priority": zod.string(),
+  "status": zod.string(),
+  "description": zod.string(),
+  "assignedTo": zod.number().nullish(),
+  "userFullName": zod.string().nullish(),
+  "userEmail": zod.string().nullish(),
+  "resolvedAt": zod.string().nullish(),
+  "closedAt": zod.string().nullish(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+
+
+/**
+ * @summary Assign ticket to admin
+ */
+export const AssignTicketParams = zod.object({
+  "ref": zod.coerce.string()
+})
+
+export const AssignTicketBody = zod.object({
+  "assignedTo": zod.number().nullable()
+})
+
+export const AssignTicketResponse = zod.object({
+  "id": zod.number(),
+  "ticketRef": zod.string(),
+  "userId": zod.number(),
+  "subject": zod.string(),
+  "category": zod.string(),
+  "priority": zod.string(),
+  "status": zod.string(),
+  "description": zod.string(),
+  "assignedTo": zod.number().nullish(),
+  "userFullName": zod.string().nullish(),
+  "userEmail": zod.string().nullish(),
+  "resolvedAt": zod.string().nullish(),
+  "closedAt": zod.string().nullish(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+
+
+/**
+ * @summary Close a ticket
+ */
+export const CloseTicketParams = zod.object({
+  "ref": zod.coerce.string()
+})
+
+export const CloseTicketResponse = zod.object({
+  "id": zod.number(),
+  "ticketRef": zod.string(),
+  "userId": zod.number(),
+  "subject": zod.string(),
+  "category": zod.string(),
+  "priority": zod.string(),
+  "status": zod.string(),
+  "description": zod.string(),
+  "assignedTo": zod.number().nullish(),
+  "userFullName": zod.string().nullish(),
+  "userEmail": zod.string().nullish(),
+  "resolvedAt": zod.string().nullish(),
+  "closedAt": zod.string().nullish(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+
+
+/**
+ * @summary Reopen a closed ticket (super_admin)
+ */
+export const ReopenTicketParams = zod.object({
+  "ref": zod.coerce.string()
+})
+
+export const ReopenTicketResponse = zod.object({
+  "id": zod.number(),
+  "ticketRef": zod.string(),
+  "userId": zod.number(),
+  "subject": zod.string(),
+  "category": zod.string(),
+  "priority": zod.string(),
+  "status": zod.string(),
+  "description": zod.string(),
+  "assignedTo": zod.number().nullish(),
+  "userFullName": zod.string().nullish(),
+  "userEmail": zod.string().nullish(),
+  "resolvedAt": zod.string().nullish(),
+  "closedAt": zod.string().nullish(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+
+
+/**
+ * @summary Support ticket analytics (admin)
+ */
+export const GetSupportAnalyticsResponse = zod.object({
+  "total": zod.number(),
+  "open": zod.number(),
+  "inProgress": zod.number(),
+  "waitingForCustomer": zod.number(),
+  "resolved": zod.number(),
+  "closed": zod.number(),
+  "byCategory": zod.array(zod.object({
+  "category": zod.string(),
+  "count": zod.number()
+})),
+  "byPriority": zod.array(zod.object({
+  "priority": zod.string(),
+  "count": zod.number()
+}))
+})
+
+
