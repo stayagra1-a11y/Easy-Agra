@@ -67,7 +67,7 @@ export default function TouristPlacePhotos() {
     }
     setSaving(true);
     try {
-      await apiRequest(`/tourist-places/${placeId}/images`, {
+      await apiRequest(`/api/tourist-places/${placeId}/images`, {
         method: "POST",
         body: newImg,
       });
@@ -86,7 +86,7 @@ export default function TouristPlacePhotos() {
     if (!editImg) return;
     setSaving(true);
     try {
-      await apiRequest(`/tourist-places/images/${editImg.id}`, {
+      await apiRequest(`/api/tourist-places/images/${editImg.id}`, {
         method: "PUT",
         body: {
           imageUrl: editImg.imageUrl,
@@ -110,7 +110,7 @@ export default function TouristPlacePhotos() {
   const handleDelete = async (imageId: number) => {
     setDeleting(imageId);
     try {
-      await apiRequest(`/tourist-places/images/${imageId}`, { method: "DELETE" });
+      await apiRequest(`/api/tourist-places/images/${imageId}`, { method: "DELETE" });
       toast({ title: "Deleted" });
       invalidate();
     } catch {
@@ -123,7 +123,7 @@ export default function TouristPlacePhotos() {
   const handleFeature = async (imageId: number) => {
     setFeaturing(imageId);
     try {
-      await apiRequest(`/tourist-places/images/${imageId}/feature`, { method: "PUT" });
+      await apiRequest(`/api/tourist-places/images/${imageId}/feature`, { method: "PUT" });
       toast({ title: "Set as featured!" });
       invalidate();
     } catch {
@@ -142,7 +142,7 @@ export default function TouristPlacePhotos() {
     [newImages[idx], newImages[swapIdx]] = [newImages[swapIdx], newImages[idx]];
     const imageIds = newImages.map((img) => img.id);
     try {
-      await apiRequest(`/tourist-places/${placeId}/images/reorder`, {
+      await apiRequest(`/api/tourist-places/${placeId}/images/reorder`, {
         method: "POST",
         body: { imageIds },
       });
