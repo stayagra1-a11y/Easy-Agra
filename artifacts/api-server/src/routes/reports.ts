@@ -5,7 +5,7 @@ import {
   paymentsTable,
   usersTable,
 } from "@workspace/db";
-import { eq, and, gte, lte, desc } from "drizzle-orm";
+import { eq, and, gte, lte, desc, sql } from "drizzle-orm";
 import { requireAuth, requireRole } from "../middlewares/requireAuth";
 
 const router = Router();
@@ -142,6 +142,72 @@ router.get(
     const ownerId = isAdmin ? ownerIdParam : (user.id as number);
     const report = await buildReport(from, to, ownerId, undefined);
     res.json(report);
+  },
+);
+
+router.get(
+  "/admin/reports/users",
+  requireRole("admin", "super_admin"),
+  async (req, res) => {
+    const [byRole, byStatus, total, recent] = await Promise.all([
+      db.select({ role: usersTable.role, count: sql<number>`count(*)::int` })
+        .from(usersTable).groupBy(usersTable.role),
+      db.select({ status: usersTable.status, count: sql<number>`count(*)::int` })
+        .from(usersTable).groupBy(usersTable.status),
+      db.select({ count: sql<number>`count(*)::int` }).from(usersTable),
+      db.select({ role: usersTable.role, count: sql<number>`count(*)::int` })
+        .from(usersTable)
+        .where(gte(usersTable.createdAt, new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)))
+        .groupBy(usersTable.role),
+    ]);
+    res.json({ total: total[0]?.count ?? 0, byRole, byStatus, recentSignups: recent });
+  },
+);
+
+router.get(
+  "/admin/reports/export",
+  requireRole("admin", "super_admin"),
+  async (req, res) => {
+    const { from, to, bookingType } = req.query as Record<string, string>;
+    const report = await buildReport(from, to, undefined, bookingType);
+
+    const lines = [
+      "Date,Payment Ref,Booking Type,Gross (₹),Commission (₹),Net (₹),Owner,Status",
+      ...report.rows.map((r) =>
+        [r.date, r.paymentRef, r.bookingType, r.gross.toFixed(2), r.commission.toFixed(2), r.net.toFixed(2), `"${r.ownerName}"`, r.status].join(",")
+      ),
+    ];
+
+    res.setHeader("Content-Type", "text/csv");
+    res.setHeader("Content-Disposition", `attachment; filename="revenue-report-${new Date().toISOString().substring(0, 10)}.csv"`);
+    res.send(lines.join("\n"));
+  },
+);
+
+router.get(
+  "/admin/reports/users/export",
+  requireRole("admin", "super_admin"),
+  async (req, res) => {
+    const users = await db.select({
+      id: usersTable.id,
+      fullName: usersTable.fullName,
+      email: usersTable.email,
+      role: usersTable.role,
+      status: usersTable.status,
+      city: usersTable.city,
+      createdAt: usersTable.createdAt,
+    }).from(usersTable).orderBy(desc(usersTable.createdAt));
+
+    const lines = [
+      "ID,Full Name,Email,Role,Status,City,Joined",
+      ...users.map((u) =>
+        [u.id, `"${u.fullName}"`, u.email, u.role, u.status, u.city || "", u.createdAt.toISOString().substring(0, 10)].join(",")
+      ),
+    ];
+
+    res.setHeader("Content-Type", "text/csv");
+    res.setHeader("Content-Disposition", `attachment; filename="users-report-${new Date().toISOString().substring(0, 10)}.csv"`);
+    res.send(lines.join("\n"));
   },
 );
 

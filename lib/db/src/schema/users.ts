@@ -22,6 +22,7 @@ export const userStatusEnum = pgEnum("user_status", [
   "active",
   "suspended",
   "rejected",
+  "banned",
 ]);
 
 export const usersTable = pgTable("users", {

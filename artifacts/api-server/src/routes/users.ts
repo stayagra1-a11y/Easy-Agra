@@ -142,7 +142,7 @@ router.patch("/users/:id/status", requireRole("admin", "super_admin"), async (re
   const { status, reason } = req.body;
   const currentUser = (req as any).currentUser;
 
-  if (!["pending", "active", "suspended", "rejected"].includes(status)) {
+  if (!["pending", "active", "suspended", "rejected", "banned"].includes(status)) {
     res.status(400).json({ error: "Invalid status" });
     return;
   }

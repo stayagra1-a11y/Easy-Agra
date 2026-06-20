@@ -40,6 +40,10 @@ import SuperAdminAdmins from "@/pages/super-admin/admins";
 import PlatformSettings from "@/pages/super-admin/platform-settings";
 import SuperAdminActivityLogs from "@/pages/super-admin/activity-logs";
 import SuperAdminOwnerRequests from "@/pages/super-admin/owner-requests";
+import CouponsPage from "@/pages/super-admin/coupons";
+import FeaturedContent from "@/pages/super-admin/featured-content";
+import SuperAdminReports from "@/pages/super-admin/reports";
+import SecurityPage from "@/pages/super-admin/security";
 
 // Owner dashboards
 import HotelOwnerDashboard from "@/pages/hotel-owner/dashboard";
@@ -304,6 +308,10 @@ function Router() {
       <Route path="/super-admin/owner-requests" component={() => <ProtectedRoute component={SuperAdminOwnerRequests} allowedRoles={["super_admin"]} />} />
       <Route path="/super-admin/support-analytics" component={() => <ProtectedRoute component={SuperAdminSupportAnalytics} allowedRoles={["super_admin"]} />} />
       <Route path="/super-admin/refund-analytics" component={() => <ProtectedRoute component={SuperAdminRefundAnalytics} allowedRoles={["super_admin"]} />} />
+      <Route path="/super-admin/coupons" component={() => <ProtectedRoute component={CouponsPage} allowedRoles={["super_admin"]} />} />
+      <Route path="/super-admin/featured" component={() => <ProtectedRoute component={FeaturedContent} allowedRoles={["super_admin"]} />} />
+      <Route path="/super-admin/reports" component={() => <ProtectedRoute component={SuperAdminReports} allowedRoles={["super_admin"]} />} />
+      <Route path="/super-admin/security" component={() => <ProtectedRoute component={SecurityPage} allowedRoles={["super_admin"]} />} />
 
       {/* Fallback */}
       <Route component={NotFound} />

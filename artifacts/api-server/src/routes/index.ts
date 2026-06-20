@@ -27,6 +27,8 @@ import notificationsRouter from "./notifications";
 import activityLogsRouter from "./activity-logs";
 import platformSettingsRouter from "./platform-settings";
 import dashboardRouter from "./dashboard";
+import couponsRouter from "./coupons";
+import securityRouter from "./security";
 
 const router: IRouter = Router();
 
@@ -57,6 +59,8 @@ router.use(supportTicketsRouter);
 router.use(notificationsRouter);
 router.use(activityLogsRouter);
 router.use(platformSettingsRouter);
+router.use(couponsRouter);
+router.use(securityRouter);
 router.use(dashboardRouter);
 
 export default router;
