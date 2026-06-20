@@ -230,6 +230,10 @@ router.post("/users/:id/change-password", requireAuth, async (req, res): Promise
     return;
   }
 
+  if (!user.passwordHash) {
+    res.status(400).json({ error: "This account uses Google login. Password cannot be changed here." });
+    return;
+  }
   const valid = await bcrypt.compare(currentPassword, user.passwordHash);
   if (!valid) {
     res.status(400).json({ error: "Current password is incorrect" });

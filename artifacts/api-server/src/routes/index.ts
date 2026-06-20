@@ -31,11 +31,13 @@ import couponsRouter from "./coupons";
 import securityRouter from "./security";
 import pushNotificationsRouter from "./push-notifications";
 import marketingRouter from "./marketing";
+import googleAuthRouter from "./google-auth";
 
 const router: IRouter = Router();
 
 router.use(healthRouter);
 router.use(authRouter);
+router.use(googleAuthRouter);
 router.use(usersRouter);
 router.use(ownerRequestsRouter);
 router.use(hotelsRouter);

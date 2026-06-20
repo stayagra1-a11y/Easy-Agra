@@ -52,5 +52,6 @@ declare module "express-session" {
   interface SessionData {
     userId?: number;
     rememberMe?: boolean;
+    oauthState?: string;
   }
 }
