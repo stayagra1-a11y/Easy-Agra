@@ -40,6 +40,10 @@ tags:
     description: Spa appointment booking
   - name: tourist-places
     description: Tourist places management
+  - name: payments
+    description: Payment management and processing
+  - name: refunds
+    description: Refund management
 
 paths:
   /healthz:
@@ -3268,6 +3272,295 @@ paths:
                   success: { type: boolean }
                 required: [success]
 
+  # ─── Payments ───────────────────────────────────────────
+  /payments:
+    post:
+      operationId: createPayment
+      tags: [payments]
+      summary: Create a payment record for a booking/reservation/appointment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreatePaymentInput"
+      responses:
+        "201":
+          description: Payment record created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Payment"
+
+  /payments/my:
+    get:
+      operationId: getMyPayments
+      tags: [payments]
+      summary: Get current customer's payment history
+      parameters:
+        - name: page
+          in: query
+          schema: { type: integer, default: 1 }
+        - name: limit
+          in: query
+          schema: { type: integer, default: 20 }
+        - name: status
+          in: query
+          schema: { type: string }
+      responses:
+        "200":
+          description: Customer payment list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaymentListResponse"
+
+  /payments/owner:
+    get:
+      operationId: getOwnerPayments
+      tags: [payments]
+      summary: Get payments for the current owner's properties
+      parameters:
+        - name: page
+          in: query
+          schema: { type: integer, default: 1 }
+        - name: limit
+          in: query
+          schema: { type: integer, default: 20 }
+        - name: status
+          in: query
+          schema: { type: string }
+        - name: bookingType
+          in: query
+          schema: { type: string }
+      responses:
+        "200":
+          description: Owner payment list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaymentListResponse"
+
+  /payments/admin:
+    get:
+      operationId: getAdminPayments
+      tags: [payments]
+      summary: Get all payments (admin/super_admin)
+      parameters:
+        - name: page
+          in: query
+          schema: { type: integer, default: 1 }
+        - name: limit
+          in: query
+          schema: { type: integer, default: 20 }
+        - name: status
+          in: query
+          schema: { type: string }
+        - name: bookingType
+          in: query
+          schema: { type: string }
+        - name: search
+          in: query
+          schema: { type: string }
+      responses:
+        "200":
+          description: All payments
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaymentListResponse"
+
+  /payments/analytics:
+    get:
+      operationId: getPaymentAnalytics
+      tags: [payments]
+      summary: Revenue and payment analytics (admin/super_admin)
+      responses:
+        "200":
+          description: Analytics data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaymentAnalytics"
+
+  /payments/{ref}:
+    get:
+      operationId: getPaymentByRef
+      tags: [payments]
+      summary: Get single payment by paymentRef
+      parameters:
+        - name: ref
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Payment detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaymentDetail"
+
+  /payments/{ref}/initiate:
+    post:
+      operationId: initiatePayment
+      tags: [payments]
+      summary: Initiate payment (simulate gateway order creation)
+      parameters:
+        - name: ref
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/InitiatePaymentInput"
+      responses:
+        "200":
+          description: Payment initiated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Payment"
+
+  /payments/{ref}/confirm:
+    post:
+      operationId: confirmPayment
+      tags: [payments]
+      summary: Confirm/complete a payment (simulate gateway callback)
+      parameters:
+        - name: ref
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ConfirmPaymentInput"
+      responses:
+        "200":
+          description: Payment confirmed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Payment"
+
+  /payments/{ref}/fail:
+    post:
+      operationId: failPayment
+      tags: [payments]
+      summary: Mark payment as failed
+      parameters:
+        - name: ref
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FailPaymentInput"
+      responses:
+        "200":
+          description: Payment marked failed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Payment"
+
+  # ─── Refunds ───────────────────────────────────────────
+  /refunds:
+    post:
+      operationId: requestRefund
+      tags: [refunds]
+      summary: Request a refund for a payment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RefundRequestInput"
+      responses:
+        "201":
+          description: Refund request submitted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Refund"
+
+  /refunds/my:
+    get:
+      operationId: getMyRefunds
+      tags: [refunds]
+      summary: Get current customer's refund history
+      responses:
+        "200":
+          description: Customer refund list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  refunds:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/RefundDetail"
+                  total: { type: integer }
+                required: [refunds, total]
+
+  /refunds/admin:
+    get:
+      operationId: getAdminRefunds
+      tags: [refunds]
+      summary: Get all refunds (admin/super_admin)
+      parameters:
+        - name: status
+          in: query
+          schema: { type: string }
+      responses:
+        "200":
+          description: All refunds
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  refunds:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/RefundDetail"
+                  total: { type: integer }
+                required: [refunds, total]
+
+  /refunds/{id}:
+    put:
+      operationId: processRefund
+      tags: [refunds]
+      summary: Approve or reject a refund (admin/super_admin)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProcessRefundInput"
+      responses:
+        "200":
+          description: Refund processed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Refund"
+
 components:
   schemas:
     HealthStatus:
@@ -6101,3 +6394,229 @@ components:
           items:
             $ref: "#/components/schemas/NearbyVenueItem"
       required: [hotels, restaurants, spas]
+
+    # ─── Payment schemas ───────────────────────────────────
+    FailPaymentInput:
+      type: object
+      properties:
+        reason: { type: string }
+      required: [reason]
+
+    CreatePaymentInput:
+      type: object
+      properties:
+        bookingType:
+          type: string
+          enum: [hotel, restaurant, spa]
+        bookingId:
+          type: integer
+        bookingRef:
+          type: string
+        ownerId:
+          type: integer
+        amount:
+          type: number
+        paymentMode:
+          type: string
+          enum: [full, advance]
+        notes:
+          type: string
+          nullable: true
+      required: [bookingType, bookingId, bookingRef, ownerId, amount, paymentMode]
+
+    InitiatePaymentInput:
+      type: object
+      properties:
+        paymentMethod:
+          type: string
+          enum: [upi, credit_card, debit_card, net_banking, wallet]
+        paymentGateway:
+          type: string
+          enum: [razorpay, stripe, manual]
+      required: [paymentMethod]
+
+    ConfirmPaymentInput:
+      type: object
+      properties:
+        gatewayPaymentId:
+          type: string
+          nullable: true
+        gatewaySignature:
+          type: string
+          nullable: true
+        paidAmount:
+          type: number
+          nullable: true
+      required: []
+
+    Payment:
+      type: object
+      properties:
+        id: { type: integer }
+        paymentRef: { type: string }
+        bookingType:
+          type: string
+          enum: [hotel, restaurant, spa]
+        bookingId: { type: integer }
+        bookingRef: { type: string }
+        customerId: { type: integer }
+        ownerId: { type: integer }
+        amount: { type: number }
+        paidAmount: { type: number }
+        currency: { type: string }
+        paymentMode:
+          type: string
+          enum: [full, advance]
+        paymentMethod:
+          type: string
+          enum: [upi, credit_card, debit_card, net_banking, wallet]
+          nullable: true
+        paymentStatus:
+          type: string
+          enum: [pending, successful, failed, refunded, partially_refunded]
+        paymentGateway:
+          type: string
+          enum: [razorpay, stripe, manual]
+        gatewayOrderId: { type: string, nullable: true }
+        gatewayPaymentId: { type: string, nullable: true }
+        failureReason: { type: string, nullable: true }
+        notes: { type: string, nullable: true }
+        paidAt: { type: string, nullable: true }
+        createdAt: { type: string }
+        updatedAt: { type: string }
+      required: [id, paymentRef, bookingType, bookingId, bookingRef, customerId, ownerId, amount, paidAmount, currency, paymentMode, paymentStatus, paymentGateway, createdAt, updatedAt]
+
+    PaymentDetail:
+      allOf:
+        - $ref: "#/components/schemas/Payment"
+        - type: object
+          properties:
+            customerName: { type: string, nullable: true }
+            customerEmail: { type: string, nullable: true }
+            ownerName: { type: string, nullable: true }
+            transactions:
+              type: array
+              items:
+                $ref: "#/components/schemas/Transaction"
+            refunds:
+              type: array
+              items:
+                $ref: "#/components/schemas/Refund"
+          required: [transactions, refunds]
+
+    PaymentListResponse:
+      type: object
+      properties:
+        payments:
+          type: array
+          items:
+            $ref: "#/components/schemas/PaymentDetail"
+        total: { type: integer }
+        page: { type: integer }
+        limit: { type: integer }
+        totalPages: { type: integer }
+      required: [payments, total, page, limit, totalPages]
+
+    PaymentAnalytics:
+      type: object
+      properties:
+        totalRevenue: { type: number }
+        successfulPayments: { type: integer }
+        failedPayments: { type: integer }
+        pendingPayments: { type: integer }
+        refundedAmount: { type: number }
+        totalTransactions: { type: integer }
+        revenueByType:
+          type: array
+          items:
+            type: object
+            properties:
+              bookingType: { type: string }
+              revenue: { type: number }
+              count: { type: integer }
+            required: [bookingType, revenue, count]
+        revenueByMethod:
+          type: array
+          items:
+            type: object
+            properties:
+              paymentMethod: { type: string }
+              revenue: { type: number }
+              count: { type: integer }
+            required: [paymentMethod, revenue, count]
+        revenueByDay:
+          type: array
+          items:
+            type: object
+            properties:
+              date: { type: string }
+              revenue: { type: number }
+              count: { type: integer }
+            required: [date, revenue, count]
+      required: [totalRevenue, successfulPayments, failedPayments, pendingPayments, refundedAmount, totalTransactions, revenueByType, revenueByMethod, revenueByDay]
+
+    Transaction:
+      type: object
+      properties:
+        id: { type: integer }
+        transactionRef: { type: string }
+        paymentId: { type: integer }
+        type:
+          type: string
+          enum: [payment, refund, partial_refund]
+        amount: { type: number }
+        description: { type: string }
+        status: { type: string }
+        metadata: {}
+        createdAt: { type: string }
+      required: [id, transactionRef, paymentId, type, amount, description, status, createdAt]
+
+    # ─── Refund schemas ────────────────────────────────────
+    RefundRequestInput:
+      type: object
+      properties:
+        paymentId: { type: integer }
+        amount: { type: number }
+        reason: { type: string }
+      required: [paymentId, amount, reason]
+
+    ProcessRefundInput:
+      type: object
+      properties:
+        action:
+          type: string
+          enum: [approve, reject]
+        rejectionReason: { type: string, nullable: true }
+        notes: { type: string, nullable: true }
+      required: [action]
+
+    Refund:
+      type: object
+      properties:
+        id: { type: integer }
+        refundRef: { type: string }
+        paymentId: { type: integer }
+        amount: { type: number }
+        reason: { type: string }
+        status:
+          type: string
+          enum: [pending, approved, rejected, processed]
+        requestedBy: { type: integer }
+        processedBy: { type: integer, nullable: true }
+        processedAt: { type: string, nullable: true }
+        rejectionReason: { type: string, nullable: true }
+        notes: { type: string, nullable: true }
+        gatewayRefundId: { type: string, nullable: true }
+        createdAt: { type: string }
+        updatedAt: { type: string }
+      required: [id, refundRef, paymentId, amount, reason, status, requestedBy, createdAt, updatedAt]
+
+    RefundDetail:
+      allOf:
+        - $ref: "#/components/schemas/Refund"
+        - type: object
+          properties:
+            payment:
+              $ref: "#/components/schemas/Payment"
+            requestedByName: { type: string, nullable: true }
+            processedByName: { type: string, nullable: true }

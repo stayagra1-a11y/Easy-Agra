@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { LayoutDashboard, Users, FileCheck, Bell, Activity, Settings, LogOut, Map, Menu, X, Shield, BookOpen, BarChart2, Star, Utensils, Sparkles, Landmark } from "lucide-react";
+import { LayoutDashboard, Users, FileCheck, Bell, Activity, Settings, LogOut, Map, Menu, X, Shield, BookOpen, BarChart2, Star, Utensils, Sparkles, Landmark, IndianRupee } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { useLogout, getGetMeQueryKey } from "@workspace/api-client-react";
@@ -21,6 +21,7 @@ const adminNavItems: NavItem[] = [
   { href: "/admin/tourist-places", icon: Landmark, label: "Tourist Places" },
   { href: "/admin/bookings", icon: BookOpen, label: "Bookings" },
   { href: "/admin/booking-analytics", icon: BarChart2, label: "Analytics" },
+  { href: "/admin/payments", icon: IndianRupee, label: "Payments" },
   { href: "/admin/reviews", icon: Star, label: "Reviews" },
   { href: "/admin/restaurants", icon: Utensils, label: "Restaurants" },
   { href: "/admin/spas", icon: Sparkles, label: "Spas" },
@@ -35,6 +36,7 @@ const superAdminNavItems: NavItem[] = [
   { href: "/admin/tourist-places", icon: Landmark, label: "Tourist Places" },
   { href: "/admin/bookings", icon: BookOpen, label: "Bookings" },
   { href: "/admin/booking-analytics", icon: BarChart2, label: "Analytics" },
+  { href: "/admin/payments", icon: IndianRupee, label: "Payments" },
   { href: "/admin/reviews", icon: Star, label: "Reviews" },
   { href: "/admin/restaurants", icon: Utensils, label: "Restaurants" },
   { href: "/admin/spas", icon: Sparkles, label: "Spas" },

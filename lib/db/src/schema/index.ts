@@ -10,3 +10,4 @@ export * from "./notifications";
 export * from "./activity_logs";
 export * from "./platform_settings";
 export * from "./tourist_places";
+export * from "./payments";

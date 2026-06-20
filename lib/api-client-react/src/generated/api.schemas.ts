@@ -1531,6 +1531,260 @@ export interface NearbyRecommendations {
   spas: NearbyVenueItem[];
 }
 
+export interface FailPaymentInput {
+  reason: string;
+}
+
+export type CreatePaymentInputBookingType = typeof CreatePaymentInputBookingType[keyof typeof CreatePaymentInputBookingType];
+
+
+export const CreatePaymentInputBookingType = {
+  hotel: 'hotel',
+  restaurant: 'restaurant',
+  spa: 'spa',
+} as const;
+
+export type CreatePaymentInputPaymentMode = typeof CreatePaymentInputPaymentMode[keyof typeof CreatePaymentInputPaymentMode];
+
+
+export const CreatePaymentInputPaymentMode = {
+  full: 'full',
+  advance: 'advance',
+} as const;
+
+export interface CreatePaymentInput {
+  bookingType: CreatePaymentInputBookingType;
+  bookingId: number;
+  bookingRef: string;
+  ownerId: number;
+  amount: number;
+  paymentMode: CreatePaymentInputPaymentMode;
+  notes?: string | null;
+}
+
+export type InitiatePaymentInputPaymentMethod = typeof InitiatePaymentInputPaymentMethod[keyof typeof InitiatePaymentInputPaymentMethod];
+
+
+export const InitiatePaymentInputPaymentMethod = {
+  upi: 'upi',
+  credit_card: 'credit_card',
+  debit_card: 'debit_card',
+  net_banking: 'net_banking',
+  wallet: 'wallet',
+} as const;
+
+export type InitiatePaymentInputPaymentGateway = typeof InitiatePaymentInputPaymentGateway[keyof typeof InitiatePaymentInputPaymentGateway];
+
+
+export const InitiatePaymentInputPaymentGateway = {
+  razorpay: 'razorpay',
+  stripe: 'stripe',
+  manual: 'manual',
+} as const;
+
+export interface InitiatePaymentInput {
+  paymentMethod: InitiatePaymentInputPaymentMethod;
+  paymentGateway?: InitiatePaymentInputPaymentGateway;
+}
+
+export interface ConfirmPaymentInput {
+  gatewayPaymentId?: string | null;
+  gatewaySignature?: string | null;
+  paidAmount?: number | null;
+}
+
+export type PaymentBookingType = typeof PaymentBookingType[keyof typeof PaymentBookingType];
+
+
+export const PaymentBookingType = {
+  hotel: 'hotel',
+  restaurant: 'restaurant',
+  spa: 'spa',
+} as const;
+
+export type PaymentPaymentMode = typeof PaymentPaymentMode[keyof typeof PaymentPaymentMode];
+
+
+export const PaymentPaymentMode = {
+  full: 'full',
+  advance: 'advance',
+} as const;
+
+export type PaymentPaymentMethod = typeof PaymentPaymentMethod[keyof typeof PaymentPaymentMethod] | null;
+
+
+export const PaymentPaymentMethod = {
+  upi: 'upi',
+  credit_card: 'credit_card',
+  debit_card: 'debit_card',
+  net_banking: 'net_banking',
+  wallet: 'wallet',
+} as const;
+
+export type PaymentPaymentStatus = typeof PaymentPaymentStatus[keyof typeof PaymentPaymentStatus];
+
+
+export const PaymentPaymentStatus = {
+  pending: 'pending',
+  successful: 'successful',
+  failed: 'failed',
+  refunded: 'refunded',
+  partially_refunded: 'partially_refunded',
+} as const;
+
+export type PaymentPaymentGateway = typeof PaymentPaymentGateway[keyof typeof PaymentPaymentGateway];
+
+
+export const PaymentPaymentGateway = {
+  razorpay: 'razorpay',
+  stripe: 'stripe',
+  manual: 'manual',
+} as const;
+
+export interface Payment {
+  id: number;
+  paymentRef: string;
+  bookingType: PaymentBookingType;
+  bookingId: number;
+  bookingRef: string;
+  customerId: number;
+  ownerId: number;
+  amount: number;
+  paidAmount: number;
+  currency: string;
+  paymentMode: PaymentPaymentMode;
+  paymentMethod?: PaymentPaymentMethod;
+  paymentStatus: PaymentPaymentStatus;
+  paymentGateway: PaymentPaymentGateway;
+  gatewayOrderId?: string | null;
+  gatewayPaymentId?: string | null;
+  failureReason?: string | null;
+  notes?: string | null;
+  paidAt?: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type TransactionType = typeof TransactionType[keyof typeof TransactionType];
+
+
+export const TransactionType = {
+  payment: 'payment',
+  refund: 'refund',
+  partial_refund: 'partial_refund',
+} as const;
+
+export interface Transaction {
+  id: number;
+  transactionRef: string;
+  paymentId: number;
+  type: TransactionType;
+  amount: number;
+  description: string;
+  status: string;
+  metadata?: unknown;
+  createdAt: string;
+}
+
+export type RefundStatus = typeof RefundStatus[keyof typeof RefundStatus];
+
+
+export const RefundStatus = {
+  pending: 'pending',
+  approved: 'approved',
+  rejected: 'rejected',
+  processed: 'processed',
+} as const;
+
+export interface Refund {
+  id: number;
+  refundRef: string;
+  paymentId: number;
+  amount: number;
+  reason: string;
+  status: RefundStatus;
+  requestedBy: number;
+  processedBy?: number | null;
+  processedAt?: string | null;
+  rejectionReason?: string | null;
+  notes?: string | null;
+  gatewayRefundId?: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type PaymentDetail = Payment & ({
+  customerName?: string | null;
+  customerEmail?: string | null;
+  ownerName?: string | null;
+  transactions: Transaction[];
+  refunds: Refund[];
+});
+
+export interface PaymentListResponse {
+  payments: PaymentDetail[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
+export type PaymentAnalyticsRevenueByTypeItem = {
+  bookingType: string;
+  revenue: number;
+  count: number;
+};
+
+export type PaymentAnalyticsRevenueByMethodItem = {
+  paymentMethod: string;
+  revenue: number;
+  count: number;
+};
+
+export type PaymentAnalyticsRevenueByDayItem = {
+  date: string;
+  revenue: number;
+  count: number;
+};
+
+export interface PaymentAnalytics {
+  totalRevenue: number;
+  successfulPayments: number;
+  failedPayments: number;
+  pendingPayments: number;
+  refundedAmount: number;
+  totalTransactions: number;
+  revenueByType: PaymentAnalyticsRevenueByTypeItem[];
+  revenueByMethod: PaymentAnalyticsRevenueByMethodItem[];
+  revenueByDay: PaymentAnalyticsRevenueByDayItem[];
+}
+
+export interface RefundRequestInput {
+  paymentId: number;
+  amount: number;
+  reason: string;
+}
+
+export type ProcessRefundInputAction = typeof ProcessRefundInputAction[keyof typeof ProcessRefundInputAction];
+
+
+export const ProcessRefundInputAction = {
+  approve: 'approve',
+  reject: 'reject',
+} as const;
+
+export interface ProcessRefundInput {
+  action: ProcessRefundInputAction;
+  rejectionReason?: string | null;
+  notes?: string | null;
+}
+
+export type RefundDetail = Refund & ({
+  payment?: Payment;
+  requestedByName?: string | null;
+  processedByName?: string | null;
+});
+
 export type ListUsersParams = {
 role?: string;
 status?: string;
@@ -1722,5 +1976,40 @@ export type GetPlaceConnections200 = {
 
 export type DeleteTouristPlaceDistance200 = {
   success: boolean;
+};
+
+export type GetMyPaymentsParams = {
+page?: number;
+limit?: number;
+status?: string;
+};
+
+export type GetOwnerPaymentsParams = {
+page?: number;
+limit?: number;
+status?: string;
+bookingType?: string;
+};
+
+export type GetAdminPaymentsParams = {
+page?: number;
+limit?: number;
+status?: string;
+bookingType?: string;
+search?: string;
+};
+
+export type GetMyRefunds200 = {
+  refunds: RefundDetail[];
+  total: number;
+};
+
+export type GetAdminRefundsParams = {
+status?: string;
+};
+
+export type GetAdminRefunds200 = {
+  refunds: RefundDetail[];
+  total: number;
 };
 

@@ -4280,3 +4280,589 @@ export const DeleteTouristPlaceDistanceResponse = zod.object({
 })
 
 
+/**
+ * @summary Create a payment record for a booking/reservation/appointment
+ */
+export const CreatePaymentBody = zod.object({
+  "bookingType": zod.enum(['hotel', 'restaurant', 'spa']),
+  "bookingId": zod.number(),
+  "bookingRef": zod.string(),
+  "ownerId": zod.number(),
+  "amount": zod.number(),
+  "paymentMode": zod.enum(['full', 'advance']),
+  "notes": zod.string().nullish()
+})
+
+
+/**
+ * @summary Get current customer's payment history
+ */
+export const getMyPaymentsQueryPageDefault = 1;
+export const getMyPaymentsQueryLimitDefault = 20;
+
+export const GetMyPaymentsQueryParams = zod.object({
+  "page": zod.coerce.number().default(getMyPaymentsQueryPageDefault),
+  "limit": zod.coerce.number().default(getMyPaymentsQueryLimitDefault),
+  "status": zod.coerce.string().optional()
+})
+
+export const GetMyPaymentsResponse = zod.object({
+  "payments": zod.array(zod.object({
+  "id": zod.number(),
+  "paymentRef": zod.string(),
+  "bookingType": zod.enum(['hotel', 'restaurant', 'spa']),
+  "bookingId": zod.number(),
+  "bookingRef": zod.string(),
+  "customerId": zod.number(),
+  "ownerId": zod.number(),
+  "amount": zod.number(),
+  "paidAmount": zod.number(),
+  "currency": zod.string(),
+  "paymentMode": zod.enum(['full', 'advance']),
+  "paymentMethod": zod.enum(['upi', 'credit_card', 'debit_card', 'net_banking', 'wallet']).nullish(),
+  "paymentStatus": zod.enum(['pending', 'successful', 'failed', 'refunded', 'partially_refunded']),
+  "paymentGateway": zod.enum(['razorpay', 'stripe', 'manual']),
+  "gatewayOrderId": zod.string().nullish(),
+  "gatewayPaymentId": zod.string().nullish(),
+  "failureReason": zod.string().nullish(),
+  "notes": zod.string().nullish(),
+  "paidAt": zod.string().nullish(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+}).and(zod.object({
+  "customerName": zod.string().nullish(),
+  "customerEmail": zod.string().nullish(),
+  "ownerName": zod.string().nullish(),
+  "transactions": zod.array(zod.object({
+  "id": zod.number(),
+  "transactionRef": zod.string(),
+  "paymentId": zod.number(),
+  "type": zod.enum(['payment', 'refund', 'partial_refund']),
+  "amount": zod.number(),
+  "description": zod.string(),
+  "status": zod.string(),
+  "metadata": zod.unknown().optional(),
+  "createdAt": zod.string()
+})),
+  "refunds": zod.array(zod.object({
+  "id": zod.number(),
+  "refundRef": zod.string(),
+  "paymentId": zod.number(),
+  "amount": zod.number(),
+  "reason": zod.string(),
+  "status": zod.enum(['pending', 'approved', 'rejected', 'processed']),
+  "requestedBy": zod.number(),
+  "processedBy": zod.number().nullish(),
+  "processedAt": zod.string().nullish(),
+  "rejectionReason": zod.string().nullish(),
+  "notes": zod.string().nullish(),
+  "gatewayRefundId": zod.string().nullish(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+}))
+}))),
+  "total": zod.number(),
+  "page": zod.number(),
+  "limit": zod.number(),
+  "totalPages": zod.number()
+})
+
+
+/**
+ * @summary Get payments for the current owner's properties
+ */
+export const getOwnerPaymentsQueryPageDefault = 1;
+export const getOwnerPaymentsQueryLimitDefault = 20;
+
+export const GetOwnerPaymentsQueryParams = zod.object({
+  "page": zod.coerce.number().default(getOwnerPaymentsQueryPageDefault),
+  "limit": zod.coerce.number().default(getOwnerPaymentsQueryLimitDefault),
+  "status": zod.coerce.string().optional(),
+  "bookingType": zod.coerce.string().optional()
+})
+
+export const GetOwnerPaymentsResponse = zod.object({
+  "payments": zod.array(zod.object({
+  "id": zod.number(),
+  "paymentRef": zod.string(),
+  "bookingType": zod.enum(['hotel', 'restaurant', 'spa']),
+  "bookingId": zod.number(),
+  "bookingRef": zod.string(),
+  "customerId": zod.number(),
+  "ownerId": zod.number(),
+  "amount": zod.number(),
+  "paidAmount": zod.number(),
+  "currency": zod.string(),
+  "paymentMode": zod.enum(['full', 'advance']),
+  "paymentMethod": zod.enum(['upi', 'credit_card', 'debit_card', 'net_banking', 'wallet']).nullish(),
+  "paymentStatus": zod.enum(['pending', 'successful', 'failed', 'refunded', 'partially_refunded']),
+  "paymentGateway": zod.enum(['razorpay', 'stripe', 'manual']),
+  "gatewayOrderId": zod.string().nullish(),
+  "gatewayPaymentId": zod.string().nullish(),
+  "failureReason": zod.string().nullish(),
+  "notes": zod.string().nullish(),
+  "paidAt": zod.string().nullish(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+}).and(zod.object({
+  "customerName": zod.string().nullish(),
+  "customerEmail": zod.string().nullish(),
+  "ownerName": zod.string().nullish(),
+  "transactions": zod.array(zod.object({
+  "id": zod.number(),
+  "transactionRef": zod.string(),
+  "paymentId": zod.number(),
+  "type": zod.enum(['payment', 'refund', 'partial_refund']),
+  "amount": zod.number(),
+  "description": zod.string(),
+  "status": zod.string(),
+  "metadata": zod.unknown().optional(),
+  "createdAt": zod.string()
+})),
+  "refunds": zod.array(zod.object({
+  "id": zod.number(),
+  "refundRef": zod.string(),
+  "paymentId": zod.number(),
+  "amount": zod.number(),
+  "reason": zod.string(),
+  "status": zod.enum(['pending', 'approved', 'rejected', 'processed']),
+  "requestedBy": zod.number(),
+  "processedBy": zod.number().nullish(),
+  "processedAt": zod.string().nullish(),
+  "rejectionReason": zod.string().nullish(),
+  "notes": zod.string().nullish(),
+  "gatewayRefundId": zod.string().nullish(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+}))
+}))),
+  "total": zod.number(),
+  "page": zod.number(),
+  "limit": zod.number(),
+  "totalPages": zod.number()
+})
+
+
+/**
+ * @summary Get all payments (admin/super_admin)
+ */
+export const getAdminPaymentsQueryPageDefault = 1;
+export const getAdminPaymentsQueryLimitDefault = 20;
+
+export const GetAdminPaymentsQueryParams = zod.object({
+  "page": zod.coerce.number().default(getAdminPaymentsQueryPageDefault),
+  "limit": zod.coerce.number().default(getAdminPaymentsQueryLimitDefault),
+  "status": zod.coerce.string().optional(),
+  "bookingType": zod.coerce.string().optional(),
+  "search": zod.coerce.string().optional()
+})
+
+export const GetAdminPaymentsResponse = zod.object({
+  "payments": zod.array(zod.object({
+  "id": zod.number(),
+  "paymentRef": zod.string(),
+  "bookingType": zod.enum(['hotel', 'restaurant', 'spa']),
+  "bookingId": zod.number(),
+  "bookingRef": zod.string(),
+  "customerId": zod.number(),
+  "ownerId": zod.number(),
+  "amount": zod.number(),
+  "paidAmount": zod.number(),
+  "currency": zod.string(),
+  "paymentMode": zod.enum(['full', 'advance']),
+  "paymentMethod": zod.enum(['upi', 'credit_card', 'debit_card', 'net_banking', 'wallet']).nullish(),
+  "paymentStatus": zod.enum(['pending', 'successful', 'failed', 'refunded', 'partially_refunded']),
+  "paymentGateway": zod.enum(['razorpay', 'stripe', 'manual']),
+  "gatewayOrderId": zod.string().nullish(),
+  "gatewayPaymentId": zod.string().nullish(),
+  "failureReason": zod.string().nullish(),
+  "notes": zod.string().nullish(),
+  "paidAt": zod.string().nullish(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+}).and(zod.object({
+  "customerName": zod.string().nullish(),
+  "customerEmail": zod.string().nullish(),
+  "ownerName": zod.string().nullish(),
+  "transactions": zod.array(zod.object({
+  "id": zod.number(),
+  "transactionRef": zod.string(),
+  "paymentId": zod.number(),
+  "type": zod.enum(['payment', 'refund', 'partial_refund']),
+  "amount": zod.number(),
+  "description": zod.string(),
+  "status": zod.string(),
+  "metadata": zod.unknown().optional(),
+  "createdAt": zod.string()
+})),
+  "refunds": zod.array(zod.object({
+  "id": zod.number(),
+  "refundRef": zod.string(),
+  "paymentId": zod.number(),
+  "amount": zod.number(),
+  "reason": zod.string(),
+  "status": zod.enum(['pending', 'approved', 'rejected', 'processed']),
+  "requestedBy": zod.number(),
+  "processedBy": zod.number().nullish(),
+  "processedAt": zod.string().nullish(),
+  "rejectionReason": zod.string().nullish(),
+  "notes": zod.string().nullish(),
+  "gatewayRefundId": zod.string().nullish(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+}))
+}))),
+  "total": zod.number(),
+  "page": zod.number(),
+  "limit": zod.number(),
+  "totalPages": zod.number()
+})
+
+
+/**
+ * @summary Revenue and payment analytics (admin/super_admin)
+ */
+export const GetPaymentAnalyticsResponse = zod.object({
+  "totalRevenue": zod.number(),
+  "successfulPayments": zod.number(),
+  "failedPayments": zod.number(),
+  "pendingPayments": zod.number(),
+  "refundedAmount": zod.number(),
+  "totalTransactions": zod.number(),
+  "revenueByType": zod.array(zod.object({
+  "bookingType": zod.string(),
+  "revenue": zod.number(),
+  "count": zod.number()
+})),
+  "revenueByMethod": zod.array(zod.object({
+  "paymentMethod": zod.string(),
+  "revenue": zod.number(),
+  "count": zod.number()
+})),
+  "revenueByDay": zod.array(zod.object({
+  "date": zod.string(),
+  "revenue": zod.number(),
+  "count": zod.number()
+}))
+})
+
+
+/**
+ * @summary Get single payment by paymentRef
+ */
+export const GetPaymentByRefParams = zod.object({
+  "ref": zod.coerce.string()
+})
+
+export const GetPaymentByRefResponse = zod.object({
+  "id": zod.number(),
+  "paymentRef": zod.string(),
+  "bookingType": zod.enum(['hotel', 'restaurant', 'spa']),
+  "bookingId": zod.number(),
+  "bookingRef": zod.string(),
+  "customerId": zod.number(),
+  "ownerId": zod.number(),
+  "amount": zod.number(),
+  "paidAmount": zod.number(),
+  "currency": zod.string(),
+  "paymentMode": zod.enum(['full', 'advance']),
+  "paymentMethod": zod.enum(['upi', 'credit_card', 'debit_card', 'net_banking', 'wallet']).nullish(),
+  "paymentStatus": zod.enum(['pending', 'successful', 'failed', 'refunded', 'partially_refunded']),
+  "paymentGateway": zod.enum(['razorpay', 'stripe', 'manual']),
+  "gatewayOrderId": zod.string().nullish(),
+  "gatewayPaymentId": zod.string().nullish(),
+  "failureReason": zod.string().nullish(),
+  "notes": zod.string().nullish(),
+  "paidAt": zod.string().nullish(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+}).and(zod.object({
+  "customerName": zod.string().nullish(),
+  "customerEmail": zod.string().nullish(),
+  "ownerName": zod.string().nullish(),
+  "transactions": zod.array(zod.object({
+  "id": zod.number(),
+  "transactionRef": zod.string(),
+  "paymentId": zod.number(),
+  "type": zod.enum(['payment', 'refund', 'partial_refund']),
+  "amount": zod.number(),
+  "description": zod.string(),
+  "status": zod.string(),
+  "metadata": zod.unknown().optional(),
+  "createdAt": zod.string()
+})),
+  "refunds": zod.array(zod.object({
+  "id": zod.number(),
+  "refundRef": zod.string(),
+  "paymentId": zod.number(),
+  "amount": zod.number(),
+  "reason": zod.string(),
+  "status": zod.enum(['pending', 'approved', 'rejected', 'processed']),
+  "requestedBy": zod.number(),
+  "processedBy": zod.number().nullish(),
+  "processedAt": zod.string().nullish(),
+  "rejectionReason": zod.string().nullish(),
+  "notes": zod.string().nullish(),
+  "gatewayRefundId": zod.string().nullish(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+}))
+}))
+
+
+/**
+ * @summary Initiate payment (simulate gateway order creation)
+ */
+export const InitiatePaymentParams = zod.object({
+  "ref": zod.coerce.string()
+})
+
+export const InitiatePaymentBody = zod.object({
+  "paymentMethod": zod.enum(['upi', 'credit_card', 'debit_card', 'net_banking', 'wallet']),
+  "paymentGateway": zod.enum(['razorpay', 'stripe', 'manual']).optional()
+})
+
+export const InitiatePaymentResponse = zod.object({
+  "id": zod.number(),
+  "paymentRef": zod.string(),
+  "bookingType": zod.enum(['hotel', 'restaurant', 'spa']),
+  "bookingId": zod.number(),
+  "bookingRef": zod.string(),
+  "customerId": zod.number(),
+  "ownerId": zod.number(),
+  "amount": zod.number(),
+  "paidAmount": zod.number(),
+  "currency": zod.string(),
+  "paymentMode": zod.enum(['full', 'advance']),
+  "paymentMethod": zod.enum(['upi', 'credit_card', 'debit_card', 'net_banking', 'wallet']).nullish(),
+  "paymentStatus": zod.enum(['pending', 'successful', 'failed', 'refunded', 'partially_refunded']),
+  "paymentGateway": zod.enum(['razorpay', 'stripe', 'manual']),
+  "gatewayOrderId": zod.string().nullish(),
+  "gatewayPaymentId": zod.string().nullish(),
+  "failureReason": zod.string().nullish(),
+  "notes": zod.string().nullish(),
+  "paidAt": zod.string().nullish(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+
+
+/**
+ * @summary Confirm/complete a payment (simulate gateway callback)
+ */
+export const ConfirmPaymentParams = zod.object({
+  "ref": zod.coerce.string()
+})
+
+export const ConfirmPaymentBody = zod.object({
+  "gatewayPaymentId": zod.string().nullish(),
+  "gatewaySignature": zod.string().nullish(),
+  "paidAmount": zod.number().nullish()
+})
+
+export const ConfirmPaymentResponse = zod.object({
+  "id": zod.number(),
+  "paymentRef": zod.string(),
+  "bookingType": zod.enum(['hotel', 'restaurant', 'spa']),
+  "bookingId": zod.number(),
+  "bookingRef": zod.string(),
+  "customerId": zod.number(),
+  "ownerId": zod.number(),
+  "amount": zod.number(),
+  "paidAmount": zod.number(),
+  "currency": zod.string(),
+  "paymentMode": zod.enum(['full', 'advance']),
+  "paymentMethod": zod.enum(['upi', 'credit_card', 'debit_card', 'net_banking', 'wallet']).nullish(),
+  "paymentStatus": zod.enum(['pending', 'successful', 'failed', 'refunded', 'partially_refunded']),
+  "paymentGateway": zod.enum(['razorpay', 'stripe', 'manual']),
+  "gatewayOrderId": zod.string().nullish(),
+  "gatewayPaymentId": zod.string().nullish(),
+  "failureReason": zod.string().nullish(),
+  "notes": zod.string().nullish(),
+  "paidAt": zod.string().nullish(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+
+
+/**
+ * @summary Mark payment as failed
+ */
+export const FailPaymentParams = zod.object({
+  "ref": zod.coerce.string()
+})
+
+export const FailPaymentBody = zod.object({
+  "reason": zod.string()
+})
+
+export const FailPaymentResponse = zod.object({
+  "id": zod.number(),
+  "paymentRef": zod.string(),
+  "bookingType": zod.enum(['hotel', 'restaurant', 'spa']),
+  "bookingId": zod.number(),
+  "bookingRef": zod.string(),
+  "customerId": zod.number(),
+  "ownerId": zod.number(),
+  "amount": zod.number(),
+  "paidAmount": zod.number(),
+  "currency": zod.string(),
+  "paymentMode": zod.enum(['full', 'advance']),
+  "paymentMethod": zod.enum(['upi', 'credit_card', 'debit_card', 'net_banking', 'wallet']).nullish(),
+  "paymentStatus": zod.enum(['pending', 'successful', 'failed', 'refunded', 'partially_refunded']),
+  "paymentGateway": zod.enum(['razorpay', 'stripe', 'manual']),
+  "gatewayOrderId": zod.string().nullish(),
+  "gatewayPaymentId": zod.string().nullish(),
+  "failureReason": zod.string().nullish(),
+  "notes": zod.string().nullish(),
+  "paidAt": zod.string().nullish(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+
+
+/**
+ * @summary Request a refund for a payment
+ */
+export const RequestRefundBody = zod.object({
+  "paymentId": zod.number(),
+  "amount": zod.number(),
+  "reason": zod.string()
+})
+
+
+/**
+ * @summary Get current customer's refund history
+ */
+export const GetMyRefundsResponse = zod.object({
+  "refunds": zod.array(zod.object({
+  "id": zod.number(),
+  "refundRef": zod.string(),
+  "paymentId": zod.number(),
+  "amount": zod.number(),
+  "reason": zod.string(),
+  "status": zod.enum(['pending', 'approved', 'rejected', 'processed']),
+  "requestedBy": zod.number(),
+  "processedBy": zod.number().nullish(),
+  "processedAt": zod.string().nullish(),
+  "rejectionReason": zod.string().nullish(),
+  "notes": zod.string().nullish(),
+  "gatewayRefundId": zod.string().nullish(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+}).and(zod.object({
+  "payment": zod.object({
+  "id": zod.number(),
+  "paymentRef": zod.string(),
+  "bookingType": zod.enum(['hotel', 'restaurant', 'spa']),
+  "bookingId": zod.number(),
+  "bookingRef": zod.string(),
+  "customerId": zod.number(),
+  "ownerId": zod.number(),
+  "amount": zod.number(),
+  "paidAmount": zod.number(),
+  "currency": zod.string(),
+  "paymentMode": zod.enum(['full', 'advance']),
+  "paymentMethod": zod.enum(['upi', 'credit_card', 'debit_card', 'net_banking', 'wallet']).nullish(),
+  "paymentStatus": zod.enum(['pending', 'successful', 'failed', 'refunded', 'partially_refunded']),
+  "paymentGateway": zod.enum(['razorpay', 'stripe', 'manual']),
+  "gatewayOrderId": zod.string().nullish(),
+  "gatewayPaymentId": zod.string().nullish(),
+  "failureReason": zod.string().nullish(),
+  "notes": zod.string().nullish(),
+  "paidAt": zod.string().nullish(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+}).optional(),
+  "requestedByName": zod.string().nullish(),
+  "processedByName": zod.string().nullish()
+}))),
+  "total": zod.number()
+})
+
+
+/**
+ * @summary Get all refunds (admin/super_admin)
+ */
+export const GetAdminRefundsQueryParams = zod.object({
+  "status": zod.coerce.string().optional()
+})
+
+export const GetAdminRefundsResponse = zod.object({
+  "refunds": zod.array(zod.object({
+  "id": zod.number(),
+  "refundRef": zod.string(),
+  "paymentId": zod.number(),
+  "amount": zod.number(),
+  "reason": zod.string(),
+  "status": zod.enum(['pending', 'approved', 'rejected', 'processed']),
+  "requestedBy": zod.number(),
+  "processedBy": zod.number().nullish(),
+  "processedAt": zod.string().nullish(),
+  "rejectionReason": zod.string().nullish(),
+  "notes": zod.string().nullish(),
+  "gatewayRefundId": zod.string().nullish(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+}).and(zod.object({
+  "payment": zod.object({
+  "id": zod.number(),
+  "paymentRef": zod.string(),
+  "bookingType": zod.enum(['hotel', 'restaurant', 'spa']),
+  "bookingId": zod.number(),
+  "bookingRef": zod.string(),
+  "customerId": zod.number(),
+  "ownerId": zod.number(),
+  "amount": zod.number(),
+  "paidAmount": zod.number(),
+  "currency": zod.string(),
+  "paymentMode": zod.enum(['full', 'advance']),
+  "paymentMethod": zod.enum(['upi', 'credit_card', 'debit_card', 'net_banking', 'wallet']).nullish(),
+  "paymentStatus": zod.enum(['pending', 'successful', 'failed', 'refunded', 'partially_refunded']),
+  "paymentGateway": zod.enum(['razorpay', 'stripe', 'manual']),
+  "gatewayOrderId": zod.string().nullish(),
+  "gatewayPaymentId": zod.string().nullish(),
+  "failureReason": zod.string().nullish(),
+  "notes": zod.string().nullish(),
+  "paidAt": zod.string().nullish(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+}).optional(),
+  "requestedByName": zod.string().nullish(),
+  "processedByName": zod.string().nullish()
+}))),
+  "total": zod.number()
+})
+
+
+/**
+ * @summary Approve or reject a refund (admin/super_admin)
+ */
+export const ProcessRefundParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const ProcessRefundBody = zod.object({
+  "action": zod.enum(['approve', 'reject']),
+  "rejectionReason": zod.string().nullish(),
+  "notes": zod.string().nullish()
+})
+
+export const ProcessRefundResponse = zod.object({
+  "id": zod.number(),
+  "refundRef": zod.string(),
+  "paymentId": zod.number(),
+  "amount": zod.number(),
+  "reason": zod.string(),
+  "status": zod.enum(['pending', 'approved', 'rejected', 'processed']),
+  "requestedBy": zod.number(),
+  "processedBy": zod.number().nullish(),
+  "processedAt": zod.string().nullish(),
+  "rejectionReason": zod.string().nullish(),
+  "notes": zod.string().nullish(),
+  "gatewayRefundId": zod.string().nullish(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+
+
