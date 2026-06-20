@@ -45,12 +45,16 @@ import type {
   DeleteTouristPlaceTip200,
   EligibleBooking,
   ErrorResponse,
+  FavoriteToggleResult,
   ForgotPasswordInput,
   GetAllSpasParams,
+  GetMyFavoritePlaces200,
   GetMySpaAppointmentsParams,
   GetOwnerSpaAppointmentsParams,
+  GetPlaceConnections200,
   GetRoomStatsParams,
   GetTopRatedHotelsParams,
+  GetTouristPlaceConnections200,
   HealthStatus,
   Hotel,
   HotelInput,
@@ -73,6 +77,7 @@ import type {
   MenuItemDetail,
   MenuItemInput,
   MessageResponse,
+  NearbyRecommendations,
   Notification,
   NotificationsPage,
   OwnerRequest,
@@ -10406,6 +10411,384 @@ export const useAddTouristPlaceDistance = <TError = ErrorType<unknown>,
       > => {
       return useMutation(getAddTouristPlaceDistanceMutationOptions(options));
     }
+
+export const getGetMyFavoritePlacesUrl = () => {
+
+
+
+
+  return `/api/tourist-places/my-favorites`
+}
+
+/**
+ * @summary Get my favorited tourist places
+ */
+export const getMyFavoritePlaces = async ( options?: RequestInit): Promise<GetMyFavoritePlaces200> => {
+
+  return customFetch<GetMyFavoritePlaces200>(getGetMyFavoritePlacesUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetMyFavoritePlacesQueryKey = () => {
+    return [
+    `/api/tourist-places/my-favorites`
+    ] as const;
+    }
+
+
+export const getGetMyFavoritePlacesQueryOptions = <TData = Awaited<ReturnType<typeof getMyFavoritePlaces>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getMyFavoritePlaces>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetMyFavoritePlacesQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getMyFavoritePlaces>>> = ({ signal }) => getMyFavoritePlaces({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getMyFavoritePlaces>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetMyFavoritePlacesQueryResult = NonNullable<Awaited<ReturnType<typeof getMyFavoritePlaces>>>
+export type GetMyFavoritePlacesQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Get my favorited tourist places
+ */
+
+export function useGetMyFavoritePlaces<TData = Awaited<ReturnType<typeof getMyFavoritePlaces>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getMyFavoritePlaces>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetMyFavoritePlacesQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getGetTouristPlaceConnectionsUrl = () => {
+
+
+
+
+  return `/api/tourist-places/connections`
+}
+
+/**
+ * @summary Get inter-place distances between all tourist places
+ */
+export const getTouristPlaceConnections = async ( options?: RequestInit): Promise<GetTouristPlaceConnections200> => {
+
+  return customFetch<GetTouristPlaceConnections200>(getGetTouristPlaceConnectionsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetTouristPlaceConnectionsQueryKey = () => {
+    return [
+    `/api/tourist-places/connections`
+    ] as const;
+    }
+
+
+export const getGetTouristPlaceConnectionsQueryOptions = <TData = Awaited<ReturnType<typeof getTouristPlaceConnections>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getTouristPlaceConnections>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetTouristPlaceConnectionsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getTouristPlaceConnections>>> = ({ signal }) => getTouristPlaceConnections({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getTouristPlaceConnections>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetTouristPlaceConnectionsQueryResult = NonNullable<Awaited<ReturnType<typeof getTouristPlaceConnections>>>
+export type GetTouristPlaceConnectionsQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Get inter-place distances between all tourist places
+ */
+
+export function useGetTouristPlaceConnections<TData = Awaited<ReturnType<typeof getTouristPlaceConnections>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getTouristPlaceConnections>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetTouristPlaceConnectionsQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getToggleTouristPlaceFavoriteUrl = (id: number,) => {
+
+
+
+
+  return `/api/tourist-places/${id}/favorite`
+}
+
+/**
+ * @summary Toggle favorite status for a tourist place
+ */
+export const toggleTouristPlaceFavorite = async (id: number, options?: RequestInit): Promise<FavoriteToggleResult> => {
+
+  return customFetch<FavoriteToggleResult>(getToggleTouristPlaceFavoriteUrl(id),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+export const getToggleTouristPlaceFavoriteMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof toggleTouristPlaceFavorite>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof toggleTouristPlaceFavorite>>, TError,{id: number}, TContext> => {
+
+const mutationKey = ['toggleTouristPlaceFavorite'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof toggleTouristPlaceFavorite>>, {id: number}> = (props) => {
+          const {id} = props ?? {};
+
+          return  toggleTouristPlaceFavorite(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ToggleTouristPlaceFavoriteMutationResult = NonNullable<Awaited<ReturnType<typeof toggleTouristPlaceFavorite>>>
+
+    export type ToggleTouristPlaceFavoriteMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Toggle favorite status for a tourist place
+ */
+export const useToggleTouristPlaceFavorite = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof toggleTouristPlaceFavorite>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof toggleTouristPlaceFavorite>>,
+        TError,
+        {id: number},
+        TContext
+      > => {
+      return useMutation(getToggleTouristPlaceFavoriteMutationOptions(options));
+    }
+
+export const getGetNearbyRecommendationsUrl = (id: number,) => {
+
+
+
+
+  return `/api/tourist-places/${id}/nearby`
+}
+
+/**
+ * @summary Get nearby hotels, restaurants, and spas for a tourist place
+ */
+export const getNearbyRecommendations = async (id: number, options?: RequestInit): Promise<NearbyRecommendations> => {
+
+  return customFetch<NearbyRecommendations>(getGetNearbyRecommendationsUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetNearbyRecommendationsQueryKey = (id: number,) => {
+    return [
+    `/api/tourist-places/${id}/nearby`
+    ] as const;
+    }
+
+
+export const getGetNearbyRecommendationsQueryOptions = <TData = Awaited<ReturnType<typeof getNearbyRecommendations>>, TError = ErrorType<unknown>>(id: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getNearbyRecommendations>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetNearbyRecommendationsQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getNearbyRecommendations>>> = ({ signal }) => getNearbyRecommendations(id, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: !!(id), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getNearbyRecommendations>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetNearbyRecommendationsQueryResult = NonNullable<Awaited<ReturnType<typeof getNearbyRecommendations>>>
+export type GetNearbyRecommendationsQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Get nearby hotels, restaurants, and spas for a tourist place
+ */
+
+export function useGetNearbyRecommendations<TData = Awaited<ReturnType<typeof getNearbyRecommendations>>, TError = ErrorType<unknown>>(
+ id: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getNearbyRecommendations>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetNearbyRecommendationsQueryOptions(id,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getGetPlaceConnectionsUrl = (id: number,) => {
+
+
+
+
+  return `/api/tourist-places/${id}/connections`
+}
+
+/**
+ * @summary Get distances from this place to all other tourist places
+ */
+export const getPlaceConnections = async (id: number, options?: RequestInit): Promise<GetPlaceConnections200> => {
+
+  return customFetch<GetPlaceConnections200>(getGetPlaceConnectionsUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetPlaceConnectionsQueryKey = (id: number,) => {
+    return [
+    `/api/tourist-places/${id}/connections`
+    ] as const;
+    }
+
+
+export const getGetPlaceConnectionsQueryOptions = <TData = Awaited<ReturnType<typeof getPlaceConnections>>, TError = ErrorType<unknown>>(id: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getPlaceConnections>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetPlaceConnectionsQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getPlaceConnections>>> = ({ signal }) => getPlaceConnections(id, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: !!(id), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getPlaceConnections>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetPlaceConnectionsQueryResult = NonNullable<Awaited<ReturnType<typeof getPlaceConnections>>>
+export type GetPlaceConnectionsQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Get distances from this place to all other tourist places
+ */
+
+export function useGetPlaceConnections<TData = Awaited<ReturnType<typeof getPlaceConnections>>, TError = ErrorType<unknown>>(
+ id: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getPlaceConnections>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetPlaceConnectionsQueryOptions(id,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
 
 export const getUpdateTouristPlaceDistanceUrl = (distId: number,) => {
 

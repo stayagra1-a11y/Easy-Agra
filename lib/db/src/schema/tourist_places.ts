@@ -7,9 +7,11 @@ import {
   pgEnum,
   boolean,
   numeric,
+  unique,
 } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod/v4";
+import { usersTable } from "./users";
 
 // ── Enums ──────────────────────────────────────────────────────────────
 export const touristPlaceImageTypeEnum = pgEnum("tourist_place_image_type", [
@@ -167,3 +169,45 @@ export type InsertTouristPlaceDistance = z.infer<
 >;
 export type TouristPlaceDistance =
   typeof touristPlaceDistancesTable.$inferSelect;
+
+// ── Tourist Place Favorites ─────────────────────────────────────────────
+export const touristPlaceFavoritesTable = pgTable(
+  "tourist_place_favorites",
+  {
+    id: serial("id").primaryKey(),
+    userId: integer("user_id")
+      .notNull()
+      .references(() => usersTable.id, { onDelete: "cascade" }),
+    placeId: integer("place_id")
+      .notNull()
+      .references(() => touristPlacesTable.id, { onDelete: "cascade" }),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => [unique("uq_place_favorites").on(t.userId, t.placeId)],
+);
+export type TouristPlaceFavorite =
+  typeof touristPlaceFavoritesTable.$inferSelect;
+
+// ── Tourist Place Connections (inter-place distances) ───────────────────
+export const touristPlaceConnectionsTable = pgTable(
+  "tourist_place_connections",
+  {
+    id: serial("id").primaryKey(),
+    fromPlaceId: integer("from_place_id")
+      .notNull()
+      .references(() => touristPlacesTable.id, { onDelete: "cascade" }),
+    toPlaceId: integer("to_place_id")
+      .notNull()
+      .references(() => touristPlacesTable.id, { onDelete: "cascade" }),
+    distanceKm: numeric("distance_km", { precision: 6, scale: 2 }),
+    estimatedTimeMinutes: integer("estimated_time_minutes"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => [unique("uq_place_connections").on(t.fromPlaceId, t.toPlaceId)],
+);
+export type TouristPlaceConnection =
+  typeof touristPlaceConnectionsTable.$inferSelect;

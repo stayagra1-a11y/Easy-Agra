@@ -28,7 +28,24 @@ The seed data lives in both:
 **Why:** curl sessions through the shared proxy don't reliably propagate HttpOnly session cookies, so the `/seed` API endpoint can't be called from shell scripts. The scripts package approach bypasses the proxy entirely.
 
 ## Scripts package @workspace/db dependency
-`@workspace/scripts` does NOT have `@workspace/db` by default. Add it to `scripts/package.json` dependencies when writing DB seed scripts.
+`@workspace/scripts` has `@workspace/db` added. However, scripts CANNOT import drizzle-orm operators (`eq`, `isNull`, etc.) directly — drizzle-orm is not a direct dependency of scripts. Only use `@workspace/db` exports (tables, `db`). Do any filtering in JavaScript, not in Drizzle queries.
+
+## Tourist place slugs (actual values in DB)
+- Akbar's Tomb: `akbar-tomb-sikandra` (NOT `sikandra`)
+- All 28 inter-place connections seeded in `tourist_place_connections` table
+- Connection seed script: `scripts/src/seed-connections.ts`
+
+## Part 8B new tables
+- `tourist_place_favorites` (userId, placeId, unique) — customer wishlist
+- `tourist_place_connections` (fromPlaceId, toPlaceId, distanceKm, estimatedTimeMinutes, unique pair) — inter-place distances
+
+## New static routes (must stay before /:id)
+- `/tourist-places/my-favorites` — GET, requireAuth
+- `/tourist-places/connections` — GET, public
+- `/tourist-places/seed-connections` — POST, super_admin
+
+## Nearby recommendations
+Hotels, restaurants, spas have NO lat/lng. Nearby shows top-4 of each type from DB (no geo filtering). Empty until owner data is added. This is expected behavior.
 
 ## Image cover detection
 The `coverImageUrl` field is derived at query time — find the first image where `imageType === 'cover' || isFeatured === true`. It is NOT stored as a separate column.

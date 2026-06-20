@@ -70,6 +70,7 @@ import MySpaAppointments from "@/pages/customer/my-spa-appointments";
 // Customer - tourist places
 import CustomerPlaces from "@/pages/customer/places";
 import PlaceDetail from "@/pages/customer/place-detail";
+import MyPlaces from "@/pages/customer/my-places";
 
 // Admin - tourist places
 import AdminTouristPlaces from "@/pages/admin/tourist-places";
@@ -197,6 +198,7 @@ function Router() {
       <Route path="/spas" component={() => <ProtectedRoute component={CustomerSpas} allowedRoles={["customer"]} />} />
       <Route path="/my-spa-appointments" component={() => <ProtectedRoute component={MySpaAppointments} allowedRoles={["customer"]} />} />
 
+      <Route path="/my-places" component={() => <ProtectedRoute component={MyPlaces} allowedRoles={["customer"]} />} />
       <Route path="/places/:id" component={() => <ProtectedRoute component={PlaceDetail} allowedRoles={["customer"]} />} />
       <Route path="/places" component={() => <ProtectedRoute component={CustomerPlaces} allowedRoles={["customer"]} />} />
 

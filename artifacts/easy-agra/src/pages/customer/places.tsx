@@ -1,12 +1,20 @@
 import { useState, useCallback } from "react";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { CustomerLayout } from "@/components/layout/customer-layout";
-import { useListTouristPlaces } from "@workspace/api-client-react";
+import {
+  useListTouristPlaces,
+  useToggleTouristPlaceFavorite,
+  useGetMyFavoritePlaces,
+  getGetMyFavoritePlacesQueryKey,
+} from "@workspace/api-client-react";
+import { useQueryClient } from "@tanstack/react-query";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { MapPin, Clock, TicketIcon, Star, Search, ChevronRight } from "lucide-react";
+import {
+  MapPin, Clock, TicketIcon, Star, Search, ChevronRight, Heart, Bookmark,
+} from "lucide-react";
 
 function useDebouncedValue(value: string, delay = 400) {
   const [debounced, setDebounced] = useState(value);
@@ -19,23 +27,56 @@ function useDebouncedValue(value: string, delay = 400) {
 }
 
 export default function CustomerPlaces() {
+  const [, navigate] = useLocation();
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebouncedValue(search, 400);
+  const queryClient = useQueryClient();
 
   const { data, isLoading } = useListTouristPlaces({
     search: debouncedSearch || undefined,
     limit: 30,
   });
+  const { data: favData } = useGetMyFavoritePlaces();
+  const toggleFav = useToggleTouristPlaceFavorite();
 
   const places = data?.places ?? [];
+  const favIds = new Set((favData?.places ?? []).map((p: any) => p.id));
+
+  const handleToggleFav = (e: React.MouseEvent, placeId: number) => {
+    e.preventDefault();
+    e.stopPropagation();
+    toggleFav.mutate({ id: placeId }, {
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: getGetMyFavoritePlacesQueryKey() });
+      },
+    });
+  };
 
   return (
     <CustomerLayout>
       <div className="px-4 py-5 space-y-5">
         {/* Header */}
-        <div>
-          <h1 className="text-xl font-bold">Tourist Places</h1>
-          <p className="text-sm text-muted-foreground mt-0.5">Explore Agra's magnificent heritage sites</p>
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <h1 className="text-xl font-bold">Tourist Places</h1>
+            <p className="text-sm text-muted-foreground mt-0.5">
+              Explore Agra's magnificent heritage sites
+            </p>
+          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            className="shrink-0 gap-1.5 text-xs"
+            onClick={() => navigate("/my-places")}
+          >
+            <Heart className="h-3.5 w-3.5" />
+            Saved
+            {favIds.size > 0 && (
+              <Badge className="h-4 px-1 text-[10px] bg-red-500 text-white border-0 ml-0.5">
+                {favIds.size}
+              </Badge>
+            )}
+          </Button>
         </div>
 
         {/* Search */}
@@ -73,16 +114,17 @@ export default function CustomerPlaces() {
         {!isLoading && places.length > 0 && (
           <div className="space-y-4">
             {places.map((place) => {
-              const coverImg = (place as any).coverImageUrl ||
-                (place as any).images?.[0]?.imageUrl;
+              const coverImg =
+                (place as any).coverImageUrl || (place as any).images?.[0]?.imageUrl;
               const ticketIndian = (place as any).ticketPriceIndian;
               const isFree = ticketIndian !== null && Number(ticketIndian) === 0;
+              const isFav = favIds.has(place.id);
 
               return (
                 <Link key={place.id} href={`/places/${place.id}`}>
                   <div className="bg-white rounded-xl overflow-hidden shadow-sm border border-border hover:shadow-md transition-shadow cursor-pointer">
                     {/* Image */}
-                    <div className="relative h-44 bg-muted">
+                    <div className="relative h-48 bg-muted">
                       {coverImg ? (
                         <img
                           src={coverImg}
@@ -97,6 +139,11 @@ export default function CustomerPlaces() {
                           <MapPin className="h-12 w-12 text-muted-foreground/40" />
                         </div>
                       )}
+
+                      {/* Gradient overlay */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+
+                      {/* Badges */}
                       {place.isFeatured && (
                         <div className="absolute top-3 left-3">
                           <Badge className="bg-accent text-accent-foreground text-xs gap-1">
@@ -105,10 +152,22 @@ export default function CustomerPlaces() {
                         </div>
                       )}
                       {isFree && (
-                        <div className="absolute top-3 right-3">
+                        <div className="absolute top-3 left-3" style={{ top: place.isFeatured ? "2.5rem" : undefined }}>
                           <Badge className="bg-green-500 text-white text-xs">Free Entry</Badge>
                         </div>
                       )}
+
+                      {/* Heart button */}
+                      <button
+                        onClick={(e) => handleToggleFav(e, place.id)}
+                        className={`absolute top-3 right-3 p-2 rounded-full transition-all ${
+                          isFav
+                            ? "bg-red-500 text-white shadow-md scale-110"
+                            : "bg-black/40 text-white hover:bg-black/60"
+                        }`}
+                      >
+                        <Heart className={`h-4 w-4 ${isFav ? "fill-current" : ""}`} />
+                      </button>
                     </div>
 
                     {/* Content */}
@@ -124,17 +183,17 @@ export default function CustomerPlaces() {
                         <ChevronRight className="h-5 w-5 text-muted-foreground shrink-0 mt-0.5" />
                       </div>
 
-                      {place.shortDescription && (
+                      {(place as any).shortDescription && (
                         <p className="text-sm text-muted-foreground mt-2 line-clamp-2">
-                          {place.shortDescription}
+                          {(place as any).shortDescription}
                         </p>
                       )}
 
                       <div className="flex flex-wrap gap-3 mt-3 text-xs text-muted-foreground">
-                        {place.openingTime && (
+                        {(place as any).openingTime && (
                           <span className="flex items-center gap-1">
                             <Clock className="h-3.5 w-3.5" />
-                            {place.openingTime} – {place.closingTime}
+                            {(place as any).openingTime} – {(place as any).closingTime}
                           </span>
                         )}
                         {ticketIndian !== null && (

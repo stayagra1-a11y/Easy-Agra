@@ -1497,6 +1497,40 @@ export interface ReorderImagesInput {
   imageIds: number[];
 }
 
+export interface FavoriteToggleResult {
+  isFavorited: boolean;
+  totalFavorites: number;
+}
+
+export interface TouristPlaceConnection {
+  id: number;
+  fromPlaceId: number;
+  toPlaceId: number;
+  fromPlaceName: string;
+  toPlaceName: string;
+  fromPlaceSlug: string;
+  toPlaceSlug: string;
+  distanceKm?: number | null;
+  estimatedTimeMinutes?: number | null;
+}
+
+export interface NearbyVenueItem {
+  id: number;
+  name: string;
+  type: string;
+  address?: string | null;
+  city?: string | null;
+  rating?: number | null;
+  imageUrl?: string | null;
+  slug?: string | null;
+}
+
+export interface NearbyRecommendations {
+  hotels: NearbyVenueItem[];
+  restaurants: NearbyVenueItem[];
+  spas: NearbyVenueItem[];
+}
+
 export type ListUsersParams = {
 role?: string;
 status?: string;
@@ -1671,6 +1705,19 @@ export type SetFeaturedTouristPlaceImage200 = {
 
 export type DeleteTouristPlaceTip200 = {
   success: boolean;
+};
+
+export type GetMyFavoritePlaces200 = {
+  places: TouristPlaceDetail[];
+  total: number;
+};
+
+export type GetTouristPlaceConnections200 = {
+  connections: TouristPlaceConnection[];
+};
+
+export type GetPlaceConnections200 = {
+  connections: TouristPlaceConnection[];
 };
 
 export type DeleteTouristPlaceDistance200 = {

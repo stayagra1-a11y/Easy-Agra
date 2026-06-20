@@ -5,8 +5,13 @@ import {
   touristPlaceImagesTable,
   touristPlaceTipsTable,
   touristPlaceDistancesTable,
+  touristPlaceFavoritesTable,
+  touristPlaceConnectionsTable,
+  hotelsTable,
+  restaurantsTable,
+  spasTable,
 } from "@workspace/db";
-import { eq, and, ilike, sql, desc, asc, isNull, or } from "drizzle-orm";
+import { eq, and, ilike, sql, desc, asc, isNull, or, ne, inArray } from "drizzle-orm";
 import { logActivity } from "../lib/auth";
 import { requireAuth, requireRole } from "../middlewares/requireAuth";
 
@@ -372,6 +377,131 @@ router.post(
   },
 );
 
+// GET /tourist-places/my-favorites — authenticated customer
+router.get("/tourist-places/my-favorites", requireAuth, async (req, res) => {
+  const userId = (req as any).user?.id;
+  if (!userId) { res.status(401).json({ error: "Unauthorized" }); return; }
+
+  const favRows = await db
+    .select({ placeId: touristPlaceFavoritesTable.placeId })
+    .from(touristPlaceFavoritesTable)
+    .where(eq(touristPlaceFavoritesTable.userId, userId));
+
+  if (favRows.length === 0) {
+    res.json({ places: [], total: 0 });
+    return;
+  }
+
+  const placeIds = favRows.map((r) => r.placeId);
+  const placesWithDetail = await Promise.all(
+    placeIds.map((id) => getPlaceWithRelations(id)),
+  );
+  const places = placesWithDetail.filter(Boolean);
+  res.json({ places, total: places.length });
+});
+
+// GET /tourist-places/connections — public
+router.get("/tourist-places/connections", async (req, res) => {
+  const rows = await db
+    .select({
+      id: touristPlaceConnectionsTable.id,
+      fromPlaceId: touristPlaceConnectionsTable.fromPlaceId,
+      toPlaceId: touristPlaceConnectionsTable.toPlaceId,
+      distanceKm: touristPlaceConnectionsTable.distanceKm,
+      estimatedTimeMinutes: touristPlaceConnectionsTable.estimatedTimeMinutes,
+      fromPlaceName: sql<string>`fp.name`,
+      fromPlaceSlug: sql<string>`fp.slug`,
+      toPlaceName: sql<string>`tp.name`,
+      toPlaceSlug: sql<string>`tp.slug`,
+    })
+    .from(touristPlaceConnectionsTable)
+    .leftJoin(
+      sql`tourist_places fp`,
+      eq(touristPlaceConnectionsTable.fromPlaceId, sql`fp.id`),
+    )
+    .leftJoin(
+      sql`tourist_places tp`,
+      eq(touristPlaceConnectionsTable.toPlaceId, sql`tp.id`),
+    )
+    .orderBy(asc(touristPlaceConnectionsTable.distanceKm));
+
+  const connections = rows.map((r) => ({
+    ...r,
+    distanceKm: r.distanceKm ? parseFloat(String(r.distanceKm)) : null,
+  }));
+  res.json({ connections });
+});
+
+// POST /tourist-places/seed-connections — super_admin only
+router.post(
+  "/tourist-places/seed-connections",
+  requireRole("super_admin"),
+  async (req, res) => {
+    const existing = await db
+      .select({ id: touristPlaceConnectionsTable.id })
+      .from(touristPlaceConnectionsTable)
+      .limit(1);
+
+    if (existing.length > 0) {
+      res.json({ message: "Connections already seeded", count: 0 });
+      return;
+    }
+
+    const allPlaces = await db
+      .select({ id: touristPlacesTable.id, slug: touristPlacesTable.slug })
+      .from(touristPlacesTable)
+      .where(isNull(touristPlacesTable.deletedAt));
+
+    const bySlug = Object.fromEntries(allPlaces.map((p) => [p.slug, p.id]));
+
+    const CONNECTIONS: Array<[string, string, number, number]> = [
+      ["taj-mahal", "agra-fort", 2.5, 10],
+      ["taj-mahal", "fatehpur-sikri", 40, 60],
+      ["taj-mahal", "mehtab-bagh", 1.5, 8],
+      ["taj-mahal", "itimad-ud-daulah", 5.5, 20],
+      ["taj-mahal", "sikandra", 10, 30],
+      ["taj-mahal", "chini-ka-rauza", 5.0, 18],
+      ["taj-mahal", "jama-masjid-agra", 2.8, 12],
+      ["agra-fort", "fatehpur-sikri", 38, 58],
+      ["agra-fort", "mehtab-bagh", 4.0, 15],
+      ["agra-fort", "itimad-ud-daulah", 7.0, 25],
+      ["agra-fort", "sikandra", 8.5, 28],
+      ["agra-fort", "chini-ka-rauza", 6.5, 22],
+      ["agra-fort", "jama-masjid-agra", 0.8, 5],
+      ["fatehpur-sikri", "mehtab-bagh", 41, 62],
+      ["fatehpur-sikri", "itimad-ud-daulah", 46, 70],
+      ["fatehpur-sikri", "sikandra", 50, 75],
+      ["fatehpur-sikri", "chini-ka-rauza", 45, 68],
+      ["fatehpur-sikri", "jama-masjid-agra", 38, 58],
+      ["mehtab-bagh", "itimad-ud-daulah", 6.5, 23],
+      ["mehtab-bagh", "sikandra", 11, 33],
+      ["mehtab-bagh", "chini-ka-rauza", 5.5, 20],
+      ["mehtab-bagh", "jama-masjid-agra", 4.0, 15],
+      ["itimad-ud-daulah", "sikandra", 14, 42],
+      ["itimad-ud-daulah", "chini-ka-rauza", 1.0, 5],
+      ["itimad-ud-daulah", "jama-masjid-agra", 7.0, 25],
+      ["sikandra", "chini-ka-rauza", 12, 36],
+      ["sikandra", "jama-masjid-agra", 9.0, 28],
+      ["chini-ka-rauza", "jama-masjid-agra", 6.0, 22],
+    ];
+
+    let count = 0;
+    for (const [fromSlug, toSlug, distKm, timeMin] of CONNECTIONS) {
+      const fromId = bySlug[fromSlug];
+      const toId = bySlug[toSlug];
+      if (!fromId || !toId) continue;
+      await db
+        .insert(touristPlaceConnectionsTable)
+        .values({ fromPlaceId: fromId, toPlaceId: toId, distanceKm: String(distKm), estimatedTimeMinutes: timeMin })
+        .onConflictDoNothing();
+      count++;
+    }
+
+    await logActivity(req, "seed_place_connections", `Seeded ${count} place connections`);
+    res.json({ message: `Seeded ${count} connections`, count });
+  },
+);
+
 // GET /tourist-places/:id — public
 router.get("/tourist-places/:id", async (req, res) => {
   const id = parseInt(req.params.id as string);
@@ -534,6 +664,96 @@ router.post(
     res.status(201).json(serializeDistance(dist));
   },
 );
+
+// POST /tourist-places/:id/favorite — authenticated
+router.post("/tourist-places/:id/favorite", requireAuth, async (req, res) => {
+  const placeId = parseInt(req.params.id as string);
+  const userId = (req as any).user?.id;
+  if (!userId) { res.status(401).json({ error: "Unauthorized" }); return; }
+
+  const existing = await db
+    .select()
+    .from(touristPlaceFavoritesTable)
+    .where(and(eq(touristPlaceFavoritesTable.userId, userId), eq(touristPlaceFavoritesTable.placeId, placeId)))
+    .limit(1);
+
+  if (existing.length > 0) {
+    await db
+      .delete(touristPlaceFavoritesTable)
+      .where(and(eq(touristPlaceFavoritesTable.userId, userId), eq(touristPlaceFavoritesTable.placeId, placeId)));
+    const [total] = await db
+      .select({ count: sql<number>`count(*)::int` })
+      .from(touristPlaceFavoritesTable)
+      .where(eq(touristPlaceFavoritesTable.placeId, placeId));
+    res.json({ isFavorited: false, totalFavorites: total?.count ?? 0 });
+  } else {
+    await db.insert(touristPlaceFavoritesTable).values({ userId, placeId });
+    const [total] = await db
+      .select({ count: sql<number>`count(*)::int` })
+      .from(touristPlaceFavoritesTable)
+      .where(eq(touristPlaceFavoritesTable.placeId, placeId));
+    res.json({ isFavorited: true, totalFavorites: total?.count ?? 0 });
+  }
+});
+
+// GET /tourist-places/:id/nearby — public
+router.get("/tourist-places/:id/nearby", async (req, res) => {
+  const [hotels, restaurants, spas] = await Promise.all([
+    db
+      .select({ id: hotelsTable.id, name: hotelsTable.name, address: hotelsTable.address, city: hotelsTable.city, imageUrl: hotelsTable.coverImage })
+      .from(hotelsTable)
+      .limit(4),
+    db
+      .select({ id: restaurantsTable.id, name: restaurantsTable.name, address: restaurantsTable.address, city: restaurantsTable.city, imageUrl: restaurantsTable.coverPhoto })
+      .from(restaurantsTable)
+      .limit(4),
+    db
+      .select({ id: spasTable.id, name: spasTable.name, address: spasTable.address, city: spasTable.city, imageUrl: spasTable.coverPhoto })
+      .from(spasTable)
+      .limit(4),
+  ]);
+
+  res.json({
+    hotels: hotels.map((h) => ({ ...h, type: "hotel", rating: null, slug: null })),
+    restaurants: restaurants.map((r) => ({ ...r, type: "restaurant", rating: null, slug: null })),
+    spas: spas.map((s) => ({ ...s, type: "spa", rating: null, slug: null })),
+  });
+});
+
+// GET /tourist-places/:id/connections — public
+router.get("/tourist-places/:id/connections", async (req, res) => {
+  const placeId = parseInt(req.params.id as string);
+  if (isNaN(placeId)) { res.status(400).json({ error: "Invalid ID" }); return; }
+
+  const rows = await db
+    .select({
+      id: touristPlaceConnectionsTable.id,
+      fromPlaceId: touristPlaceConnectionsTable.fromPlaceId,
+      toPlaceId: touristPlaceConnectionsTable.toPlaceId,
+      distanceKm: touristPlaceConnectionsTable.distanceKm,
+      estimatedTimeMinutes: touristPlaceConnectionsTable.estimatedTimeMinutes,
+      fromPlaceName: sql<string>`fp.name`,
+      fromPlaceSlug: sql<string>`fp.slug`,
+      toPlaceName: sql<string>`tp.name`,
+      toPlaceSlug: sql<string>`tp.slug`,
+    })
+    .from(touristPlaceConnectionsTable)
+    .leftJoin(sql`tourist_places fp`, eq(touristPlaceConnectionsTable.fromPlaceId, sql`fp.id`))
+    .leftJoin(sql`tourist_places tp`, eq(touristPlaceConnectionsTable.toPlaceId, sql`tp.id`))
+    .where(
+      or(
+        eq(touristPlaceConnectionsTable.fromPlaceId, placeId),
+        eq(touristPlaceConnectionsTable.toPlaceId, placeId),
+      ),
+    )
+    .orderBy(asc(touristPlaceConnectionsTable.distanceKm));
+
+  const connections = rows.map((r) => ({
+    ...r,
+    distanceKm: r.distanceKm ? parseFloat(String(r.distanceKm)) : null,
+  }));
+  res.json({ connections });
+});
 
 export default router;
 

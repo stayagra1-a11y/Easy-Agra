@@ -3125,6 +3125,106 @@ paths:
               schema:
                 $ref: "#/components/schemas/TouristPlaceDistance"
 
+  /tourist-places/my-favorites:
+    get:
+      operationId: getMyFavoritePlaces
+      tags: [tourist-places]
+      summary: Get my favorited tourist places
+      responses:
+        "200":
+          description: List of favorited places
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  places:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/TouristPlaceDetail"
+                  total:
+                    type: integer
+                required: [places, total]
+
+  /tourist-places/connections:
+    get:
+      operationId: getTouristPlaceConnections
+      tags: [tourist-places]
+      summary: Get inter-place distances between all tourist places
+      responses:
+        "200":
+          description: All place-to-place distances
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  connections:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/TouristPlaceConnection"
+                required: [connections]
+
+  /tourist-places/{id}/favorite:
+    post:
+      operationId: toggleTouristPlaceFavorite
+      tags: [tourist-places]
+      summary: Toggle favorite status for a tourist place
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: Favorite toggled
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FavoriteToggleResult"
+
+  /tourist-places/{id}/nearby:
+    get:
+      operationId: getNearbyRecommendations
+      tags: [tourist-places]
+      summary: Get nearby hotels, restaurants, and spas for a tourist place
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: Nearby recommendations
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NearbyRecommendations"
+
+  /tourist-places/{id}/connections:
+    get:
+      operationId: getPlaceConnections
+      tags: [tourist-places]
+      summary: Get distances from this place to all other tourist places
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: Connections from this place
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  connections:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/TouristPlaceConnection"
+                required: [connections]
+
   /tourist-places/distances/{distId}:
     put:
       operationId: updateTouristPlaceDistance
@@ -5924,3 +6024,80 @@ components:
             type: integer
       required:
         - imageIds
+
+    FavoriteToggleResult:
+      type: object
+      properties:
+        isFavorited:
+          type: boolean
+        totalFavorites:
+          type: integer
+      required: [isFavorited, totalFavorites]
+
+    TouristPlaceConnection:
+      type: object
+      properties:
+        id:
+          type: integer
+        fromPlaceId:
+          type: integer
+        toPlaceId:
+          type: integer
+        fromPlaceName:
+          type: string
+        toPlaceName:
+          type: string
+        fromPlaceSlug:
+          type: string
+        toPlaceSlug:
+          type: string
+        distanceKm:
+          type: number
+          nullable: true
+        estimatedTimeMinutes:
+          type: integer
+          nullable: true
+      required: [id, fromPlaceId, toPlaceId, fromPlaceName, toPlaceName, fromPlaceSlug, toPlaceSlug]
+
+    NearbyVenueItem:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        type:
+          type: string
+        address:
+          type: string
+          nullable: true
+        city:
+          type: string
+          nullable: true
+        rating:
+          type: number
+          nullable: true
+        imageUrl:
+          type: string
+          nullable: true
+        slug:
+          type: string
+          nullable: true
+      required: [id, name, type]
+
+    NearbyRecommendations:
+      type: object
+      properties:
+        hotels:
+          type: array
+          items:
+            $ref: "#/components/schemas/NearbyVenueItem"
+        restaurants:
+          type: array
+          items:
+            $ref: "#/components/schemas/NearbyVenueItem"
+        spas:
+          type: array
+          items:
+            $ref: "#/components/schemas/NearbyVenueItem"
+      required: [hotels, restaurants, spas]

@@ -4085,6 +4085,165 @@ export const AddTouristPlaceDistanceBody = zod.object({
 
 
 /**
+ * @summary Get my favorited tourist places
+ */
+export const GetMyFavoritePlacesResponse = zod.object({
+  "places": zod.array(zod.object({
+  "id": zod.number(),
+  "name": zod.string(),
+  "slug": zod.string(),
+  "shortDescription": zod.string().nullish(),
+  "description": zod.string().nullish(),
+  "historicalInfo": zod.string().nullish(),
+  "openingTime": zod.string().nullish(),
+  "closingTime": zod.string().nullish(),
+  "ticketPriceIndian": zod.string().nullish(),
+  "ticketPriceForeign": zod.string().nullish(),
+  "ticketPriceChild": zod.string().nullish(),
+  "bestTimeToVisit": zod.string().nullish(),
+  "address": zod.string().nullish(),
+  "googleMapsLink": zod.string().nullish(),
+  "latitude": zod.string().nullish(),
+  "longitude": zod.string().nullish(),
+  "city": zod.string(),
+  "state": zod.string(),
+  "country": zod.string(),
+  "isActive": zod.boolean(),
+  "isFeatured": zod.boolean(),
+  "sortOrder": zod.number(),
+  "coverImageUrl": zod.string().nullish(),
+  "images": zod.array(zod.object({
+  "id": zod.number(),
+  "placeId": zod.number(),
+  "imageUrl": zod.string(),
+  "caption": zod.string().nullish(),
+  "altText": zod.string().nullish(),
+  "imageType": zod.enum(['cover', 'gallery']),
+  "isFeatured": zod.boolean(),
+  "sortOrder": zod.number(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})),
+  "tips": zod.array(zod.object({
+  "id": zod.number(),
+  "placeId": zod.number(),
+  "tip": zod.string(),
+  "category": zod.string().nullish(),
+  "sortOrder": zod.number(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})),
+  "distances": zod.array(zod.object({
+  "id": zod.number(),
+  "placeId": zod.number(),
+  "fromLocation": zod.string(),
+  "locationType": zod.enum(['railway_station', 'airport', 'bus_stand', 'city_center']),
+  "distanceKm": zod.string().nullish(),
+  "estimatedTimeMinutes": zod.number().nullish(),
+  "createdAt": zod.string()
+})),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})),
+  "total": zod.number()
+})
+
+
+/**
+ * @summary Get inter-place distances between all tourist places
+ */
+export const GetTouristPlaceConnectionsResponse = zod.object({
+  "connections": zod.array(zod.object({
+  "id": zod.number(),
+  "fromPlaceId": zod.number(),
+  "toPlaceId": zod.number(),
+  "fromPlaceName": zod.string(),
+  "toPlaceName": zod.string(),
+  "fromPlaceSlug": zod.string(),
+  "toPlaceSlug": zod.string(),
+  "distanceKm": zod.number().nullish(),
+  "estimatedTimeMinutes": zod.number().nullish()
+}))
+})
+
+
+/**
+ * @summary Toggle favorite status for a tourist place
+ */
+export const ToggleTouristPlaceFavoriteParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const ToggleTouristPlaceFavoriteResponse = zod.object({
+  "isFavorited": zod.boolean(),
+  "totalFavorites": zod.number()
+})
+
+
+/**
+ * @summary Get nearby hotels, restaurants, and spas for a tourist place
+ */
+export const GetNearbyRecommendationsParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const GetNearbyRecommendationsResponse = zod.object({
+  "hotels": zod.array(zod.object({
+  "id": zod.number(),
+  "name": zod.string(),
+  "type": zod.string(),
+  "address": zod.string().nullish(),
+  "city": zod.string().nullish(),
+  "rating": zod.number().nullish(),
+  "imageUrl": zod.string().nullish(),
+  "slug": zod.string().nullish()
+})),
+  "restaurants": zod.array(zod.object({
+  "id": zod.number(),
+  "name": zod.string(),
+  "type": zod.string(),
+  "address": zod.string().nullish(),
+  "city": zod.string().nullish(),
+  "rating": zod.number().nullish(),
+  "imageUrl": zod.string().nullish(),
+  "slug": zod.string().nullish()
+})),
+  "spas": zod.array(zod.object({
+  "id": zod.number(),
+  "name": zod.string(),
+  "type": zod.string(),
+  "address": zod.string().nullish(),
+  "city": zod.string().nullish(),
+  "rating": zod.number().nullish(),
+  "imageUrl": zod.string().nullish(),
+  "slug": zod.string().nullish()
+}))
+})
+
+
+/**
+ * @summary Get distances from this place to all other tourist places
+ */
+export const GetPlaceConnectionsParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const GetPlaceConnectionsResponse = zod.object({
+  "connections": zod.array(zod.object({
+  "id": zod.number(),
+  "fromPlaceId": zod.number(),
+  "toPlaceId": zod.number(),
+  "fromPlaceName": zod.string(),
+  "toPlaceName": zod.string(),
+  "fromPlaceSlug": zod.string(),
+  "toPlaceSlug": zod.string(),
+  "distanceKm": zod.number().nullish(),
+  "estimatedTimeMinutes": zod.number().nullish()
+}))
+})
+
+
+/**
  * @summary Update distance info (admin)
  */
 export const UpdateTouristPlaceDistanceParams = zod.object({
