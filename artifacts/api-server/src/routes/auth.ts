@@ -23,9 +23,15 @@ router.post("/auth/register", async (req, res): Promise<void> => {
     return;
   }
 
-  const existing = await db.select().from(usersTable).where(eq(usersTable.email, email.toLowerCase()));
-  if (existing.length > 0) {
-    res.status(409).json({ error: "Email already registered" });
+  const existingEmail = await db.select().from(usersTable).where(eq(usersTable.email, email.toLowerCase()));
+  if (existingEmail.length > 0) {
+    res.status(409).json({ error: "This email is already registered. Please sign in or use a different email." });
+    return;
+  }
+
+  const existingMobile = await db.select().from(usersTable).where(eq(usersTable.mobile, mobile.trim()));
+  if (existingMobile.length > 0) {
+    res.status(409).json({ error: "This mobile number is already registered. Please sign in or use a different number." });
     return;
   }
 
