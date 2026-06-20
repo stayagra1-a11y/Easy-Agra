@@ -52,6 +52,8 @@ tags:
     description: Owner payout/withdrawal requests
   - name: reports
     description: Revenue, commission and earnings reports
+  - name: trips
+    description: Customer trip planning and management
 
 paths:
   /healthz:
@@ -7185,3 +7187,126 @@ components:
               status: { type: string }
             required: [date, paymentRef, bookingType, gross, commission, net, ownerName, status]
       required: [generatedAt, period, summary, byType, monthly, rows]
+
+  /trips:
+    get:
+      operationId: listTrips
+      summary: List customer's trips
+      tags: [trips]
+      security: [{ cookieAuth: [] }]
+      parameters:
+        - name: status
+          in: query
+          schema: { type: string, enum: [all, draft, upcoming, ongoing, completed, cancelled] }
+        - name: page
+          in: query
+          schema: { type: integer, default: 1 }
+        - name: limit
+          in: query
+          schema: { type: integer, default: 20 }
+      responses:
+        '200':
+          description: Trip list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  trips: { type: array, items: { $ref: '#/components/schemas/TripPlan' } }
+                  total: { type: integer }
+                  page: { type: integer }
+                  limit: { type: integer }
+                required: [trips, total, page, limit]
+    post:
+      operationId: createTrip
+      summary: Create a new trip plan
+      tags: [trips]
+      security: [{ cookieAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreateTripBody' }
+      responses:
+        '201':
+          description: Created trip
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/TripPlan' }
+
+  /trips/{ref}:
+    get:
+      operationId: getTrip
+      summary: Get a single trip by ref
+      tags: [trips]
+      security: [{ cookieAuth: [] }]
+      parameters:
+        - name: ref
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Trip detail
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/TripPlan' }
+    put:
+      operationId: updateTrip
+      summary: Update a trip plan
+      tags: [trips]
+      security: [{ cookieAuth: [] }]
+      parameters:
+        - name: ref
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/UpdateTripBody' }
+      responses:
+        '200':
+          description: Updated trip
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/TripPlan' }
+    delete:
+      operationId: deleteTrip
+      summary: Delete a trip plan
+      tags: [trips]
+      security: [{ cookieAuth: [] }]
+      parameters:
+        - name: ref
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success: { type: boolean }
+                required: [success]
+
+  /trips/{ref}/cancel:
+    patch:
+      operationId: cancelTrip
+      summary: Cancel a trip plan
+      tags: [trips]
+      security: [{ cookieAuth: [] }]
+      parameters:
+        - name: ref
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Cancelled trip
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/TripPlan' }
