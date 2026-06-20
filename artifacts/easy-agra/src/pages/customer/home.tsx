@@ -74,7 +74,7 @@ export default function CustomerHome() {
     { icon: UtensilsCrossed, label: "Restaurants", color: "bg-orange-50 text-orange-600", href: "/restaurants" },
     { icon: Sparkles, label: "Spas", color: "bg-purple-50 text-purple-600", href: "/spas" },
     { icon: MapPin, label: "Places", color: "bg-green-50 text-green-600", href: "/places" },
-    { icon: Building2, label: "Hotels", color: "bg-blue-50 text-blue-600", coming: true },
+    { icon: Building2, label: "Hotels", color: "bg-blue-50 text-blue-600", href: "/hotels" },
   ];
 
   return (
