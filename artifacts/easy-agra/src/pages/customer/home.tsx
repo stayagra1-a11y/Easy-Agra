@@ -71,10 +71,10 @@ export default function CustomerHome() {
     );
 
   const features = [
-    { icon: BedDouble, label: "Hotels", color: "bg-blue-50 text-blue-600", href: "/hotels" },
-    { icon: Landmark, label: "Famous Places", color: "bg-amber-50 text-amber-600", href: "/places" },
-    { icon: UtensilsCrossed, label: "Best Restaurants", color: "bg-orange-50 text-orange-600", href: "/restaurants" },
-    { icon: Leaf, label: "Spas", color: "bg-green-50 text-green-600", href: "/spas" },
+    { icon: BedDouble, label: "Hotels", href: "/hotels", bg: "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=200&q=80", color: "text-blue-100" },
+    { icon: Landmark, label: "Famous Places", href: "/places", bg: "https://images.unsplash.com/photo-1548013146-72479768bada?w=200&q=80", color: "text-amber-100" },
+    { icon: UtensilsCrossed, label: "Best Restaurants", href: "/restaurants", bg: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=200&q=80", color: "text-orange-100" },
+    { icon: Leaf, label: "Spas", href: "/spas", bg: "https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=200&q=80", color: "text-green-100" },
   ];
 
   return (
@@ -109,11 +109,15 @@ export default function CustomerHome() {
         <div>
           <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">Explore Agra</h2>
           <div className="grid grid-cols-4 gap-2">
-            {features.map(({ icon: Icon, label, color, href }: any) => {
+            {features.map(({ icon: Icon, label, color, href, bg }: any) => {
               const tile = (
                 <div key={label} className="flex flex-col items-center gap-2 group cursor-pointer">
-                  <div className={`h-16 w-16 rounded-2xl ${color} flex items-center justify-center transition-transform group-active:scale-95 shadow-sm`}>
-                    <Icon className="h-8 w-8" />
+                  <div className="h-16 w-16 rounded-2xl overflow-hidden relative shadow-sm transition-transform group-active:scale-95">
+                    <img src={bg} alt={label} className="absolute inset-0 w-full h-full object-cover" />
+                    <div className="absolute inset-0 bg-black/30" />
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <Icon className={`h-8 w-8 ${color} drop-shadow`} />
+                    </div>
                   </div>
                   <span className="text-xs font-medium text-foreground text-center leading-tight">{label}</span>
                 </div>
