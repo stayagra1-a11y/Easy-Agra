@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useParams, useLocation, Link } from "wouter";
 import { CustomerLayout } from "@/components/layout/customer-layout";
+import { MapEmbed } from "@/components/map-embed";
 import { useGetRestaurant, useGetRestaurantMenu } from "@workspace/api-client-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -163,6 +164,13 @@ export default function RestaurantDetail() {
               )}
             </CardContent>
           </Card>
+
+          {/* Map */}
+          <MapEmbed
+            name={r.name}
+            address={r.address}
+            city={r.city}
+          />
 
           {/* Gallery */}
           {gallery.length > 0 && (

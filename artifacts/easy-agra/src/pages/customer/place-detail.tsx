@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useParams, useLocation, Link } from "wouter";
 import { CustomerLayout } from "@/components/layout/customer-layout";
+import { MapEmbed } from "@/components/map-embed";
 import {
   useGetTouristPlace,
   useToggleTouristPlaceFavorite,
@@ -322,26 +323,15 @@ export default function PlaceDetail() {
             </Card>
           )}
 
-          {/* Google Maps buttons */}
-          {mapsUrl && (
-            <div className="flex gap-3">
-              <a href={mapsUrl} target="_blank" rel="noopener noreferrer" className="flex-1">
-                <Button variant="outline" className="w-full gap-2 text-sm">
-                  <MapPin className="h-4 w-4" />
-                  Open in Maps
-                  <ExternalLink className="h-3.5 w-3.5 ml-auto" />
-                </Button>
-              </a>
-              {directionsUrl && (
-                <a href={directionsUrl} target="_blank" rel="noopener noreferrer" className="flex-1">
-                  <Button className="w-full gap-2 text-sm">
-                    <Navigation className="h-4 w-4" />
-                    Get Directions
-                  </Button>
-                </a>
-              )}
-            </div>
-          )}
+          {/* Map */}
+          <MapEmbed
+            lat={lat}
+            lng={lng}
+            name={place.name}
+            address={(place as any).address}
+            city={place.city}
+            googleMapLink={(place as any).googleMapsLink}
+          />
 
           {/* About */}
           {(place as any).description && (

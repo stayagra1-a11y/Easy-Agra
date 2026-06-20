@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useParams, useLocation, Link } from "wouter";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { CustomerLayout } from "@/components/layout/customer-layout";
+import { MapEmbed } from "@/components/map-embed";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -427,6 +428,14 @@ export default function HotelDetail() {
               </CardContent>
             </Card>
           )}
+
+          {/* Map */}
+          <MapEmbed
+            name={hotel.name}
+            address={hotel.address}
+            city={hotel.city}
+            googleMapLink={hotel.googleMapLink}
+          />
 
           {/* Rooms */}
           <div>

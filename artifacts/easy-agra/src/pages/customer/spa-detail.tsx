@@ -1,6 +1,7 @@
 import { useParams, useLocation } from "wouter";
 import { useGetSpaById, useGetSpaServices } from "@workspace/api-client-react";
 import { CustomerLayout } from "@/components/layout/customer-layout";
+import { MapEmbed } from "@/components/map-embed";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -121,6 +122,13 @@ export default function SpaDetail() {
           {spa.description && (
             <p className="text-sm text-muted-foreground">{spa.description}</p>
           )}
+
+          {/* Map */}
+          <MapEmbed
+            name={spa.name}
+            address={spa.address}
+            city={spa.city}
+          />
 
           {/* Contact */}
           {(spa.contactNumber || spaAny.website) && (
