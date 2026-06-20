@@ -40,8 +40,7 @@ export default defineConfig({
       filename: "sw.ts",
       injectRegister: "auto",
       devOptions: {
-        enabled: true,
-        type: "module",
+        enabled: false,
       },
       manifest: {
         name: "Easy Agra",

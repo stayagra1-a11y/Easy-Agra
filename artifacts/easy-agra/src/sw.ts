@@ -38,13 +38,11 @@ registerRoute(
   }),
 );
 
-// Static assets — CacheFirst for images/fonts
+// Static assets — CacheFirst only for images and fonts (NOT scripts/styles — those are handled by precacheAndRoute)
 registerRoute(
   ({ request }) =>
     request.destination === "image" ||
-    request.destination === "font" ||
-    request.destination === "style" ||
-    request.destination === "script",
+    request.destination === "font",
   new CacheFirst({
     cacheName: "static-assets",
     plugins: [
