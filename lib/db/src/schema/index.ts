@@ -5,6 +5,7 @@ export * from "./rooms";
 export * from "./bookings";
 export * from "./reviews";
 export * from "./restaurants";
+export * from "./spas";
 export * from "./notifications";
 export * from "./activity_logs";
 export * from "./platform_settings";

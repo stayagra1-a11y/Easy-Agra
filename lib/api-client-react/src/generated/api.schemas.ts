@@ -1118,6 +1118,86 @@ export interface ReservationsPage {
   limit: number;
 }
 
+export type SpaStatus = typeof SpaStatus[keyof typeof SpaStatus];
+
+
+export const SpaStatus = {
+  draft: 'draft',
+  pending: 'pending',
+  approved: 'approved',
+  rejected: 'rejected',
+  suspended: 'suspended',
+} as const;
+
+export interface Spa {
+  id: number;
+  ownerId: number;
+  name: string;
+  description?: string | null;
+  address?: string | null;
+  city?: string | null;
+  state?: string | null;
+  contactNumber?: string | null;
+  contactEmail?: string | null;
+  openingTime?: string | null;
+  closingTime?: string | null;
+  coverPhoto?: string | null;
+  galleryPhotos?: string[] | null;
+  facilities?: string[] | null;
+  status: SpaStatus;
+  rejectionReason?: string | null;
+  deletedAt?: string | null;
+  ownerName?: string | null;
+  ownerEmail?: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface SpaInput {
+  name: string;
+  description?: string | null;
+  address?: string | null;
+  city?: string | null;
+  state?: string | null;
+  contactNumber?: string | null;
+  contactEmail?: string | null;
+  openingTime?: string | null;
+  closingTime?: string | null;
+  coverPhoto?: string | null;
+  galleryPhotos?: string[] | null;
+  facilities?: string[] | null;
+}
+
+export interface SpasPage {
+  spas: Spa[];
+  total: number;
+  page: number;
+  limit: number;
+}
+
+export interface SpaStats {
+  totalSpas: number;
+  activeSpas: number;
+  pendingSpas: number;
+  draftSpas: number;
+}
+
+export type SpaStatusUpdateStatus = typeof SpaStatusUpdateStatus[keyof typeof SpaStatusUpdateStatus];
+
+
+export const SpaStatusUpdateStatus = {
+  draft: 'draft',
+  pending: 'pending',
+  approved: 'approved',
+  rejected: 'rejected',
+  suspended: 'suspended',
+} as const;
+
+export interface SpaStatusUpdate {
+  status: SpaStatusUpdateStatus;
+  rejectionReason?: string | null;
+}
+
 export type ListUsersParams = {
 role?: string;
 status?: string;
@@ -1230,5 +1310,17 @@ status?: string;
 date?: string;
 page?: number;
 limit?: number;
+};
+
+export type GetAllSpasParams = {
+search?: string;
+status?: string;
+city?: string;
+page?: number;
+limit?: number;
+};
+
+export type DeleteSpa200 = {
+  success: boolean;
 };
 

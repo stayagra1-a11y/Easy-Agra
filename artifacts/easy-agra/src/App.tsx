@@ -55,6 +55,9 @@ import MenuManagement from "@/pages/restaurant-owner/menu-management";
 import TableManagement from "@/pages/restaurant-owner/table-management";
 import OwnerReservations from "@/pages/restaurant-owner/owner-reservations";
 import SpaOwnerDashboard from "@/pages/spa-owner/dashboard";
+import OwnerSpas from "@/pages/spa-owner/spas";
+import SpaForm from "@/pages/spa-owner/spa-form";
+import AdminSpas from "@/pages/admin/admin-spas";
 
 // Customer - restaurants & reservations
 import CustomerRestaurants from "@/pages/customer/restaurants";
@@ -165,6 +168,9 @@ function Router() {
       <Route path="/restaurant-owner/restaurants" component={() => <ProtectedRoute component={OwnerRestaurants} allowedRoles={["restaurant_owner"]} />} />
       <Route path="/restaurant-owner/reservations" component={() => <ProtectedRoute component={OwnerReservations} allowedRoles={["restaurant_owner"]} />} />
       <Route path="/spa-owner/dashboard" component={() => <ProtectedRoute component={SpaOwnerDashboard} allowedRoles={["spa_owner"]} />} />
+      <Route path="/spa-owner/spas/new" component={() => <ProtectedRoute component={SpaForm} allowedRoles={["spa_owner"]} />} />
+      <Route path="/spa-owner/spas/:id/edit" component={() => <ProtectedRoute component={SpaForm} allowedRoles={["spa_owner"]} />} />
+      <Route path="/spa-owner/spas" component={() => <ProtectedRoute component={OwnerSpas} allowedRoles={["spa_owner"]} />} />
 
       {/* Admin routes */}
       <Route path="/admin/dashboard" component={() => <ProtectedRoute component={AdminDashboard} allowedRoles={["admin", "super_admin"]} />} />
@@ -176,6 +182,7 @@ function Router() {
       <Route path="/admin/booking-analytics" component={() => <ProtectedRoute component={BookingAnalytics} allowedRoles={["admin", "super_admin"]} />} />
       <Route path="/admin/reviews" component={() => <ProtectedRoute component={AdminReviews} allowedRoles={["admin", "super_admin"]} />} />
       <Route path="/admin/restaurants" component={() => <ProtectedRoute component={AdminRestaurants} allowedRoles={["admin", "super_admin"]} />} />
+      <Route path="/admin/spas" component={() => <ProtectedRoute component={AdminSpas} allowedRoles={["admin", "super_admin"]} />} />
 
       {/* Super Admin routes */}
       <Route path="/super-admin/dashboard" component={() => <ProtectedRoute component={SuperAdminDashboard} allowedRoles={["super_admin"]} />} />

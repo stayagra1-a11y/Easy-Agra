@@ -3057,3 +3057,263 @@ export const CompleteReservationResponse = zod.object({
 })
 
 
+/**
+ * @summary Get my spas (spa owner)
+ */
+export const GetMySpasListResponseItem = zod.object({
+  "id": zod.number(),
+  "ownerId": zod.number(),
+  "name": zod.string(),
+  "description": zod.string().nullish(),
+  "address": zod.string().nullish(),
+  "city": zod.string().nullish(),
+  "state": zod.string().nullish(),
+  "contactNumber": zod.string().nullish(),
+  "contactEmail": zod.string().nullish(),
+  "openingTime": zod.string().nullish(),
+  "closingTime": zod.string().nullish(),
+  "coverPhoto": zod.string().nullish(),
+  "galleryPhotos": zod.array(zod.string()).nullish(),
+  "facilities": zod.array(zod.string()).nullish(),
+  "status": zod.enum(['draft', 'pending', 'approved', 'rejected', 'suspended']),
+  "rejectionReason": zod.string().nullish(),
+  "deletedAt": zod.string().nullish(),
+  "ownerName": zod.string().nullish(),
+  "ownerEmail": zod.string().nullish(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+export const GetMySpasListResponse = zod.array(GetMySpasListResponseItem)
+
+
+/**
+ * @summary Get spa owner dashboard stats
+ */
+export const GetSpaOwnerStatsResponse = zod.object({
+  "totalSpas": zod.number(),
+  "activeSpas": zod.number(),
+  "pendingSpas": zod.number(),
+  "draftSpas": zod.number()
+})
+
+
+/**
+ * @summary List all spas (admin)
+ */
+export const GetAllSpasQueryParams = zod.object({
+  "search": zod.coerce.string().optional(),
+  "status": zod.coerce.string().optional(),
+  "city": zod.coerce.string().optional(),
+  "page": zod.coerce.number().optional(),
+  "limit": zod.coerce.number().optional()
+})
+
+export const GetAllSpasResponse = zod.object({
+  "spas": zod.array(zod.object({
+  "id": zod.number(),
+  "ownerId": zod.number(),
+  "name": zod.string(),
+  "description": zod.string().nullish(),
+  "address": zod.string().nullish(),
+  "city": zod.string().nullish(),
+  "state": zod.string().nullish(),
+  "contactNumber": zod.string().nullish(),
+  "contactEmail": zod.string().nullish(),
+  "openingTime": zod.string().nullish(),
+  "closingTime": zod.string().nullish(),
+  "coverPhoto": zod.string().nullish(),
+  "galleryPhotos": zod.array(zod.string()).nullish(),
+  "facilities": zod.array(zod.string()).nullish(),
+  "status": zod.enum(['draft', 'pending', 'approved', 'rejected', 'suspended']),
+  "rejectionReason": zod.string().nullish(),
+  "deletedAt": zod.string().nullish(),
+  "ownerName": zod.string().nullish(),
+  "ownerEmail": zod.string().nullish(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})),
+  "total": zod.number(),
+  "page": zod.number(),
+  "limit": zod.number()
+})
+
+
+/**
+ * @summary Create a new spa
+ */
+export const CreateSpaBody = zod.object({
+  "name": zod.string(),
+  "description": zod.string().nullish(),
+  "address": zod.string().nullish(),
+  "city": zod.string().nullish(),
+  "state": zod.string().nullish(),
+  "contactNumber": zod.string().nullish(),
+  "contactEmail": zod.string().nullish(),
+  "openingTime": zod.string().nullish(),
+  "closingTime": zod.string().nullish(),
+  "coverPhoto": zod.string().nullish(),
+  "galleryPhotos": zod.array(zod.string()).nullish(),
+  "facilities": zod.array(zod.string()).nullish()
+})
+
+
+/**
+ * @summary Get spa detail
+ */
+export const GetSpaByIdParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const GetSpaByIdResponse = zod.object({
+  "id": zod.number(),
+  "ownerId": zod.number(),
+  "name": zod.string(),
+  "description": zod.string().nullish(),
+  "address": zod.string().nullish(),
+  "city": zod.string().nullish(),
+  "state": zod.string().nullish(),
+  "contactNumber": zod.string().nullish(),
+  "contactEmail": zod.string().nullish(),
+  "openingTime": zod.string().nullish(),
+  "closingTime": zod.string().nullish(),
+  "coverPhoto": zod.string().nullish(),
+  "galleryPhotos": zod.array(zod.string()).nullish(),
+  "facilities": zod.array(zod.string()).nullish(),
+  "status": zod.enum(['draft', 'pending', 'approved', 'rejected', 'suspended']),
+  "rejectionReason": zod.string().nullish(),
+  "deletedAt": zod.string().nullish(),
+  "ownerName": zod.string().nullish(),
+  "ownerEmail": zod.string().nullish(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+
+
+/**
+ * @summary Update spa
+ */
+export const UpdateSpaParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const UpdateSpaBody = zod.object({
+  "name": zod.string(),
+  "description": zod.string().nullish(),
+  "address": zod.string().nullish(),
+  "city": zod.string().nullish(),
+  "state": zod.string().nullish(),
+  "contactNumber": zod.string().nullish(),
+  "contactEmail": zod.string().nullish(),
+  "openingTime": zod.string().nullish(),
+  "closingTime": zod.string().nullish(),
+  "coverPhoto": zod.string().nullish(),
+  "galleryPhotos": zod.array(zod.string()).nullish(),
+  "facilities": zod.array(zod.string()).nullish()
+})
+
+export const UpdateSpaResponse = zod.object({
+  "id": zod.number(),
+  "ownerId": zod.number(),
+  "name": zod.string(),
+  "description": zod.string().nullish(),
+  "address": zod.string().nullish(),
+  "city": zod.string().nullish(),
+  "state": zod.string().nullish(),
+  "contactNumber": zod.string().nullish(),
+  "contactEmail": zod.string().nullish(),
+  "openingTime": zod.string().nullish(),
+  "closingTime": zod.string().nullish(),
+  "coverPhoto": zod.string().nullish(),
+  "galleryPhotos": zod.array(zod.string()).nullish(),
+  "facilities": zod.array(zod.string()).nullish(),
+  "status": zod.enum(['draft', 'pending', 'approved', 'rejected', 'suspended']),
+  "rejectionReason": zod.string().nullish(),
+  "deletedAt": zod.string().nullish(),
+  "ownerName": zod.string().nullish(),
+  "ownerEmail": zod.string().nullish(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+
+
+/**
+ * @summary Soft delete spa
+ */
+export const DeleteSpaParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const DeleteSpaResponse = zod.object({
+  "success": zod.boolean()
+})
+
+
+/**
+ * @summary Restore a deleted spa
+ */
+export const RestoreSpaParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const RestoreSpaResponse = zod.object({
+  "id": zod.number(),
+  "ownerId": zod.number(),
+  "name": zod.string(),
+  "description": zod.string().nullish(),
+  "address": zod.string().nullish(),
+  "city": zod.string().nullish(),
+  "state": zod.string().nullish(),
+  "contactNumber": zod.string().nullish(),
+  "contactEmail": zod.string().nullish(),
+  "openingTime": zod.string().nullish(),
+  "closingTime": zod.string().nullish(),
+  "coverPhoto": zod.string().nullish(),
+  "galleryPhotos": zod.array(zod.string()).nullish(),
+  "facilities": zod.array(zod.string()).nullish(),
+  "status": zod.enum(['draft', 'pending', 'approved', 'rejected', 'suspended']),
+  "rejectionReason": zod.string().nullish(),
+  "deletedAt": zod.string().nullish(),
+  "ownerName": zod.string().nullish(),
+  "ownerEmail": zod.string().nullish(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+
+
+/**
+ * @summary Update spa status (admin)
+ */
+export const UpdateSpaStatusParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const UpdateSpaStatusBody = zod.object({
+  "status": zod.enum(['draft', 'pending', 'approved', 'rejected', 'suspended']),
+  "rejectionReason": zod.string().nullish()
+})
+
+export const UpdateSpaStatusResponse = zod.object({
+  "id": zod.number(),
+  "ownerId": zod.number(),
+  "name": zod.string(),
+  "description": zod.string().nullish(),
+  "address": zod.string().nullish(),
+  "city": zod.string().nullish(),
+  "state": zod.string().nullish(),
+  "contactNumber": zod.string().nullish(),
+  "contactEmail": zod.string().nullish(),
+  "openingTime": zod.string().nullish(),
+  "closingTime": zod.string().nullish(),
+  "coverPhoto": zod.string().nullish(),
+  "galleryPhotos": zod.array(zod.string()).nullish(),
+  "facilities": zod.array(zod.string()).nullish(),
+  "status": zod.enum(['draft', 'pending', 'approved', 'rejected', 'suspended']),
+  "rejectionReason": zod.string().nullish(),
+  "deletedAt": zod.string().nullish(),
+  "ownerName": zod.string().nullish(),
+  "ownerEmail": zod.string().nullish(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+
+
