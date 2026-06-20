@@ -112,12 +112,8 @@ export default function CustomerHome() {
             {features.map(({ icon: Icon, label, color, href, bg }: any) => {
               const tile = (
                 <div key={label} className="flex flex-col items-center gap-2 group cursor-pointer">
-                  <div className="h-16 w-16 rounded-2xl overflow-hidden relative shadow-sm transition-transform group-active:scale-95">
-                    <img src={bg} alt={label} className="absolute inset-0 w-full h-full object-cover" />
-                    <div className="absolute inset-0 bg-black/30" />
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <Icon className={`h-8 w-8 ${color} drop-shadow`} />
-                    </div>
+                  <div className="h-16 w-16 rounded-2xl overflow-hidden shadow-sm transition-transform group-active:scale-95">
+                    <img src={bg} alt={label} className="w-full h-full object-cover" />
                   </div>
                   <span className="text-xs font-medium text-foreground text-center leading-tight">{label}</span>
                 </div>
