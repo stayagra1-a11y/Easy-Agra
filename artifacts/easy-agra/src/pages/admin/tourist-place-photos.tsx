@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useParams, useLocation } from "wouter";
 import { AdminLayout } from "@/components/layout/admin-layout";
 import { useGetTouristPlace } from "@workspace/api-client-react";
@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
@@ -14,9 +14,10 @@ import { useQueryClient } from "@tanstack/react-query";
 import { getGetTouristPlaceQueryKey } from "@workspace/api-client-react";
 import {
   ArrowLeft, Loader2, PlusCircle, Trash2, Star, StarOff,
-  ArrowUp, ArrowDown, Images, ExternalLink,
+  ArrowUp, ArrowDown, Images, ExternalLink, Upload, ImagePlus,
 } from "lucide-react";
 import { apiRequest } from "@/lib/api-request";
+import { uploadToCloudinary } from "@/lib/cloudinary";
 
 type TouristPlaceImage = {
   id: number;
@@ -46,8 +47,12 @@ export default function TouristPlacePhotos() {
   const [addOpen, setAddOpen] = useState(false);
   const [editImg, setEditImg] = useState<TouristPlaceImage | null>(null);
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [deleting, setDeleting] = useState<number | null>(null);
   const [featuring, setFeaturing] = useState<number | null>(null);
+
+  const addFileRef = useRef<HTMLInputElement>(null);
+  const editFileRef = useRef<HTMLInputElement>(null);
 
   const [newImg, setNewImg] = useState({
     imageUrl: "",
@@ -60,9 +65,29 @@ export default function TouristPlacePhotos() {
   const invalidate = () =>
     queryClient.invalidateQueries({ queryKey: getGetTouristPlaceQueryKey(placeId) });
 
+  const handleUploadFile = async (
+    file: File,
+    target: "add" | "edit",
+  ) => {
+    setUploading(true);
+    try {
+      const url = await uploadToCloudinary(file);
+      if (target === "add") {
+        setNewImg((prev) => ({ ...prev, imageUrl: url }));
+      } else if (editImg) {
+        setEditImg((prev) => prev ? { ...prev, imageUrl: url } : prev);
+      }
+      toast({ title: "Photo uploaded!", description: "URL filled in automatically." });
+    } catch {
+      toast({ title: "Upload failed", description: "Could not upload photo. Try again.", variant: "destructive" });
+    } finally {
+      setUploading(false);
+    }
+  };
+
   const handleAddImage = async () => {
     if (!newImg.imageUrl.trim()) {
-      toast({ title: "Image URL is required", variant: "destructive" });
+      toast({ title: "Photo required", description: "Please upload or enter a photo URL.", variant: "destructive" });
       return;
     }
     setSaving(true);
@@ -71,12 +96,12 @@ export default function TouristPlacePhotos() {
         method: "POST",
         body: newImg,
       });
-      toast({ title: "Image added!" });
+      toast({ title: "Photo added!" });
       setNewImg({ imageUrl: "", caption: "", altText: "", imageType: "gallery", isFeatured: false });
       setAddOpen(false);
       invalidate();
     } catch {
-      toast({ title: "Error", description: "Failed to add image", variant: "destructive" });
+      toast({ title: "Error", description: "Failed to add photo", variant: "destructive" });
     } finally {
       setSaving(false);
     }
@@ -97,11 +122,11 @@ export default function TouristPlacePhotos() {
           sortOrder: editImg.sortOrder,
         },
       });
-      toast({ title: "Image updated!" });
+      toast({ title: "Photo updated!" });
       setEditImg(null);
       invalidate();
     } catch {
-      toast({ title: "Error", description: "Failed to update image", variant: "destructive" });
+      toast({ title: "Error", description: "Failed to update photo", variant: "destructive" });
     } finally {
       setSaving(false);
     }
@@ -165,7 +190,6 @@ export default function TouristPlacePhotos() {
   return (
     <AdminLayout>
       <div className="space-y-6 max-w-5xl">
-        {/* Header */}
         <div className="flex items-center gap-4">
           <Button variant="ghost" size="icon" onClick={() => navigate("/admin/tourist-places")}>
             <ArrowLeft className="h-5 w-5" />
@@ -180,22 +204,20 @@ export default function TouristPlacePhotos() {
           </Button>
         </div>
 
-        {/* Info banner */}
         <Card className="border-primary/20 bg-primary/5">
           <CardContent className="p-4 text-sm text-primary">
             <Images className="inline h-4 w-4 mr-2" />
             Set one photo as <strong>Featured</strong> to use it as the cover image on cards and detail pages.
-            Use <strong>Cover</strong> type for the main banner image. Drag reorder using the arrows.
+            Use <strong>Cover</strong> type for the main banner image.
           </CardContent>
         </Card>
 
-        {/* Image grid */}
         {images.length === 0 ? (
           <Card className="border-dashed border-2">
             <CardContent className="py-16 text-center">
               <Images className="h-12 w-12 text-muted-foreground/40 mx-auto mb-4" />
               <p className="font-semibold">No photos yet</p>
-              <p className="text-sm text-muted-foreground mt-1 mb-4">Add at least 10 photos for a rich gallery experience.</p>
+              <p className="text-sm text-muted-foreground mt-1 mb-4">Add photos to showcase this place.</p>
               <Button onClick={() => setAddOpen(true)} className="gap-1.5">
                 <PlusCircle className="h-4 w-4" /> Add First Photo
               </Button>
@@ -206,7 +228,6 @@ export default function TouristPlacePhotos() {
             {images.map((img, idx) => (
               <Card key={img.id} className="overflow-hidden">
                 <div className="flex gap-0">
-                  {/* Preview */}
                   <div className="w-40 sm:w-56 shrink-0 relative bg-muted">
                     <img
                       src={img.imageUrl}
@@ -225,83 +246,29 @@ export default function TouristPlacePhotos() {
                     </div>
                   </div>
 
-                  {/* Controls */}
                   <div className="flex-1 p-4 min-w-0">
                     <p className="font-medium text-sm truncate">{img.caption || "(no caption)"}</p>
                     <p className="text-xs text-muted-foreground truncate mt-0.5">{img.imageUrl}</p>
 
                     <div className="flex gap-2 mt-3 flex-wrap">
-                      {/* Reorder */}
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => handleReorder(img.id, "up")}
-                        disabled={idx === 0}
-                        className="h-8 w-8 p-0"
-                      >
+                      <Button size="sm" variant="outline" onClick={() => handleReorder(img.id, "up")} disabled={idx === 0} className="h-8 w-8 p-0">
                         <ArrowUp className="h-3.5 w-3.5" />
                       </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => handleReorder(img.id, "down")}
-                        disabled={idx === images.length - 1}
-                        className="h-8 w-8 p-0"
-                      >
+                      <Button size="sm" variant="outline" onClick={() => handleReorder(img.id, "down")} disabled={idx === images.length - 1} className="h-8 w-8 p-0">
                         <ArrowDown className="h-3.5 w-3.5" />
                       </Button>
-
-                      {/* Feature */}
-                      <Button
-                        size="sm"
-                        variant={img.isFeatured ? "default" : "outline"}
-                        onClick={() => handleFeature(img.id)}
-                        disabled={featuring === img.id}
-                        className="gap-1.5 h-8"
-                      >
-                        {featuring === img.id ? (
-                          <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                        ) : img.isFeatured ? (
-                          <Star className="h-3.5 w-3.5 fill-current" />
-                        ) : (
-                          <StarOff className="h-3.5 w-3.5" />
-                        )}
+                      <Button size="sm" variant={img.isFeatured ? "default" : "outline"} onClick={() => handleFeature(img.id)} disabled={featuring === img.id} className="gap-1.5 h-8">
+                        {featuring === img.id ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : img.isFeatured ? <Star className="h-3.5 w-3.5 fill-current" /> : <StarOff className="h-3.5 w-3.5" />}
                         {img.isFeatured ? "Featured" : "Set Featured"}
                       </Button>
-
-                      {/* Edit */}
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => setEditImg({ ...img })}
-                        className="gap-1.5 h-8"
-                      >
+                      <Button size="sm" variant="outline" onClick={() => setEditImg({ ...img })} className="gap-1.5 h-8">
                         Edit
                       </Button>
-
-                      {/* Open URL */}
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => window.open(img.imageUrl, "_blank")}
-                        className="gap-1.5 h-8"
-                      >
+                      <Button size="sm" variant="ghost" onClick={() => window.open(img.imageUrl, "_blank")} className="gap-1.5 h-8">
                         <ExternalLink className="h-3.5 w-3.5" />
                       </Button>
-
-                      {/* Delete */}
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => handleDelete(img.id)}
-                        disabled={deleting === img.id}
-                        className="gap-1.5 h-8 text-destructive border-destructive/40 hover:bg-destructive/5"
-                      >
-                        {deleting === img.id ? (
-                          <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                        ) : (
-                          <Trash2 className="h-3.5 w-3.5" />
-                        )}
+                      <Button size="sm" variant="outline" onClick={() => handleDelete(img.id)} disabled={deleting === img.id} className="gap-1.5 h-8 text-destructive border-destructive/40 hover:bg-destructive/5">
+                        {deleting === img.id ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Trash2 className="h-3.5 w-3.5" />}
                       </Button>
                     </div>
                   </div>
@@ -312,7 +279,31 @@ export default function TouristPlacePhotos() {
         )}
       </div>
 
-      {/* Add Image Dialog */}
+      {/* Hidden file inputs */}
+      <input
+        ref={addFileRef}
+        type="file"
+        accept="image/*"
+        className="hidden"
+        onChange={(e) => {
+          const file = e.target.files?.[0];
+          if (file) handleUploadFile(file, "add");
+          e.target.value = "";
+        }}
+      />
+      <input
+        ref={editFileRef}
+        type="file"
+        accept="image/*"
+        className="hidden"
+        onChange={(e) => {
+          const file = e.target.files?.[0];
+          if (file) handleUploadFile(file, "edit");
+          e.target.value = "";
+        }}
+      />
+
+      {/* Add Photo Dialog */}
       <Dialog open={addOpen} onOpenChange={setAddOpen}>
         <DialogContent>
           <DialogHeader>
@@ -320,38 +311,53 @@ export default function TouristPlacePhotos() {
           </DialogHeader>
           <div className="space-y-4 py-2">
             <div className="space-y-2">
-              <Label>Image URL *</Label>
+              <Label>Photo *</Label>
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full h-12 gap-2 border-dashed border-2 border-primary/40 text-primary hover:bg-primary/5"
+                onClick={() => addFileRef.current?.click()}
+                disabled={uploading}
+              >
+                {uploading ? (
+                  <><Loader2 className="h-5 w-5 animate-spin" /> Uploading...</>
+                ) : (
+                  <><ImagePlus className="h-5 w-5" /> Phone se photo upload karo</>
+                )}
+              </Button>
+              {newImg.imageUrl && (
+                <img
+                  src={newImg.imageUrl}
+                  alt="Preview"
+                  className="w-full h-48 object-cover rounded-md border"
+                />
+              )}
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <span className="w-full border-t" />
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-background px-2 text-muted-foreground">ya URL daalo</span>
+                </div>
+              </div>
               <Input
                 value={newImg.imageUrl}
                 onChange={(e) => setNewImg({ ...newImg, imageUrl: e.target.value })}
                 placeholder="https://images.unsplash.com/photo-..."
               />
-              {newImg.imageUrl && (
-                <img
-                  src={newImg.imageUrl}
-                  alt="Preview"
-                  className="w-full h-40 object-cover rounded-md mt-2 border"
-                  onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
-                />
-              )}
             </div>
             <div className="space-y-2">
-              <Label>Caption</Label>
+              <Label>Caption (optional)</Label>
               <Input
                 value={newImg.caption}
                 onChange={(e) => setNewImg({ ...newImg, caption: e.target.value })}
-                placeholder="Describe this photo..."
+                placeholder="Photo ka description..."
               />
             </div>
             <div className="space-y-2">
               <Label>Type</Label>
-              <Select
-                value={newImg.imageType}
-                onValueChange={(v) => setNewImg({ ...newImg, imageType: v as "gallery" | "cover" })}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
+              <Select value={newImg.imageType} onValueChange={(v) => setNewImg({ ...newImg, imageType: v as "gallery" | "cover" })}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="gallery">Gallery</SelectItem>
                   <SelectItem value="cover">Cover</SelectItem>
@@ -361,7 +367,7 @@ export default function TouristPlacePhotos() {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setAddOpen(false)}>Cancel</Button>
-            <Button onClick={handleAddImage} disabled={saving} className="gap-2">
+            <Button onClick={handleAddImage} disabled={saving || uploading} className="gap-2">
               {saving && <Loader2 className="h-4 w-4 animate-spin" />}
               Add Photo
             </Button>
@@ -369,7 +375,7 @@ export default function TouristPlacePhotos() {
         </DialogContent>
       </Dialog>
 
-      {/* Edit Image Dialog */}
+      {/* Edit Photo Dialog */}
       <Dialog open={!!editImg} onOpenChange={(open) => !open && setEditImg(null)}>
         <DialogContent>
           <DialogHeader>
@@ -378,10 +384,40 @@ export default function TouristPlacePhotos() {
           {editImg && (
             <div className="space-y-4 py-2">
               <div className="space-y-2">
-                <Label>Image URL</Label>
+                <Label>Photo</Label>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full h-12 gap-2 border-dashed border-2 border-primary/40 text-primary hover:bg-primary/5"
+                  onClick={() => editFileRef.current?.click()}
+                  disabled={uploading}
+                >
+                  {uploading ? (
+                    <><Loader2 className="h-5 w-5 animate-spin" /> Uploading...</>
+                  ) : (
+                    <><Upload className="h-5 w-5" /> Naya photo upload karo</>
+                  )}
+                </Button>
+                {editImg.imageUrl && (
+                  <img
+                    src={editImg.imageUrl}
+                    alt="Preview"
+                    className="w-full h-40 object-cover rounded-md border"
+                    onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+                  />
+                )}
+                <div className="relative">
+                  <div className="absolute inset-0 flex items-center">
+                    <span className="w-full border-t" />
+                  </div>
+                  <div className="relative flex justify-center text-xs uppercase">
+                    <span className="bg-background px-2 text-muted-foreground">ya URL daalo</span>
+                  </div>
+                </div>
                 <Input
                   value={editImg.imageUrl}
                   onChange={(e) => setEditImg({ ...editImg, imageUrl: e.target.value })}
+                  placeholder="https://..."
                 />
               </div>
               <div className="space-y-2">
@@ -400,10 +436,7 @@ export default function TouristPlacePhotos() {
               </div>
               <div className="space-y-2">
                 <Label>Type</Label>
-                <Select
-                  value={editImg.imageType}
-                  onValueChange={(v) => setEditImg({ ...editImg, imageType: v })}
-                >
+                <Select value={editImg.imageType} onValueChange={(v) => setEditImg({ ...editImg, imageType: v })}>
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="gallery">Gallery</SelectItem>
@@ -415,7 +448,7 @@ export default function TouristPlacePhotos() {
           )}
           <DialogFooter>
             <Button variant="outline" onClick={() => setEditImg(null)}>Cancel</Button>
-            <Button onClick={handleUpdateImage} disabled={saving} className="gap-2">
+            <Button onClick={handleUpdateImage} disabled={saving || uploading} className="gap-2">
               {saving && <Loader2 className="h-4 w-4 animate-spin" />}
               Save Changes
             </Button>
