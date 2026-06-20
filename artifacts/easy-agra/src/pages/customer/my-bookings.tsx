@@ -110,57 +110,60 @@ export default function MyBookings() {
         ) : (
           <div className="space-y-3">
             {bookings.map((b) => (
-              <Card key={b.id} className="border-0 shadow-sm overflow-hidden">
-                <CardContent className="p-4">
-                  <div className="flex items-start justify-between gap-2 mb-2">
-                    <div>
-                      <div className="font-semibold text-foreground text-sm truncate max-w-[200px]">
-                        {b.hotelName}
+              <Link key={b.id} href={`/customer/bookings/${b.id}`}>
+                <Card className="border-0 shadow-sm overflow-hidden cursor-pointer hover:shadow-md transition-shadow active:scale-[0.99]">
+                  <CardContent className="p-4">
+                    <div className="flex items-start justify-between gap-2 mb-2">
+                      <div>
+                        <div className="font-semibold text-foreground text-sm truncate max-w-[200px]">
+                          {b.hotelName}
+                        </div>
+                        <div className="text-xs text-muted-foreground font-mono">{b.bookingRef}</div>
                       </div>
-                      <div className="text-xs text-muted-foreground font-mono">{b.bookingRef}</div>
-                    </div>
-                    <Badge
-                      variant="outline"
-                      className={`text-xs flex-shrink-0 ${STATUS_COLORS[b.status] ?? ""}`}
-                    >
-                      {STATUS_LABELS[b.status] ?? b.status}
-                    </Badge>
-                  </div>
-
-                  <div className="space-y-1 text-xs text-muted-foreground mb-3">
-                    <div className="flex items-center gap-1">
-                      <CalendarDays className="w-3 h-3" />
-                      {fmtDate(b.checkInDate)} → {fmtDate(b.checkOutDate)} ({b.nights} nights)
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <Hotel className="w-3 h-3" />
-                      {b.roomName}
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <IndianRupee className="w-3 h-3" />
-                      {fmtCurrency(b.finalAmount)}
-                    </div>
-                  </div>
-
-                  {b.status === "checked_out" && (
-                    <Link href={`/customer/write-review/${b.id}`}>
-                      <Button
-                        size="sm"
-                        className="w-full h-8 text-xs bg-amber-500 hover:bg-amber-600 text-white"
+                      <Badge
+                        variant="outline"
+                        className={`text-xs flex-shrink-0 ${STATUS_COLORS[b.status] ?? ""}`}
                       >
-                        <Star className="w-3 h-3 mr-1" />
-                        Write a Review
-                      </Button>
-                    </Link>
-                  )}
-                  {b.status === "pending" && (
-                    <div className="flex items-center gap-1 text-xs text-amber-600 bg-amber-50 rounded-lg px-3 py-1.5">
-                      <Clock className="w-3 h-3" />
-                      Waiting for hotel confirmation
+                        {STATUS_LABELS[b.status] ?? b.status}
+                      </Badge>
                     </div>
-                  )}
-                </CardContent>
-              </Card>
+
+                    <div className="space-y-1 text-xs text-muted-foreground mb-3">
+                      <div className="flex items-center gap-1">
+                        <CalendarDays className="w-3 h-3" />
+                        {fmtDate(b.checkInDate)} → {fmtDate(b.checkOutDate)} ({b.nights} nights)
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <Hotel className="w-3 h-3" />
+                        {b.roomName}
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <IndianRupee className="w-3 h-3" />
+                        {fmtCurrency(b.finalAmount)}
+                      </div>
+                    </div>
+
+                    {b.status === "checked_out" && (
+                      <div className="flex items-center gap-1 text-xs text-amber-600 bg-amber-50 rounded-lg px-3 py-1.5">
+                        <Star className="w-3 h-3" />
+                        Tap to write a review
+                      </div>
+                    )}
+                    {b.status === "pending" && (
+                      <div className="flex items-center gap-1 text-xs text-amber-600 bg-amber-50 rounded-lg px-3 py-1.5">
+                        <Clock className="w-3 h-3" />
+                        Waiting for hotel confirmation
+                      </div>
+                    )}
+                    {b.status === "confirmed" && (
+                      <div className="flex items-center gap-1 text-xs text-green-600 bg-green-50 rounded-lg px-3 py-1.5">
+                        <ChevronRight className="w-3 h-3" />
+                        Tap to view details
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </Link>
             ))}
 
             {/* Pagination */}
