@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Link, useLocation } from "wouter";
 import { useRegister } from "@workspace/api-client-react";
-import { Map, Eye, EyeOff, Loader2, MailCheck } from "lucide-react";
+import { Eye, EyeOff, Loader2, MailCheck } from "lucide-react";
+import { EasyAgraLogo } from "@/components/logo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -105,11 +106,8 @@ export default function Register() {
       <div className="h-1 bg-accent" />
       <div className="flex-1 flex flex-col items-center justify-center px-4 py-8">
         <div className="flex flex-col items-center mb-6">
-          <div className="h-14 w-14 rounded-2xl bg-white/10 backdrop-blur flex items-center justify-center mb-2 border border-white/20 shadow-xl">
-            <Map className="h-7 w-7 text-accent" />
-          </div>
-          <h1 className="text-2xl font-bold text-white tracking-tight">Easy Agra</h1>
-          <p className="text-white/70 text-xs mt-1">Create your account</p>
+          <EasyAgraLogo size="md" variant="full" className="mb-1" />
+          <p className="text-white/60 text-xs mt-2">Create your account</p>
         </div>
 
         <div className="w-full max-w-sm bg-white rounded-2xl shadow-2xl p-6">

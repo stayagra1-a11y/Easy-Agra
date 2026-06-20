@@ -2,7 +2,8 @@ import { useState } from "react";
 import { Link, useLocation, useSearch } from "wouter";
 import { useLogin, getGetMeQueryKey } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
-import { Map, Eye, EyeOff, Loader2, Phone, Mail } from "lucide-react";
+import { Eye, EyeOff, Loader2, Phone, Mail } from "lucide-react";
+import { EasyAgraLogo } from "@/components/logo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -84,11 +85,8 @@ export default function Login() {
       <div className="flex-1 flex flex-col items-center justify-center px-4 py-8">
         {/* Logo */}
         <div className="flex flex-col items-center mb-8">
-          <div className="h-16 w-16 rounded-2xl bg-white/10 backdrop-blur flex items-center justify-center mb-3 border border-white/20 shadow-xl">
-            <Map className="h-8 w-8 text-accent" />
-          </div>
-          <h1 className="text-3xl font-bold text-white tracking-tight">Easy Agra</h1>
-          <p className="text-white/70 text-sm mt-1">Your guide to the City of Taj</p>
+          <EasyAgraLogo size="lg" variant="full" className="mb-2" />
+          <p className="text-white/60 text-sm mt-2">Your guide to the City of Taj</p>
         </div>
 
         {/* Card */}

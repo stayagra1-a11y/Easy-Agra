@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useLocation } from "wouter";
-import { ChevronRight, MapPin } from "lucide-react";
+import { ChevronRight } from "lucide-react";
+import { EasyAgraLogo } from "@/components/logo";
 
 const slides = [
   {
@@ -232,12 +233,9 @@ export default function Onboarding() {
         </button>
       )}
 
-      {/* Slide number */}
-      <div className="absolute top-5 left-5 z-20 flex items-center gap-1.5">
-        <MapPin className="h-3.5 w-3.5" style={{ color: slide.accent }} />
-        <span className="text-xs font-semibold" style={{ color: slide.accent }}>
-          Easy Agra
-        </span>
+      {/* Logo top-left */}
+      <div className="absolute top-4 left-4 z-20">
+        <EasyAgraLogo size="sm" variant="full" />
       </div>
 
       {/* Main content */}
