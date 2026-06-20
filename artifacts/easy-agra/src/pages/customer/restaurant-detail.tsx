@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useParams, useLocation, Link } from "wouter";
 import { CustomerLayout } from "@/components/layout/customer-layout";
 import { MapEmbed } from "@/components/map-embed";
+import { imgUrl } from "@/lib/cloudinary";
 import { useGetRestaurant, useGetRestaurantMenu } from "@workspace/api-client-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -99,7 +100,7 @@ export default function RestaurantDetail() {
         {/* Cover */}
         {r.coverPhoto ? (
           <div className="h-56 overflow-hidden">
-            <img src={r.coverPhoto} alt={r.name} className="w-full h-full object-cover" />
+            <img src={imgUrl(r.coverPhoto, 1000)} alt={r.name} className="w-full h-full object-cover" />
           </div>
         ) : (
           <div className="h-40 bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center">
@@ -179,7 +180,7 @@ export default function RestaurantDetail() {
               <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
                 {gallery.map((p, i) => (
                   <div key={i} className="flex-shrink-0 w-28 h-20 rounded-xl overflow-hidden border">
-                    <img src={p} alt="" className="w-full h-full object-cover" />
+                    <img src={imgUrl(p, 400)} alt="" className="w-full h-full object-cover" />
                   </div>
                 ))}
               </div>
@@ -230,7 +231,7 @@ export default function RestaurantDetail() {
                     <CardContent className="p-3">
                       <div className="flex gap-3">
                         {item.itemPhoto ? (
-                          <img src={item.itemPhoto} alt="" className="w-16 h-16 rounded-xl object-cover flex-shrink-0 border" />
+                          <img src={imgUrl(item.itemPhoto, 200)} alt="" className="w-16 h-16 rounded-xl object-cover flex-shrink-0 border" />
                         ) : (
                           <div className="w-16 h-16 rounded-xl bg-muted flex items-center justify-center flex-shrink-0">
                             {item.isVeg ? <Leaf className="w-6 h-6 text-green-600" /> : <Drumstick className="w-6 h-6 text-red-600" />}

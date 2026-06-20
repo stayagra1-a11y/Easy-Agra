@@ -2,6 +2,7 @@ import { useParams, useLocation } from "wouter";
 import { useGetSpaById, useGetSpaServices } from "@workspace/api-client-react";
 import { CustomerLayout } from "@/components/layout/customer-layout";
 import { MapEmbed } from "@/components/map-embed";
+import { imgUrl } from "@/lib/cloudinary";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -67,7 +68,7 @@ export default function SpaDetail() {
           {spa.coverPhoto ? (
             <div className="h-52 overflow-hidden">
               <img
-                src={spa.coverPhoto}
+                src={imgUrl(spa.coverPhoto, 1000)}
                 alt={spa.name}
                 className="w-full h-full object-cover"
               />

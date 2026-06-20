@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { CustomerLayout } from "@/components/layout/customer-layout";
+import { imgUrl } from "@/lib/cloudinary";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -115,7 +116,7 @@ export default function CustomerSpas() {
                   {spa.coverPhoto && (
                     <div className="h-36 overflow-hidden">
                       <img
-                        src={spa.coverPhoto}
+                        src={imgUrl(spa.coverPhoto, 600)}
                         alt={spa.name}
                         className="w-full h-full object-cover"
                         onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}

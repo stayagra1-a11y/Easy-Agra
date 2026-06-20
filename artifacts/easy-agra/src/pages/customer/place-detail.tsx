@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { useParams, useLocation, Link } from "wouter";
 import { CustomerLayout } from "@/components/layout/customer-layout";
 import { MapEmbed } from "@/components/map-embed";
+import { imgUrl } from "@/lib/cloudinary";
 import {
   useGetTouristPlace,
   useToggleTouristPlaceFavorite,
@@ -499,7 +500,7 @@ export default function PlaceDetail() {
                           <div className="h-24 bg-muted relative">
                             {h.imageUrl ? (
                               <img
-                                src={h.imageUrl}
+                                src={imgUrl(h.imageUrl, 300)}
                                 alt={h.name}
                                 className="w-full h-full object-cover"
                                 onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
@@ -539,7 +540,7 @@ export default function PlaceDetail() {
                           <div className="h-24 bg-muted relative">
                             {r.imageUrl ? (
                               <img
-                                src={r.imageUrl}
+                                src={imgUrl(r.imageUrl, 300)}
                                 alt={r.name}
                                 className="w-full h-full object-cover"
                                 onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
@@ -579,7 +580,7 @@ export default function PlaceDetail() {
                           <div className="h-24 bg-muted relative">
                             {s.imageUrl ? (
                               <img
-                                src={s.imageUrl}
+                                src={imgUrl(s.imageUrl, 300)}
                                 alt={s.name}
                                 className="w-full h-full object-cover"
                                 onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}

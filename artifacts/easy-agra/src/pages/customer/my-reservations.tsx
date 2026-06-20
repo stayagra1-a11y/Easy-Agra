@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useLocation } from "wouter";
 import { CustomerLayout } from "@/components/layout/customer-layout";
+import { imgUrl } from "@/lib/cloudinary";
 import { useGetMyReservations, useCancelReservation } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
@@ -138,7 +139,7 @@ export default function MyReservations() {
                   {/* Top: restaurant + status */}
                   <div className="flex items-center gap-3 px-4 pt-4 pb-2">
                     {(res as any).restaurantCoverPhoto ? (
-                      <img src={(res as any).restaurantCoverPhoto} alt="" className="w-12 h-12 rounded-xl object-cover flex-shrink-0 border" />
+                      <img src={imgUrl((res as any).restaurantCoverPhoto, 200)} alt="" className="w-12 h-12 rounded-xl object-cover flex-shrink-0 border" />
                     ) : (
                       <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
                         <Utensils className="w-5 h-5 text-primary/40" />

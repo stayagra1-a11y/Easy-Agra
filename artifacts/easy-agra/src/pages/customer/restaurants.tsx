@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "wouter";
 import { CustomerLayout } from "@/components/layout/customer-layout";
+import { imgUrl } from "@/lib/cloudinary";
 import { useListRestaurants } from "@workspace/api-client-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -120,7 +121,7 @@ export default function CustomerRestaurants() {
                     {/* Cover */}
                     {r.coverPhoto ? (
                       <div className="h-40 overflow-hidden">
-                        <img src={r.coverPhoto} alt={r.name} className="w-full h-full object-cover" />
+                        <img src={imgUrl(r.coverPhoto, 600)} alt={r.name} className="w-full h-full object-cover" />
                       </div>
                     ) : (
                       <div className="h-24 bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center">

@@ -1,6 +1,7 @@
 import { useState, useCallback } from "react";
 import { Link, useLocation } from "wouter";
 import { CustomerLayout } from "@/components/layout/customer-layout";
+import { imgUrl } from "@/lib/cloudinary";
 import {
   useListTouristPlaces,
   useToggleTouristPlaceFavorite,
@@ -127,7 +128,7 @@ export default function CustomerPlaces() {
                     <div className="relative h-48 bg-muted">
                       {coverImg ? (
                         <img
-                          src={coverImg}
+                          src={imgUrl(coverImg, 600)}
                           alt={place.name}
                           className="w-full h-full object-cover"
                           onError={(e) => {

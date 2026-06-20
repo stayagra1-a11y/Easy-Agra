@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { X, ChevronLeft, ChevronRight, ZoomIn, ZoomOut, Maximize2 } from "lucide-react";
 import { Button } from "./button";
+import { imgUrl } from "@/lib/cloudinary";
 
 export type GalleryImage = {
   id: number;
@@ -116,7 +117,7 @@ function Lightbox({ images, initialIndex = 0, onClose }: LightboxProps) {
         >
           <img
             key={img.id}
-            src={img.imageUrl}
+            src={imgUrl(img.imageUrl, 1200)}
             alt={img.altText ?? img.caption ?? "Gallery image"}
             className={`max-w-full max-h-full object-contain transition-transform duration-300 select-none ${
               zoomed ? "scale-[2]" : "scale-100"
@@ -160,7 +161,7 @@ function Lightbox({ images, initialIndex = 0, onClose }: LightboxProps) {
               }`}
             >
               <img
-                src={thumb.imageUrl}
+                src={imgUrl(thumb.imageUrl, 120)}
                 alt=""
                 className="w-full h-full object-cover"
                 draggable={false}
@@ -205,7 +206,7 @@ export function PlaceGallery({ images, placeName }: PlaceGalleryProps) {
             onClick={() => setLightboxIndex(0)}
           >
             <img
-              src={cover.imageUrl}
+              src={imgUrl(cover.imageUrl, 1000)}
               alt={cover.caption ?? placeName}
               className="w-full h-full object-cover"
               onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
@@ -215,7 +216,7 @@ export function PlaceGallery({ images, placeName }: PlaceGalleryProps) {
           <div className="grid grid-cols-2 gap-0.5 h-64">
             {sorted.slice(0, 2).map((img, idx) => (
               <div key={img.id} className="relative cursor-pointer overflow-hidden bg-muted" onClick={() => setLightboxIndex(idx)}>
-                <img src={img.imageUrl} alt={img.caption ?? ""} className="w-full h-full object-cover hover:scale-105 transition-transform duration-300" />
+                <img src={imgUrl(img.imageUrl, 600)} alt={img.caption ?? ""} className="w-full h-full object-cover hover:scale-105 transition-transform duration-300" />
               </div>
             ))}
           </div>
@@ -227,7 +228,7 @@ export function PlaceGallery({ images, placeName }: PlaceGalleryProps) {
               onClick={() => setLightboxIndex(0)}
             >
               <img
-                src={cover.imageUrl}
+                src={imgUrl(cover.imageUrl, 1000)}
                 alt={cover.caption ?? placeName}
                 className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                 onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
@@ -241,7 +242,7 @@ export function PlaceGallery({ images, placeName }: PlaceGalleryProps) {
                 onClick={() => setLightboxIndex(idx + 1)}
               >
                 <img
-                  src={img.imageUrl}
+                  src={imgUrl(img.imageUrl, 400)}
                   alt={img.caption ?? ""}
                   className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                   onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}

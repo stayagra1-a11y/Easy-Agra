@@ -1,5 +1,6 @@
 import { Link, useLocation } from "wouter";
 import { CustomerLayout } from "@/components/layout/customer-layout";
+import { imgUrl } from "@/lib/cloudinary";
 import {
   useGetMyFavoritePlaces,
   useToggleTouristPlaceFavorite,
@@ -86,7 +87,7 @@ export default function MyPlaces() {
                     <div className="relative h-44 bg-muted">
                       {coverImg ? (
                         <img
-                          src={coverImg}
+                          src={imgUrl(coverImg, 600)}
                           alt={place.name}
                           className="w-full h-full object-cover"
                           onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}

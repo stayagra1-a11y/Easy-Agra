@@ -3,6 +3,7 @@ import { useParams, useLocation, Link } from "wouter";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { CustomerLayout } from "@/components/layout/customer-layout";
 import { MapEmbed } from "@/components/map-embed";
+import { imgUrl } from "@/lib/cloudinary";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -81,7 +82,7 @@ function Gallery({ images, name }: { images: string[]; name: string }) {
   );
   return (
     <div className="relative h-56 rounded-xl overflow-hidden bg-black">
-      <img src={images[current]} alt={name} className="w-full h-full object-cover" />
+      <img src={imgUrl(images[current], 1000)} alt={name} className="w-full h-full object-cover" />
       {images.length > 1 && (
         <>
           <button
@@ -463,7 +464,7 @@ export default function HotelDetail() {
                     <Card key={room.id} className="overflow-hidden">
                       {room.coverImage && (
                         <div className="h-32 overflow-hidden">
-                          <img src={room.coverImage} alt={room.name} className="w-full h-full object-cover" />
+                          <img src={imgUrl(room.coverImage, 600)} alt={room.name} className="w-full h-full object-cover" />
                         </div>
                       )}
                       <CardContent className="p-4 space-y-3">

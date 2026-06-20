@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useLocation } from "wouter";
 import { CustomerLayout } from "@/components/layout/customer-layout";
+import { imgUrl } from "@/lib/cloudinary";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -122,7 +123,7 @@ export default function CustomerHotels() {
                   {hotel.coverImage && (
                     <div className="h-40 overflow-hidden">
                       <img
-                        src={hotel.coverImage}
+                        src={imgUrl(hotel.coverImage, 600)}
                         alt={hotel.name}
                         className="w-full h-full object-cover"
                         onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}

@@ -1,6 +1,12 @@
 const CLOUD_NAME = "dwd9hk7ir";
 const UPLOAD_PRESET = "ml_default";
 
+export function imgUrl(url: string | null | undefined, width: number): string {
+  if (!url) return "";
+  if (!url.includes("res.cloudinary.com")) return url;
+  return url.replace("/upload/", `/upload/q_auto:best,f_auto,w_${width},c_fill,dpr_auto/`);
+}
+
 export async function uploadToCloudinary(file: File): Promise<string> {
   const formData = new FormData();
   formData.append("file", file);

@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useLocation, useParams } from "wouter";
 import { CustomerLayout } from "@/components/layout/customer-layout";
+import { imgUrl } from "@/lib/cloudinary";
 import {
   useGetRestaurant,
   useGetRestaurantTables,
@@ -126,7 +127,7 @@ export default function MakeReservation() {
             <CardContent className="p-4">
               <div className="flex gap-3 items-center">
                 {r.coverPhoto && (
-                  <img src={r.coverPhoto} alt="" className="w-16 h-16 rounded-xl object-cover flex-shrink-0 border" />
+                  <img src={imgUrl(r.coverPhoto, 200)} alt="" className="w-16 h-16 rounded-xl object-cover flex-shrink-0 border" />
                 )}
                 <div>
                   <h3 className="font-bold text-foreground">{r.name}</h3>
