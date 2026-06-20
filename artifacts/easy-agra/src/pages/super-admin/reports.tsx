@@ -382,55 +382,30 @@ export default function SuperAdminReports() {
                   <SummaryCard label="Cancellations" value={String(refundsData?.totalCancellations ?? 0)} icon={BarChart2} color="bg-orange-100 text-orange-600" />
                 </div>
 
-                <div className="grid gap-6 md:grid-cols-2">
-                  <Card>
-                    <CardHeader className="pb-3"><CardTitle className="text-base">Refunds by Status</CardTitle></CardHeader>
-                    <CardContent className="p-0">
-                      <Table>
-                        <TableHeader>
-                          <TableRow>
-                            <TableHead>Status</TableHead>
-                            <TableHead className="text-right">Count</TableHead>
-                            <TableHead className="text-right">Total (₹)</TableHead>
+                <Card>
+                  <CardHeader className="pb-3"><CardTitle className="text-base">Refunds by Status</CardTitle></CardHeader>
+                  <CardContent className="p-0">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Status</TableHead>
+                          <TableHead className="text-right">Count</TableHead>
+                          <TableHead className="text-right">Total (₹)</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {(refundsData?.byStatus ?? []).map((s: any) => (
+                          <TableRow key={s.status}>
+                            <TableCell><span className={`text-xs font-medium px-2 py-0.5 rounded-full capitalize ${statusColors[s.status] ?? "bg-gray-100 text-gray-700"}`}>{s.status}</span></TableCell>
+                            <TableCell className="text-right">{s.count}</TableCell>
+                            <TableCell className="text-right">{formatINR(parseFloat(s.totalAmount ?? "0"))}</TableCell>
                           </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {(refundsData?.byStatus ?? []).map((s: any) => (
-                            <TableRow key={s.status}>
-                              <TableCell><span className={`text-xs font-medium px-2 py-0.5 rounded-full capitalize ${statusColors[s.status] ?? "bg-gray-100 text-gray-700"}`}>{s.status}</span></TableCell>
-                              <TableCell className="text-right">{s.count}</TableCell>
-                              <TableCell className="text-right">{formatINR(parseFloat(s.totalAmount ?? "0"))}</TableCell>
-                            </TableRow>
-                          ))}
-                          {!refundsData?.byStatus?.length && <TableRow><TableCell colSpan={3} className="text-center text-muted-foreground py-6">No refunds found</TableCell></TableRow>}
-                        </TableBody>
-                      </Table>
-                    </CardContent>
-                  </Card>
-
-                  <Card>
-                    <CardHeader className="pb-3"><CardTitle className="text-base">Refunds by Booking Type</CardTitle></CardHeader>
-                    <CardContent className="p-0">
-                      <Table>
-                        <TableHeader>
-                          <TableRow>
-                            <TableHead>Type</TableHead>
-                            <TableHead className="text-right">Count</TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {(refundsData?.byType ?? []).map((t: any) => (
-                            <TableRow key={t.bookingType}>
-                              <TableCell className="capitalize font-medium">{t.bookingType}</TableCell>
-                              <TableCell className="text-right">{t.count}</TableCell>
-                            </TableRow>
-                          ))}
-                          {!refundsData?.byType?.length && <TableRow><TableCell colSpan={2} className="text-center text-muted-foreground py-6">No refunds found</TableCell></TableRow>}
-                        </TableBody>
-                      </Table>
-                    </CardContent>
-                  </Card>
-                </div>
+                        ))}
+                        {!refundsData?.byStatus?.length && <TableRow><TableCell colSpan={3} className="text-center text-muted-foreground py-6">No refunds found</TableCell></TableRow>}
+                      </TableBody>
+                    </Table>
+                  </CardContent>
+                </Card>
 
                 {refundsData?.recentRefunds?.length > 0 && (
                   <Card>
@@ -440,7 +415,6 @@ export default function SuperAdminReports() {
                         <TableHeader>
                           <TableRow>
                             <TableHead>Ref</TableHead>
-                            <TableHead>Type</TableHead>
                             <TableHead>Amount</TableHead>
                             <TableHead>Status</TableHead>
                             <TableHead>Reason</TableHead>
@@ -451,7 +425,6 @@ export default function SuperAdminReports() {
                           {refundsData.recentRefunds.map((r: any) => (
                             <TableRow key={r.id}>
                               <TableCell className="font-mono text-xs">{r.refundRef}</TableCell>
-                              <TableCell className="capitalize">{r.bookingType}</TableCell>
                               <TableCell>{formatINR(parseFloat(r.refundAmount ?? "0"))}</TableCell>
                               <TableCell><span className={`text-xs font-medium px-2 py-0.5 rounded-full capitalize ${statusColors[r.status] ?? "bg-gray-100 text-gray-700"}`}>{r.status}</span></TableCell>
                               <TableCell className="max-w-[160px] truncate text-sm">{r.reason ?? "—"}</TableCell>

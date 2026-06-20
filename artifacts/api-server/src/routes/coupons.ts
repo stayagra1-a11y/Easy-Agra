@@ -9,7 +9,7 @@ const createCouponSchema = z.object({
   code: z.string().min(1).max(50),
   name: z.string().min(1).max(100),
   description: z.string().optional(),
-  type: z.enum(["global", "first_time", "referral", "seasonal"]).default("global"),
+  type: z.enum(["global", "festival", "first_booking", "seasonal"]).default("global"),
   discountType: z.enum(["percentage", "flat"]),
   discountValue: z.number().positive(),
   minOrderValue: z.number().min(0).optional(),
@@ -66,31 +66,28 @@ router.post(
   requireRole("super_admin"),
   async (req, res): Promise<void> => {
     const currentUser = (req as any).currentUser;
-    const {
-      code, name, description, type, discountType, discountValue,
-      minOrderValue, maxDiscount, applicableOn, startDate, endDate,
-      maxUses, isActive,
-    } = req.body;
-
-    if (!code || !name || !discountType || !discountValue) {
-      res.status(400).json({ error: "code, name, discountType, and discountValue are required" });
+    const parsed = createCouponSchema.safeParse(req.body);
+    if (!parsed.success) {
+      res.status(400).json({ error: "Validation failed", details: parsed.error.issues });
       return;
     }
+    const data = parsed.data;
 
     const [coupon] = await db.insert(couponsTable).values({
-      code: String(code).toUpperCase(),
-      name,
-      description,
-      type: type || "global",
-      discountType,
-      discountValue: String(discountValue),
-      minOrderValue: minOrderValue ? String(minOrderValue) : "0",
-      maxDiscount: maxDiscount ? String(maxDiscount) : undefined,
-      applicableOn: applicableOn || ["all"],
-      startDate: startDate || undefined,
-      endDate: endDate || undefined,
-      maxUses: maxUses || undefined,
-      isActive: isActive !== false,
+      code: data.code.toUpperCase(),
+      name: data.name,
+      description: data.description,
+      type: data.type,
+      discountType: data.discountType,
+      discountValue: String(data.discountValue),
+      minOrderValue: data.minOrderValue != null ? String(data.minOrderValue) : "0",
+      maxDiscount: data.maxDiscount != null ? String(data.maxDiscount) : undefined,
+      applicableOn: data.applicableOn,
+      startDate: data.startDate || undefined,
+      endDate: data.endDate || undefined,
+      maxUses: data.maxUses || undefined,
+      isActive: data.isActive,
+      createdBy: currentUser.id,
     }).returning();
 
     await logActivity(req, "coupon_created", `Coupon created: ${coupon.code}`, currentUser.id, currentUser.role);
@@ -105,26 +102,27 @@ router.patch(
     const currentUser = (req as any).currentUser;
     const raw = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
     const id = parseInt(raw, 10);
-    const {
-      code, name, description, type, discountType, discountValue,
-      minOrderValue, maxDiscount, applicableOn, startDate, endDate,
-      maxUses, isActive,
-    } = req.body;
+    const parsed = updateCouponSchema.safeParse(req.body);
+    if (!parsed.success) {
+      res.status(400).json({ error: "Validation failed", details: parsed.error.issues });
+      return;
+    }
+    const data = parsed.data;
 
     const updates: Record<string, any> = {};
-    if (code !== undefined) updates.code = String(code).toUpperCase();
-    if (name !== undefined) updates.name = name;
-    if (description !== undefined) updates.description = description;
-    if (type !== undefined) updates.type = type;
-    if (discountType !== undefined) updates.discountType = discountType;
-    if (discountValue !== undefined) updates.discountValue = String(discountValue);
-    if (minOrderValue !== undefined) updates.minOrderValue = String(minOrderValue);
-    if (maxDiscount !== undefined) updates.maxDiscount = maxDiscount ? String(maxDiscount) : null;
-    if (applicableOn !== undefined) updates.applicableOn = applicableOn;
-    if (startDate !== undefined) updates.startDate = startDate || null;
-    if (endDate !== undefined) updates.endDate = endDate || null;
-    if (maxUses !== undefined) updates.maxUses = maxUses || null;
-    if (isActive !== undefined) updates.isActive = isActive;
+    if (data.code !== undefined) updates.code = data.code.toUpperCase();
+    if (data.name !== undefined) updates.name = data.name;
+    if (data.description !== undefined) updates.description = data.description;
+    if (data.type !== undefined) updates.type = data.type;
+    if (data.discountType !== undefined) updates.discountType = data.discountType;
+    if (data.discountValue !== undefined) updates.discountValue = String(data.discountValue);
+    if (data.minOrderValue !== undefined) updates.minOrderValue = String(data.minOrderValue);
+    if (data.maxDiscount !== undefined) updates.maxDiscount = data.maxDiscount ? String(data.maxDiscount) : null;
+    if (data.applicableOn !== undefined) updates.applicableOn = data.applicableOn;
+    if (data.startDate !== undefined) updates.startDate = data.startDate || null;
+    if (data.endDate !== undefined) updates.endDate = data.endDate || null;
+    if (data.maxUses !== undefined) updates.maxUses = data.maxUses || null;
+    if (data.isActive !== undefined) updates.isActive = data.isActive;
 
     const [updated] = await db.update(couponsTable).set(updates).where(eq(couponsTable.id, id)).returning();
     if (!updated) { res.status(404).json({ error: "Coupon not found" }); return; }

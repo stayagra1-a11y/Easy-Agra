@@ -56,7 +56,7 @@ router.patch("/platform-settings", requireRole("super_admin"), async (req, res):
 router.get("/admin/featured-content", requireRole("admin", "super_admin"), async (req, res): Promise<void> => {
   const settings = await getOrCreateSettings();
 
-  const [hotels, restaurants, spas, places] = await Promise.all([
+  const [hotels, restaurants, spas, touristPlaces] = await Promise.all([
     db.select({ id: hotelsTable.id, name: hotelsTable.name, status: hotelsTable.status, category: hotelsTable.category }).from(hotelsTable),
     db.select({ id: restaurantsTable.id, name: restaurantsTable.name, status: restaurantsTable.status }).from(restaurantsTable),
     db.select({ id: spasTable.id, name: spasTable.name, status: spasTable.status }).from(spasTable),
@@ -68,21 +68,21 @@ router.get("/admin/featured-content", requireRole("admin", "super_admin"), async
       hotels: settings.featuredHotelIds ?? [],
       restaurants: settings.featuredRestaurantIds ?? [],
       spas: settings.featuredSpaIds ?? [],
-      places: settings.featuredTouristPlaceIds ?? [],
+      touristPlaces: settings.featuredTouristPlaceIds ?? [],
     },
-    all: { hotels, restaurants, spas, places },
+    all: { hotels, restaurants, spas, touristPlaces },
   });
 });
 
 router.patch("/admin/featured-content", requireRole("super_admin"), async (req, res): Promise<void> => {
   const currentUser = (req as any).currentUser;
-  const { hotels, restaurants, spas, places } = req.body;
+  const { featuredHotelIds, featuredRestaurantIds, featuredSpaIds, featuredTouristPlaceIds } = req.body;
   const existing = await getOrCreateSettings();
   const [updated] = await db.update(platformSettingsTable).set({
-    featuredHotelIds: Array.isArray(hotels) ? hotels : existing.featuredHotelIds,
-    featuredRestaurantIds: Array.isArray(restaurants) ? restaurants : existing.featuredRestaurantIds,
-    featuredSpaIds: Array.isArray(spas) ? spas : existing.featuredSpaIds,
-    featuredTouristPlaceIds: Array.isArray(places) ? places : existing.featuredTouristPlaceIds,
+    featuredHotelIds: Array.isArray(featuredHotelIds) ? featuredHotelIds : existing.featuredHotelIds,
+    featuredRestaurantIds: Array.isArray(featuredRestaurantIds) ? featuredRestaurantIds : existing.featuredRestaurantIds,
+    featuredSpaIds: Array.isArray(featuredSpaIds) ? featuredSpaIds : existing.featuredSpaIds,
+    featuredTouristPlaceIds: Array.isArray(featuredTouristPlaceIds) ? featuredTouristPlaceIds : existing.featuredTouristPlaceIds,
   }).where(eq(platformSettingsTable.id, existing.id)).returning();
 
   await logActivity(req, "featured_updated", "Featured content updated", currentUser.id, currentUser.role);
@@ -90,7 +90,7 @@ router.patch("/admin/featured-content", requireRole("super_admin"), async (req, 
     hotels: updated.featuredHotelIds,
     restaurants: updated.featuredRestaurantIds,
     spas: updated.featuredSpaIds,
-    places: updated.featuredTouristPlaceIds,
+    touristPlaces: updated.featuredTouristPlaceIds,
   }});
 });
 
