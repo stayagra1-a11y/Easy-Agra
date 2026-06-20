@@ -108,17 +108,17 @@ export default function CustomerHome() {
         {/* Quick links */}
         <div>
           <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">Explore Agra</h2>
-          <div className="grid grid-cols-4 gap-2">
+          <div className="grid grid-cols-2 gap-3">
             {features.map(({ icon: Icon, label, color, href, bg }: any) => {
               const tile = (
                 <div key={label} className="flex flex-col items-center gap-2 group cursor-pointer">
-                  <div className="h-16 w-16 rounded-2xl overflow-hidden shadow-sm transition-transform group-active:scale-95">
+                  <div className="w-full aspect-square rounded-2xl overflow-hidden shadow-md transition-transform group-active:scale-95">
                     <img src={bg} alt={label} className="w-full h-full object-cover" />
                   </div>
-                  <span className="text-xs font-medium text-foreground text-center leading-tight">{label}</span>
+                  <span className="text-sm font-semibold text-foreground text-center leading-tight">{label}</span>
                 </div>
               );
-              return href ? <Link key={label} href={href}>{tile}</Link> : tile;
+              return href ? <Link key={label} href={href} className="block">{tile}</Link> : tile;
             })}
           </div>
         </div>
