@@ -440,11 +440,11 @@ router.post(
     let dbHotels = await db
       .select()
       .from(hotelsTable)
-      .where(and(eq(hotelsTable.status, "active"), eq(hotelsTable.category, budgetCat as any)))
+      .where(and(eq(hotelsTable.status, "approved"), eq(hotelsTable.category, budgetCat as any)))
       .limit(3);
 
     if (dbHotels.length === 0) {
-      dbHotels = await db.select().from(hotelsTable).where(eq(hotelsTable.status, "active")).limit(3);
+      dbHotels = await db.select().from(hotelsTable).where(eq(hotelsTable.status, "approved")).limit(3);
     }
 
     const hotels: RecommendedHotel[] = dbHotels.map((h) => ({
@@ -478,7 +478,7 @@ router.post(
     const dbSpas = await db
       .select()
       .from(spasTable)
-      .where(eq(spasTable.status, "active"))
+      .where(eq(spasTable.status, "approved"))
       .limit(3);
 
     const spas: RecommendedSpa[] = dbSpas.map((s) => ({
