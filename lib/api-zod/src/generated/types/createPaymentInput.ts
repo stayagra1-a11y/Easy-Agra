@@ -16,4 +16,5 @@ export interface CreatePaymentInput {
   amount: number;
   paymentMode: CreatePaymentInputPaymentMode;
   notes?: string | null;
+  couponCode?: string | null;
 }

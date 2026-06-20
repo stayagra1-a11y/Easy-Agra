@@ -56,6 +56,8 @@ tags:
     description: Customer trip planning and management
   - name: support
     description: Support ticket and complaint management
+  - name: coupons
+    description: Coupon validation for customer checkout
 
 paths:
   /healthz:
@@ -3283,6 +3285,37 @@ paths:
                 properties:
                   success: { type: boolean }
                 required: [success]
+
+  # ─── Coupons (customer) ──────────────────────────────────
+  /coupons/validate:
+    post:
+      operationId: validateCoupon
+      tags: [coupons]
+      summary: Validate a coupon code and calculate discount
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CouponValidateInput"
+      responses:
+        "200":
+          description: Coupon is valid and discount is calculated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CouponValidateResult"
+        "400":
+          description: Coupon invalid or not applicable
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error: { type: string }
+                required: [error]
+        "404":
+          description: Coupon not found
 
   # ─── Payments ───────────────────────────────────────────
   /payments:
@@ -7275,6 +7308,40 @@ components:
         reason: { type: string }
       required: [reason]
 
+    CouponValidateInput:
+      type: object
+      properties:
+        code:
+          type: string
+        bookingType:
+          type: string
+          enum: [hotel, restaurant, spa]
+        amount:
+          type: number
+      required: [code, bookingType, amount]
+
+    CouponValidateResult:
+      type: object
+      properties:
+        valid:
+          type: boolean
+        coupon:
+          type: object
+          properties:
+            id: { type: integer }
+            code: { type: string }
+            name: { type: string }
+            discountType:
+              type: string
+              enum: [percentage, flat]
+            discountValue: { type: number }
+          required: [id, code, name, discountType, discountValue]
+        discountAmount:
+          type: number
+        finalAmount:
+          type: number
+      required: [valid, coupon, discountAmount, finalAmount]
+
     CreatePaymentInput:
       type: object
       properties:
@@ -7293,6 +7360,9 @@ components:
           type: string
           enum: [full, advance]
         notes:
+          type: string
+          nullable: true
+        couponCode:
           type: string
           nullable: true
       required: [bookingType, bookingId, bookingRef, ownerId, amount, paymentMode]
@@ -7336,6 +7406,8 @@ components:
         ownerId: { type: integer }
         amount: { type: number }
         paidAmount: { type: number }
+        discountAmount: { type: number }
+        couponCode: { type: string, nullable: true }
         currency: { type: string }
         paymentMode:
           type: string

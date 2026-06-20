@@ -7,6 +7,7 @@ import {
   bookingsTable,
   restaurantReservationsTable,
   spaAppointmentsTable,
+  couponsTable,
 } from "@workspace/db";
 import { eq, and, or, ilike, desc, sql, inArray } from "drizzle-orm";
 import { requireAuth, requireRole } from "../middlewares/requireAuth";
@@ -42,6 +43,7 @@ function serializePayment(p: typeof paymentsTable.$inferSelect) {
     ...p,
     amount: parseNum(p.amount),
     paidAmount: parseNum(p.paidAmount),
+    discountAmount: parseNum(p.discountAmount),
     createdAt: p.createdAt.toISOString(),
     updatedAt: p.updatedAt.toISOString(),
     paidAt: p.paidAt?.toISOString() ?? null,
@@ -313,7 +315,7 @@ router.post(
   requireAuth,
   async (req, res): Promise<void> => {
     const user = (req as any).currentUser;
-    const { bookingType, bookingId, bookingRef, ownerId, amount, paymentMode, notes } =
+    const { bookingType, bookingId, bookingRef, ownerId, amount, paymentMode, notes, couponCode } =
       req.body;
 
     if (!bookingType || !bookingId || !bookingRef || !ownerId || !amount || !paymentMode) {
@@ -340,6 +342,45 @@ router.post(
       return;
     }
 
+    // Validate and apply coupon if provided
+    let discountAmount = 0;
+    let resolvedCouponCode: string | null = null;
+    if (couponCode) {
+      const today = new Date().toISOString().slice(0, 10);
+      const [coupon] = await db
+        .select()
+        .from(couponsTable)
+        .where(eq(couponsTable.code, String(couponCode).toUpperCase()));
+
+      if (
+        coupon &&
+        coupon.isActive &&
+        (!coupon.startDate || today >= coupon.startDate) &&
+        (!coupon.endDate || today <= coupon.endDate) &&
+        (coupon.maxUses == null || coupon.usedCount < coupon.maxUses)
+      ) {
+        const applicableOn = (coupon.applicableOn as string[]) ?? ["all"];
+        const applies = applicableOn.includes("all") || applicableOn.includes(bookingType);
+        const minOrder = parseFloat((coupon.minOrderValue as string) ?? "0");
+        if (applies && amount >= minOrder) {
+          const discValue = parseFloat(coupon.discountValue as string);
+          if (coupon.discountType === "percentage") {
+            discountAmount = (amount * discValue) / 100;
+            if (coupon.maxDiscount) {
+              discountAmount = Math.min(discountAmount, parseFloat(coupon.maxDiscount as string));
+            }
+          } else {
+            discountAmount = discValue;
+          }
+          discountAmount = Math.min(discountAmount, amount);
+          discountAmount = parseFloat(discountAmount.toFixed(2));
+          resolvedCouponCode = coupon.code;
+        }
+      }
+    }
+
+    const finalPaymentAmount = parseFloat((amount - discountAmount).toFixed(2));
+
     const [payment] = await db
       .insert(paymentsTable)
       .values({
@@ -349,13 +390,15 @@ router.post(
         bookingRef,
         customerId: user.id,
         ownerId,
-        amount: String(amount),
+        amount: String(finalPaymentAmount),
         paidAmount: "0",
         currency: "INR",
         paymentMode,
         paymentStatus: "pending",
         paymentGateway: "manual",
         notes: notes ?? null,
+        couponCode: resolvedCouponCode,
+        discountAmount: String(discountAmount),
       })
       .returning();
 
@@ -537,6 +580,18 @@ router.post(
       );
     } catch (err) {
       req.log.error({ err }, "Failed to create owner earning");
+    }
+
+    // Increment coupon usedCount if a coupon was applied
+    if (payment.couponCode) {
+      try {
+        await db
+          .update(couponsTable)
+          .set({ usedCount: sql`${couponsTable.usedCount} + 1` })
+          .where(eq(couponsTable.code, payment.couponCode));
+      } catch (err) {
+        req.log.error({ err }, "Failed to increment coupon usedCount");
+      }
     }
 
     await logActivity(

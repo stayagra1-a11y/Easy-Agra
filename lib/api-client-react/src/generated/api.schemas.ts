@@ -1535,6 +1535,44 @@ export interface FailPaymentInput {
   reason: string;
 }
 
+export type CouponValidateInputBookingType = typeof CouponValidateInputBookingType[keyof typeof CouponValidateInputBookingType];
+
+
+export const CouponValidateInputBookingType = {
+  hotel: 'hotel',
+  restaurant: 'restaurant',
+  spa: 'spa',
+} as const;
+
+export interface CouponValidateInput {
+  code: string;
+  bookingType: CouponValidateInputBookingType;
+  amount: number;
+}
+
+export type CouponValidateResultCouponDiscountType = typeof CouponValidateResultCouponDiscountType[keyof typeof CouponValidateResultCouponDiscountType];
+
+
+export const CouponValidateResultCouponDiscountType = {
+  percentage: 'percentage',
+  flat: 'flat',
+} as const;
+
+export type CouponValidateResultCoupon = {
+  id: number;
+  code: string;
+  name: string;
+  discountType: CouponValidateResultCouponDiscountType;
+  discountValue: number;
+};
+
+export interface CouponValidateResult {
+  valid: boolean;
+  coupon: CouponValidateResultCoupon;
+  discountAmount: number;
+  finalAmount: number;
+}
+
 export type CreatePaymentInputBookingType = typeof CreatePaymentInputBookingType[keyof typeof CreatePaymentInputBookingType];
 
 
@@ -1560,6 +1598,7 @@ export interface CreatePaymentInput {
   amount: number;
   paymentMode: CreatePaymentInputPaymentMode;
   notes?: string | null;
+  couponCode?: string | null;
 }
 
 export type InitiatePaymentInputPaymentMethod = typeof InitiatePaymentInputPaymentMethod[keyof typeof InitiatePaymentInputPaymentMethod];
@@ -1651,6 +1690,8 @@ export interface Payment {
   ownerId: number;
   amount: number;
   paidAmount: number;
+  discountAmount?: number;
+  couponCode?: string | null;
   currency: string;
   paymentMode: PaymentPaymentMode;
   paymentMethod?: PaymentPaymentMethod;
@@ -2624,6 +2665,10 @@ export type GetPlaceConnections200 = {
 
 export type DeleteTouristPlaceDistance200 = {
   success: boolean;
+};
+
+export type ValidateCoupon400 = {
+  error: string;
 };
 
 export type GetMyPaymentsParams = {

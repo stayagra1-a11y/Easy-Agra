@@ -6,7 +6,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -14,6 +14,7 @@ import {
   useInitiatePayment,
   useConfirmPayment,
   useFailPayment,
+  useValidateCoupon,
 } from "@workspace/api-client-react";
 import {
   CreditCard,
@@ -27,6 +28,8 @@ import {
   Receipt,
   Shield,
   ChevronRight,
+  Tag,
+  X,
 } from "lucide-react";
 
 export type BookingType = "hotel" | "restaurant" | "spa";
@@ -94,6 +97,12 @@ function fmtCurrency(n: number) {
   return `₹${n.toLocaleString("en-IN", { minimumFractionDigits: 0 })}`;
 }
 
+interface AppliedCoupon {
+  code: string;
+  name: string;
+  discountAmount: number;
+}
+
 export function PaymentModal({
   open,
   onClose,
@@ -113,13 +122,26 @@ export function PaymentModal({
   const [paymentRef, setPaymentRef] = useState<string | null>(null);
   const [resultRef, setResultRef] = useState<string | null>(null);
 
+  const [couponInput, setCouponInput] = useState("");
+  const [couponError, setCouponError] = useState<string | null>(null);
+  const [appliedCoupon, setAppliedCoupon] = useState<AppliedCoupon | null>(null);
+
   const createPayment = useCreatePayment();
   const initiatePayment = useInitiatePayment();
   const confirmPayment = useConfirmPayment();
   const failPayment = useFailPayment();
+  const validateCoupon = useValidateCoupon();
 
-  const payableAmount =
-    paymentMode === "advance" && advanceAmount ? advanceAmount : amount;
+  const discountAmount = appliedCoupon?.discountAmount ?? 0;
+  const discountedAmount = Math.max(0, amount - discountAmount);
+  const discountedAdvanceAmount = advanceAmount
+    ? Math.max(0, advanceAmount - discountAmount)
+    : undefined;
+
+  const basePayable =
+    paymentMode === "advance" && discountedAdvanceAmount != null
+      ? discountedAdvanceAmount
+      : discountedAmount;
 
   const handleClose = () => {
     setStep("mode");
@@ -127,7 +149,38 @@ export function PaymentModal({
     setSelectedMethod(null);
     setPaymentRef(null);
     setResultRef(null);
+    setCouponInput("");
+    setCouponError(null);
+    setAppliedCoupon(null);
     onClose();
+  };
+
+  const handleApplyCoupon = async () => {
+    const code = couponInput.trim();
+    if (!code) return;
+    setCouponError(null);
+
+    try {
+      const result = await validateCoupon.mutateAsync({
+        data: { code, bookingType, amount },
+      });
+      setAppliedCoupon({
+        code: result.coupon.code,
+        name: result.coupon.name,
+        discountAmount: result.discountAmount,
+      });
+      setCouponInput("");
+      toast({ title: "Coupon applied!", description: `${result.coupon.name} — saving ${fmtCurrency(result.discountAmount)}` });
+    } catch (err: any) {
+      const msg = err?.response?.data?.error ?? "Invalid coupon code";
+      setCouponError(msg);
+    }
+  };
+
+  const handleRemoveCoupon = () => {
+    setAppliedCoupon(null);
+    setCouponError(null);
+    setCouponInput("");
   };
 
   const handleSelectMode = (mode: PaymentMode) => {
@@ -140,40 +193,36 @@ export function PaymentModal({
     setStep("processing");
 
     try {
-      // Step 1: Create payment record
       const created = await createPayment.mutateAsync({
         data: {
           bookingType,
           bookingId,
           bookingRef,
           ownerId,
-          amount: payableAmount,
+          amount: amount,
           paymentMode,
+          couponCode: appliedCoupon?.code ?? undefined,
         },
       });
       const ref = created.paymentRef;
       setPaymentRef(ref);
 
-      // Step 2: Initiate (simulate gateway)
       await initiatePayment.mutateAsync({
         ref,
         data: { paymentMethod: selectedMethod as any, paymentGateway: "manual" },
       });
 
-      // Step 3: Simulate processing delay (1.5s)
       await new Promise((resolve) => setTimeout(resolve, 1500));
 
-      // Step 4: Confirm payment
       const confirmed = await confirmPayment.mutateAsync({
         ref,
-        data: { paidAmount: payableAmount },
+        data: { paidAmount: basePayable },
       });
 
       setResultRef(confirmed.paymentRef);
       setStep("success");
       onSuccess?.(confirmed.paymentRef);
     } catch {
-      // Mark payment as failed if we have a ref
       if (paymentRef) {
         try {
           await failPayment.mutateAsync({
@@ -221,12 +270,23 @@ export function PaymentModal({
             </div>
             <div className="flex justify-between items-center">
               <span className="text-muted-foreground">Amount</span>
-              <span className="font-bold text-primary text-lg">{fmtCurrency(payableAmount)}</span>
+              <div className="text-right">
+                {appliedCoupon && (
+                  <span className="text-xs line-through text-muted-foreground mr-1">{fmtCurrency(amount)}</span>
+                )}
+                <span className="font-bold text-primary text-lg">{fmtCurrency(basePayable)}</span>
+              </div>
             </div>
-            {paymentMode === "advance" && advanceAmount && (
+            {appliedCoupon && (
+              <div className="flex justify-between text-xs text-emerald-600">
+                <span className="flex items-center gap-1"><Tag className="h-3 w-3" /> {appliedCoupon.code}</span>
+                <span>−{fmtCurrency(appliedCoupon.discountAmount)}</span>
+              </div>
+            )}
+            {paymentMode === "advance" && discountedAdvanceAmount != null && (
               <div className="flex justify-between text-xs text-muted-foreground">
                 <span>Remaining at property</span>
-                <span>{fmtCurrency(amount - advanceAmount)}</span>
+                <span>{fmtCurrency(discountedAmount - discountedAdvanceAmount)}</span>
               </div>
             )}
           </div>
@@ -235,6 +295,53 @@ export function PaymentModal({
         {/* ── Step: Mode Selection ── */}
         {step === "mode" && (
           <div className="space-y-3">
+            {/* Coupon input */}
+            <div className="space-y-2">
+              {appliedCoupon ? (
+                <div className="flex items-center justify-between bg-emerald-50 border border-emerald-200 rounded-lg px-3 py-2">
+                  <div className="flex items-center gap-2 text-emerald-700">
+                    <Tag className="h-4 w-4" />
+                    <div>
+                      <span className="text-sm font-medium">{appliedCoupon.code}</span>
+                      <p className="text-xs text-emerald-600">{appliedCoupon.name} — saving {fmtCurrency(appliedCoupon.discountAmount)}</p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={handleRemoveCoupon}
+                    className="text-emerald-500 hover:text-emerald-700 transition-colors"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                </div>
+              ) : (
+                <div className="space-y-1.5">
+                  <div className="flex gap-2">
+                    <Input
+                      placeholder="Coupon code"
+                      value={couponInput}
+                      onChange={(e) => { setCouponInput(e.target.value.toUpperCase()); setCouponError(null); }}
+                      onKeyDown={(e) => e.key === "Enter" && handleApplyCoupon()}
+                      className="h-9 text-sm uppercase"
+                    />
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="h-9 shrink-0"
+                      disabled={!couponInput.trim() || validateCoupon.isPending}
+                      onClick={handleApplyCoupon}
+                    >
+                      {validateCoupon.isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : "Apply"}
+                    </Button>
+                  </div>
+                  {couponError && (
+                    <p className="text-xs text-red-500">{couponError}</p>
+                  )}
+                </div>
+              )}
+            </div>
+
+            <Separator />
+
             <p className="text-sm text-muted-foreground">How would you like to pay?</p>
             <button
               onClick={() => handleSelectMode("full")}
@@ -242,7 +349,14 @@ export function PaymentModal({
             >
               <div>
                 <div className="font-semibold text-primary">Pay Full Amount</div>
-                <div className="text-sm text-muted-foreground">{fmtCurrency(amount)}</div>
+                <div className="text-sm text-muted-foreground">
+                  {appliedCoupon ? (
+                    <span>
+                      <span className="line-through mr-1">{fmtCurrency(amount)}</span>
+                      <span className="text-emerald-600 font-medium">{fmtCurrency(discountedAmount)}</span>
+                    </span>
+                  ) : fmtCurrency(amount)}
+                </div>
               </div>
               <ChevronRight className="h-5 w-5 text-primary" />
             </button>
@@ -254,7 +368,7 @@ export function PaymentModal({
                 <div>
                   <div className="font-semibold text-amber-700">Pay Advance Only</div>
                   <div className="text-sm text-amber-600">
-                    {fmtCurrency(advanceAmount!)} now · {fmtCurrency(amount - advanceAmount!)} at venue
+                    {fmtCurrency(discountedAdvanceAmount ?? advanceAmount!)} now · {fmtCurrency(discountedAmount - (discountedAdvanceAmount ?? advanceAmount!))} at venue
                   </div>
                 </div>
                 <ChevronRight className="h-5 w-5 text-amber-600" />
@@ -314,7 +428,7 @@ export function PaymentModal({
                 disabled={!selectedMethod}
                 onClick={handlePay}
               >
-                Pay {fmtCurrency(payableAmount)}
+                Pay {fmtCurrency(basePayable)}
               </Button>
             </div>
             <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
@@ -339,7 +453,7 @@ export function PaymentModal({
             </div>
             <div className="text-xs text-muted-foreground bg-muted/50 px-3 py-1.5 rounded-full">
               {PAYMENT_METHODS.find((m) => m.id === selectedMethod)?.label} ·{" "}
-              {fmtCurrency(payableAmount)}
+              {fmtCurrency(basePayable)}
             </div>
           </div>
         )}
@@ -351,7 +465,7 @@ export function PaymentModal({
             <div className="text-center">
               <div className="font-bold text-lg text-emerald-700">Payment Successful!</div>
               <div className="text-sm text-muted-foreground mt-1">
-                {fmtCurrency(payableAmount)} paid via{" "}
+                {fmtCurrency(basePayable)} paid via{" "}
                 {PAYMENT_METHODS.find((m) => m.id === selectedMethod)?.label}
               </div>
             </div>
@@ -364,9 +478,15 @@ export function PaymentModal({
                 <span className="text-muted-foreground">Payment Ref</span>
                 <span className="font-mono text-xs font-medium">{resultRef ?? paymentRef}</span>
               </div>
+              {appliedCoupon && (
+                <div className="flex justify-between text-emerald-600">
+                  <span className="flex items-center gap-1"><Tag className="h-3.5 w-3.5" /> Coupon</span>
+                  <span>−{fmtCurrency(appliedCoupon.discountAmount)}</span>
+                </div>
+              )}
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Amount</span>
-                <span className="font-bold text-emerald-700">{fmtCurrency(payableAmount)}</span>
+                <span className="text-muted-foreground">Amount Paid</span>
+                <span className="font-bold text-emerald-700">{fmtCurrency(basePayable)}</span>
               </div>
             </div>
             <div className="flex gap-2 w-full">

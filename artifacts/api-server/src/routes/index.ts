@@ -30,6 +30,7 @@ import dashboardRouter from "./dashboard";
 import couponsRouter from "./coupons";
 import securityRouter from "./security";
 import pushNotificationsRouter from "./push-notifications";
+import marketingRouter from "./marketing";
 
 const router: IRouter = Router();
 
@@ -63,6 +64,7 @@ router.use(platformSettingsRouter);
 router.use(couponsRouter);
 router.use(securityRouter);
 router.use(pushNotificationsRouter);
+router.use(marketingRouter);
 router.use(dashboardRouter);
 
 export default router;

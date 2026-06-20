@@ -1,0 +1,182 @@
+Create Part 19 - Marketing System for my Stay Agra app.
+
+Tech stack:
+Frontend: React + Tailwind CSS
+Backend: Firebase Firestore
+Storage: Firebase Storage
+
+Goal:
+Create a complete marketing management system controlled by Super Admin.
+
+--------------------
+
+SECTION 1: Banner Management
+
+Create a Banner Management page.
+
+Features:
+
+- Add new banner
+- Upload banner image
+- Banner title
+- Banner subtitle
+- Banner button text
+- Banner button link
+- Select category:
+  - Home
+  - Hotels
+  - Restaurants
+  - Spas
+  - Tourist Places
+
+Options:
+
+- Active / Inactive
+- Start date
+- End date
+- Edit banner
+- Delete banner
+- Reorder banners
+
+Store data in Firestore collection:
+
+banners
+
+Fields:
+
+title
+subtitle
+image
+buttonText
+buttonLink
+category
+isActive
+startDate
+endDate
+displayOrder
+createdAt
+
+Store images in Firebase Storage.
+
+--------------------
+
+SECTION 2: Featured Hotels
+
+Create Featured Hotels Management.
+
+Super Admin can:
+
+- Search hotel
+- Select hotel
+- Mark as Featured
+- Remove from Featured
+- Set display order
+
+Show on home page.
+
+Store in Firestore:
+
+featuredHotels
+
+Fields:
+
+hotelId
+displayOrder
+createdAt
+
+--------------------
+
+SECTION 3: Featured Restaurants
+
+Create Featured Restaurants Management.
+
+Features:
+
+- Search restaurant
+- Mark as Featured
+- Remove from Featured
+- Set display order
+
+Store in:
+
+featuredRestaurants
+
+Fields:
+
+restaurantId
+displayOrder
+createdAt
+
+--------------------
+
+SECTION 4: Featured Spas
+
+Create Featured Spas Management.
+
+Features:
+
+- Search spa
+- Mark as Featured
+- Remove from Featured
+- Set display order
+
+Store in:
+
+featuredSpas
+
+Fields:
+
+spaId
+displayOrder
+createdAt
+
+--------------------
+
+SECTION 5: Featured Tourist Places
+
+Create Featured Tourist Places Management.
+
+Features:
+
+- Search tourist place
+- Mark as Featured
+- Remove from Featured
+- Set display order
+
+Store in:
+
+featuredPlaces
+
+Fields:
+
+placeId
+displayOrder
+createdAt
+
+--------------------
+
+UI Requirements:
+
+Use a clean modern mobile-first design.
+
+Create tabs:
+
+Banner Management
+Featured Hotels
+Featured Restaurants
+Featured Spas
+Featured Tourist Places
+
+Use cards with rounded corners.
+
+Show success messages after saving.
+
+Show loading spinner while data loads.
+
+Use Firebase real-time updates.
+
+Only Super Admin can access this page.
+
+Do not break existing code.
+
+Connect everything with existing Firebase project.

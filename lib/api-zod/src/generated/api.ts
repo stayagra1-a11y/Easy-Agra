@@ -4281,6 +4281,29 @@ export const DeleteTouristPlaceDistanceResponse = zod.object({
 
 
 /**
+ * @summary Validate a coupon code and calculate discount
+ */
+export const ValidateCouponBody = zod.object({
+  "code": zod.string(),
+  "bookingType": zod.enum(['hotel', 'restaurant', 'spa']),
+  "amount": zod.number()
+})
+
+export const ValidateCouponResponse = zod.object({
+  "valid": zod.boolean(),
+  "coupon": zod.object({
+  "id": zod.number(),
+  "code": zod.string(),
+  "name": zod.string(),
+  "discountType": zod.enum(['percentage', 'flat']),
+  "discountValue": zod.number()
+}),
+  "discountAmount": zod.number(),
+  "finalAmount": zod.number()
+})
+
+
+/**
  * @summary Create a payment record for a booking/reservation/appointment
  */
 export const CreatePaymentBody = zod.object({
@@ -4290,7 +4313,8 @@ export const CreatePaymentBody = zod.object({
   "ownerId": zod.number(),
   "amount": zod.number(),
   "paymentMode": zod.enum(['full', 'advance']),
-  "notes": zod.string().nullish()
+  "notes": zod.string().nullish(),
+  "couponCode": zod.string().nullish()
 })
 
 
@@ -4317,6 +4341,8 @@ export const GetMyPaymentsResponse = zod.object({
   "ownerId": zod.number(),
   "amount": zod.number(),
   "paidAmount": zod.number(),
+  "discountAmount": zod.number().optional(),
+  "couponCode": zod.string().nullish(),
   "currency": zod.string(),
   "paymentMode": zod.enum(['full', 'advance']),
   "paymentMethod": zod.enum(['upi', 'credit_card', 'debit_card', 'net_banking', 'wallet']).nullish(),
@@ -4392,6 +4418,8 @@ export const GetOwnerPaymentsResponse = zod.object({
   "ownerId": zod.number(),
   "amount": zod.number(),
   "paidAmount": zod.number(),
+  "discountAmount": zod.number().optional(),
+  "couponCode": zod.string().nullish(),
   "currency": zod.string(),
   "paymentMode": zod.enum(['full', 'advance']),
   "paymentMethod": zod.enum(['upi', 'credit_card', 'debit_card', 'net_banking', 'wallet']).nullish(),
@@ -4468,6 +4496,8 @@ export const GetAdminPaymentsResponse = zod.object({
   "ownerId": zod.number(),
   "amount": zod.number(),
   "paidAmount": zod.number(),
+  "discountAmount": zod.number().optional(),
+  "couponCode": zod.string().nullish(),
   "currency": zod.string(),
   "paymentMode": zod.enum(['full', 'advance']),
   "paymentMethod": zod.enum(['upi', 'credit_card', 'debit_card', 'net_banking', 'wallet']).nullish(),
@@ -4564,6 +4594,8 @@ export const GetPaymentByRefResponse = zod.object({
   "ownerId": zod.number(),
   "amount": zod.number(),
   "paidAmount": zod.number(),
+  "discountAmount": zod.number().optional(),
+  "couponCode": zod.string().nullish(),
   "currency": zod.string(),
   "paymentMode": zod.enum(['full', 'advance']),
   "paymentMethod": zod.enum(['upi', 'credit_card', 'debit_card', 'net_banking', 'wallet']).nullish(),
@@ -4632,6 +4664,8 @@ export const InitiatePaymentResponse = zod.object({
   "ownerId": zod.number(),
   "amount": zod.number(),
   "paidAmount": zod.number(),
+  "discountAmount": zod.number().optional(),
+  "couponCode": zod.string().nullish(),
   "currency": zod.string(),
   "paymentMode": zod.enum(['full', 'advance']),
   "paymentMethod": zod.enum(['upi', 'credit_card', 'debit_card', 'net_banking', 'wallet']).nullish(),
@@ -4670,6 +4704,8 @@ export const ConfirmPaymentResponse = zod.object({
   "ownerId": zod.number(),
   "amount": zod.number(),
   "paidAmount": zod.number(),
+  "discountAmount": zod.number().optional(),
+  "couponCode": zod.string().nullish(),
   "currency": zod.string(),
   "paymentMode": zod.enum(['full', 'advance']),
   "paymentMethod": zod.enum(['upi', 'credit_card', 'debit_card', 'net_banking', 'wallet']).nullish(),
@@ -4706,6 +4742,8 @@ export const FailPaymentResponse = zod.object({
   "ownerId": zod.number(),
   "amount": zod.number(),
   "paidAmount": zod.number(),
+  "discountAmount": zod.number().optional(),
+  "couponCode": zod.string().nullish(),
   "currency": zod.string(),
   "paymentMode": zod.enum(['full', 'advance']),
   "paymentMethod": zod.enum(['upi', 'credit_card', 'debit_card', 'net_banking', 'wallet']).nullish(),
@@ -4761,6 +4799,8 @@ export const GetMyRefundsResponse = zod.object({
   "ownerId": zod.number(),
   "amount": zod.number(),
   "paidAmount": zod.number(),
+  "discountAmount": zod.number().optional(),
+  "couponCode": zod.string().nullish(),
   "currency": zod.string(),
   "paymentMode": zod.enum(['full', 'advance']),
   "paymentMethod": zod.enum(['upi', 'credit_card', 'debit_card', 'net_banking', 'wallet']).nullish(),
@@ -4815,6 +4855,8 @@ export const GetAdminRefundsResponse = zod.object({
   "ownerId": zod.number(),
   "amount": zod.number(),
   "paidAmount": zod.number(),
+  "discountAmount": zod.number().optional(),
+  "couponCode": zod.string().nullish(),
   "currency": zod.string(),
   "paymentMode": zod.enum(['full', 'advance']),
   "paymentMethod": zod.enum(['upi', 'credit_card', 'debit_card', 'net_banking', 'wallet']).nullish(),
@@ -5964,6 +6006,8 @@ export const GetRefundByRefResponse = zod.object({
   "ownerId": zod.number(),
   "amount": zod.number(),
   "paidAmount": zod.number(),
+  "discountAmount": zod.number().optional(),
+  "couponCode": zod.string().nullish(),
   "currency": zod.string(),
   "paymentMode": zod.enum(['full', 'advance']),
   "paymentMethod": zod.enum(['upi', 'credit_card', 'debit_card', 'net_banking', 'wallet']).nullish(),

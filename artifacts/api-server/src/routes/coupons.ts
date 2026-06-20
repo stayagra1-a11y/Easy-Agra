@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { db, couponsTable } from "@workspace/db";
 import { eq, ilike, and, desc, sql } from "drizzle-orm";
-import { requireRole } from "../middlewares/requireAuth";
+import { requireRole, requireAuth } from "../middlewares/requireAuth";
 import { logActivity } from "../lib/auth";
 import { z } from "zod";
 
@@ -23,7 +23,101 @@ const createCouponSchema = z.object({
 
 const updateCouponSchema = createCouponSchema.partial();
 
+const validateCouponSchema = z.object({
+  code: z.string().min(1),
+  bookingType: z.enum(["hotel", "restaurant", "spa"]),
+  amount: z.number().positive(),
+});
+
 const router = Router();
+
+// ─────────────────────────────────────────────────
+// POST /coupons/validate — customer coupon validation
+// ─────────────────────────────────────────────────
+router.post(
+  "/coupons/validate",
+  requireAuth,
+  async (req, res): Promise<void> => {
+    const parsed = validateCouponSchema.safeParse(req.body);
+    if (!parsed.success) {
+      res.status(400).json({ error: "Validation failed", details: parsed.error.issues });
+      return;
+    }
+    const { code, bookingType, amount } = parsed.data;
+    const today = new Date().toISOString().slice(0, 10);
+
+    const [coupon] = await db
+      .select()
+      .from(couponsTable)
+      .where(eq(couponsTable.code, code.toUpperCase()));
+
+    if (!coupon) {
+      res.status(404).json({ error: "Coupon not found" });
+      return;
+    }
+
+    if (!coupon.isActive) {
+      res.status(400).json({ error: "This coupon is no longer active" });
+      return;
+    }
+
+    if (coupon.startDate && today < coupon.startDate) {
+      res.status(400).json({ error: "This coupon is not yet valid" });
+      return;
+    }
+
+    if (coupon.endDate && today > coupon.endDate) {
+      res.status(400).json({ error: "This coupon has expired" });
+      return;
+    }
+
+    if (coupon.maxUses != null && coupon.usedCount >= coupon.maxUses) {
+      res.status(400).json({ error: "This coupon has reached its usage limit" });
+      return;
+    }
+
+    const applicableOn = (coupon.applicableOn as string[]) ?? ["all"];
+    const appliesToType =
+      applicableOn.includes("all") || applicableOn.includes(bookingType);
+    if (!appliesToType) {
+      res.status(400).json({ error: `This coupon is not applicable for ${bookingType} bookings` });
+      return;
+    }
+
+    const minOrder = parseFloat((coupon.minOrderValue as string) ?? "0");
+    if (amount < minOrder) {
+      res.status(400).json({ error: `Minimum order value for this coupon is ₹${minOrder}` });
+      return;
+    }
+
+    // Calculate discount
+    const discountValue = parseFloat(coupon.discountValue as string);
+    let discountAmount: number;
+    if (coupon.discountType === "percentage") {
+      discountAmount = (amount * discountValue) / 100;
+      if (coupon.maxDiscount) {
+        const maxDisc = parseFloat(coupon.maxDiscount as string);
+        discountAmount = Math.min(discountAmount, maxDisc);
+      }
+    } else {
+      discountAmount = discountValue;
+    }
+    discountAmount = Math.min(discountAmount, amount);
+
+    res.json({
+      valid: true,
+      coupon: {
+        id: coupon.id,
+        code: coupon.code,
+        name: coupon.name,
+        discountType: coupon.discountType,
+        discountValue: discountValue,
+      },
+      discountAmount: parseFloat(discountAmount.toFixed(2)),
+      finalAmount: parseFloat((amount - discountAmount).toFixed(2)),
+    });
+  },
+);
 
 router.get(
   "/admin/coupons",

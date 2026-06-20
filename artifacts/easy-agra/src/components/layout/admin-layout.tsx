@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { LayoutDashboard, Users, FileCheck, Bell, Activity, Settings, LogOut, Map, Menu, X, Shield, BookOpen, BarChart2, Star, Utensils, Sparkles, Landmark, IndianRupee, TrendingUp, FileBarChart, LifeBuoy, ReceiptText, Tag, ShieldAlert } from "lucide-react";
+import { LayoutDashboard, Users, FileCheck, Bell, Activity, Settings, LogOut, Map, Menu, X, Shield, BookOpen, BarChart2, Star, Utensils, Sparkles, Landmark, IndianRupee, TrendingUp, FileBarChart, LifeBuoy, ReceiptText, Tag, ShieldAlert, Megaphone } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { useLogout, getGetMeQueryKey } from "@workspace/api-client-react";
@@ -57,7 +57,7 @@ const superAdminNavItems: NavItem[] = [
   { href: "/super-admin/owner-requests", icon: FileCheck, label: "Owner Requests" },
   { href: "/super-admin/platform-settings", icon: Settings, label: "Platform Settings" },
   { href: "/super-admin/coupons", icon: Tag, label: "Coupons" },
-  { href: "/super-admin/featured-content", icon: Star, label: "Featured Content" },
+  { href: "/super-admin/marketing", icon: Megaphone, label: "Marketing" },
   { href: "/super-admin/reports", icon: FileBarChart, label: "Reports & Export" },
   { href: "/super-admin/security", icon: ShieldAlert, label: "Security" },
   { href: "/super-admin/activity-logs", icon: Activity, label: "Activity Logs" },

@@ -21,6 +21,8 @@ export interface Payment {
   ownerId: number;
   amount: number;
   paidAmount: number;
+  discountAmount?: number;
+  couponCode?: string | null;
   currency: string;
   paymentMode: PaymentPaymentMode;
   paymentMethod?: PaymentPaymentMethod;

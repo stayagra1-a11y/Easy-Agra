@@ -76,6 +76,9 @@ export const paymentsTable = pgTable("payments", {
   gatewayPaymentId: text("gateway_payment_id"),
   gatewaySignature: text("gateway_signature"),
 
+  couponCode: text("coupon_code"),
+  discountAmount: numeric("discount_amount", { precision: 12, scale: 2 }).default("0"),
+
   failureReason: text("failure_reason"),
   notes: text("notes"),
   paidAt: timestamp("paid_at", { withTimezone: true }),

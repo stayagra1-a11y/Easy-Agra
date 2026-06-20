@@ -44,6 +44,7 @@ import SuperAdminActivityLogs from "@/pages/super-admin/activity-logs";
 import SuperAdminOwnerRequests from "@/pages/super-admin/owner-requests";
 import CouponsPage from "@/pages/super-admin/coupons";
 import FeaturedContent from "@/pages/super-admin/featured-content";
+import MarketingPage from "@/pages/super-admin/marketing";
 import SuperAdminReports from "@/pages/super-admin/reports";
 import SecurityPage from "@/pages/super-admin/security";
 
@@ -312,6 +313,7 @@ function Router() {
       <Route path="/super-admin/refund-analytics" component={() => <ProtectedRoute component={SuperAdminRefundAnalytics} allowedRoles={["super_admin"]} />} />
       <Route path="/super-admin/coupons" component={() => <ProtectedRoute component={CouponsPage} allowedRoles={["super_admin"]} />} />
       <Route path="/super-admin/featured-content" component={() => <ProtectedRoute component={FeaturedContent} allowedRoles={["super_admin"]} />} />
+      <Route path="/super-admin/marketing" component={() => <ProtectedRoute component={MarketingPage} allowedRoles={["super_admin"]} />} />
       <Route path="/super-admin/reports" component={() => <ProtectedRoute component={SuperAdminReports} allowedRoles={["super_admin"]} />} />
       <Route path="/super-admin/security" component={() => <ProtectedRoute component={SecurityPage} allowedRoles={["super_admin"]} />} />
 

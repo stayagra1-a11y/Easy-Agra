@@ -38,6 +38,8 @@ import type {
   ChangePasswordInput,
   CommissionConfig,
   ConfirmPaymentInput,
+  CouponValidateInput,
+  CouponValidateResult,
   CreatePaymentInput,
   CreateSupportTicketBody,
   CreateTripBody,
@@ -211,7 +213,8 @@ import type {
   UserRoleUpdate,
   UserStatusUpdate,
   UserUpdate,
-  UsersPage
+  UsersPage,
+  ValidateCoupon400
 } from './api.schemas';
 
 import { customFetch } from '../custom-fetch';
@@ -10998,6 +11001,77 @@ export const useDeleteTouristPlaceDistance = <TError = ErrorType<unknown>,
         TContext
       > => {
       return useMutation(getDeleteTouristPlaceDistanceMutationOptions(options));
+    }
+
+export const getValidateCouponUrl = () => {
+
+
+
+
+  return `/api/coupons/validate`
+}
+
+/**
+ * @summary Validate a coupon code and calculate discount
+ */
+export const validateCoupon = async (couponValidateInput: CouponValidateInput, options?: RequestInit): Promise<CouponValidateResult> => {
+
+  return customFetch<CouponValidateResult>(getValidateCouponUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      couponValidateInput,)
+  }
+);}
+
+
+
+
+export const getValidateCouponMutationOptions = <TError = ErrorType<ValidateCoupon400 | void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof validateCoupon>>, TError,{data: BodyType<CouponValidateInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof validateCoupon>>, TError,{data: BodyType<CouponValidateInput>}, TContext> => {
+
+const mutationKey = ['validateCoupon'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof validateCoupon>>, {data: BodyType<CouponValidateInput>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  validateCoupon(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ValidateCouponMutationResult = NonNullable<Awaited<ReturnType<typeof validateCoupon>>>
+    export type ValidateCouponMutationBody = BodyType<CouponValidateInput>
+    export type ValidateCouponMutationError = ErrorType<ValidateCoupon400 | void>
+
+    /**
+ * @summary Validate a coupon code and calculate discount
+ */
+export const useValidateCoupon = <TError = ErrorType<ValidateCoupon400 | void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof validateCoupon>>, TError,{data: BodyType<CouponValidateInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof validateCoupon>>,
+        TError,
+        {data: BodyType<CouponValidateInput>},
+        TContext
+      > => {
+      return useMutation(getValidateCouponMutationOptions(options));
     }
 
 export const getCreatePaymentUrl = () => {
