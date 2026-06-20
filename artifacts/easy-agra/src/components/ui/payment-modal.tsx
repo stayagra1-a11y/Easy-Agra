@@ -18,10 +18,7 @@ import {
   useValidateCoupon,
 } from "@workspace/api-client-react";
 import {
-  CreditCard,
   Smartphone,
-  Building2,
-  Wallet,
   CheckCircle2,
   XCircle,
   Loader2,
@@ -62,38 +59,6 @@ const PAYMENT_METHODS = [
     desc: "Google Pay, PhonePe, Paytm",
     badge: "Instant",
     badgeColor: "bg-green-100 text-green-700",
-  },
-  {
-    id: "credit_card",
-    label: "Credit Card",
-    icon: CreditCard,
-    desc: "Visa, Mastercard, RuPay",
-    badge: null,
-    badgeColor: "",
-  },
-  {
-    id: "debit_card",
-    label: "Debit Card",
-    icon: CreditCard,
-    desc: "All major bank cards",
-    badge: null,
-    badgeColor: "",
-  },
-  {
-    id: "net_banking",
-    label: "Net Banking",
-    icon: Building2,
-    desc: "All major banks supported",
-    badge: null,
-    badgeColor: "",
-  },
-  {
-    id: "wallet",
-    label: "Wallet",
-    icon: Wallet,
-    desc: "Paytm, Mobikwik, Freecharge",
-    badge: null,
-    badgeColor: "",
   },
 ] as const;
 
