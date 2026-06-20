@@ -147,8 +147,8 @@ export default function CustomerHome() {
           </div>
         )}
 
-        {/* Owner request status / CTA */}
-        {ownerRequest ? (
+        {/* Owner request status */}
+        {ownerRequest && (
           <Card className="border-2 border-primary/20">
             <CardContent className="p-4">
               <div className="flex items-start gap-3">
@@ -166,17 +166,6 @@ export default function CustomerHome() {
                   {ownerRequest.status}
                 </Badge>
               </div>
-            </CardContent>
-          </Card>
-        ) : (
-          <Card className="border-dashed border-2 border-primary/20 bg-primary/5">
-            <CardContent className="p-4 text-center">
-              <Building2 className="h-8 w-8 text-primary/60 mx-auto mb-2" />
-              <p className="font-semibold text-sm">List your business</p>
-              <p className="text-xs text-muted-foreground mt-1 mb-3">Register as a hotel, restaurant, or spa owner on Easy Agra</p>
-              <Link href="/become-owner">
-                <Button size="sm" className="bg-primary hover:bg-primary/90">Become an Owner</Button>
-              </Link>
             </CardContent>
           </Card>
         )}

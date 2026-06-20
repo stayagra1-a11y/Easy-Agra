@@ -1,10 +1,12 @@
 import { Link, useLocation } from "wouter";
-import { Home, Bell, User, Settings, LogOut, Map, CalendarDays, Star, Utensils, Sparkles, Landmark, IndianRupee, LifeBuoy, ReceiptText } from "lucide-react";
+import { Home, Bell, User, Settings, LogOut, Map, CalendarDays, Star, Utensils, Sparkles, Landmark, IndianRupee, LifeBuoy, ReceiptText, Menu, Building2, ChevronRight, X } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { useGetUnreadNotificationCount, useLogout, getGetMeQueryKey } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { useState } from "react";
 
 export function CustomerLayout({ children }: { children: React.ReactNode }) {
   const { user } = useAuth();
@@ -12,6 +14,7 @@ export function CustomerLayout({ children }: { children: React.ReactNode }) {
   const queryClient = useQueryClient();
   const { data: unreadData } = useGetUnreadNotificationCount();
   const logoutMutation = useLogout();
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const handleLogout = () => {
     queryClient.setQueryData(getGetMeQueryKey(), null);
@@ -34,14 +37,33 @@ export function CustomerLayout({ children }: { children: React.ReactNode }) {
     { href: "/profile", icon: User, label: "Profile" },
   ];
 
+  const menuLinks = [
+    { href: "/profile", icon: User, label: "My Profile" },
+    { href: "/customer/bookings", icon: CalendarDays, label: "My Bookings" },
+    { href: "/my-payments", icon: IndianRupee, label: "Payments" },
+    { href: "/my-reservations", icon: Star, label: "My Reservations" },
+    { href: "/refunds", icon: ReceiptText, label: "Refunds" },
+    { href: "/support/tickets", icon: LifeBuoy, label: "Help & Support" },
+    { href: "/settings", icon: Settings, label: "Settings" },
+    { href: "/become-owner", icon: Building2, label: "List Your Business", highlight: true },
+  ];
+
   return (
     <div className="min-h-screen bg-background flex flex-col">
       {/* Top header */}
       <header className="sticky top-0 z-50 bg-primary text-primary-foreground shadow-md">
         <div className="flex items-center justify-between px-4 py-3 max-w-lg mx-auto">
-          <div className="flex items-center gap-2">
-            <Map className="h-5 w-5 text-accent" />
-            <span className="font-bold text-lg tracking-tight">Easy Agra</span>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setMenuOpen(true)}
+              className="p-1 rounded-full hover:bg-primary-foreground/10 transition-colors"
+            >
+              <Menu className="h-5 w-5" />
+            </button>
+            <div className="flex items-center gap-1.5">
+              <Map className="h-5 w-5 text-accent" />
+              <span className="font-bold text-lg tracking-tight">Easy Agra</span>
+            </div>
           </div>
           <div className="flex items-center gap-3">
             <Avatar className="h-8 w-8 border-2 border-accent">
@@ -56,6 +78,69 @@ export function CustomerLayout({ children }: { children: React.ReactNode }) {
           </div>
         </div>
       </header>
+
+      {/* Side drawer menu */}
+      <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
+        <SheetContent side="left" className="w-72 p-0 flex flex-col">
+          {/* Drawer header */}
+          <div className="bg-primary text-primary-foreground px-5 pt-6 pb-5">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <Map className="h-5 w-5 text-accent" />
+                <span className="font-bold text-lg">Easy Agra</span>
+              </div>
+              <button onClick={() => setMenuOpen(false)} className="p-1 hover:bg-primary-foreground/10 rounded-full">
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+            <div className="flex items-center gap-3">
+              <Avatar className="h-10 w-10 border-2 border-accent">
+                <AvatarImage src={user?.profilePhoto || undefined} />
+                <AvatarFallback className="bg-accent text-accent-foreground text-sm font-bold">
+                  {user?.fullName?.charAt(0) || "U"}
+                </AvatarFallback>
+              </Avatar>
+              <div>
+                <p className="font-semibold text-sm">{user?.fullName}</p>
+                <p className="text-xs text-primary-foreground/60 capitalize">{user?.role?.replace(/_/g, " ")}</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Menu items */}
+          <nav className="flex-1 overflow-y-auto py-3">
+            {menuLinks.map(({ href, icon: Icon, label, highlight }: any) => (
+              <Link
+                key={href}
+                href={href}
+                onClick={() => setMenuOpen(false)}
+                className={`flex items-center justify-between px-5 py-3.5 transition-colors ${
+                  highlight
+                    ? "text-primary font-semibold bg-primary/5 border-l-4 border-primary"
+                    : "text-foreground hover:bg-muted"
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  <Icon className={`h-5 w-5 ${highlight ? "text-primary" : "text-muted-foreground"}`} />
+                  <span className="text-sm">{label}</span>
+                </div>
+                <ChevronRight className="h-4 w-4 text-muted-foreground" />
+              </Link>
+            ))}
+          </nav>
+
+          {/* Logout */}
+          <div className="border-t p-4">
+            <button
+              onClick={handleLogout}
+              className="flex items-center gap-3 w-full px-1 py-2 text-destructive hover:bg-destructive/10 rounded-lg transition-colors"
+            >
+              <LogOut className="h-5 w-5" />
+              <span className="text-sm font-medium">Logout</span>
+            </button>
+          </div>
+        </SheetContent>
+      </Sheet>
 
       {/* Main content */}
       <main className="flex-1 pb-20 max-w-lg mx-auto w-full">
