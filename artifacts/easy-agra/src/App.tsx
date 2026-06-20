@@ -100,6 +100,9 @@ import AdminRefunds from "@/pages/admin/refunds";
 // Super Admin - refund analytics
 import SuperAdminRefundAnalytics from "@/pages/super-admin/refund-analytics";
 
+// Admin - trip analytics
+import AdminTripAnalytics from "@/pages/admin/trip-analytics";
+
 // Owner - payments
 import HotelOwnerPayments from "@/pages/hotel-owner/owner-payments";
 import RestaurantOwnerPayments from "@/pages/restaurant-owner/owner-payments";
@@ -290,6 +293,7 @@ function Router() {
       <Route path="/admin/tourist-places" component={() => <ProtectedRoute component={AdminTouristPlaces} allowedRoles={["admin", "super_admin"]} />} />
       <Route path="/admin/support" component={() => <ProtectedRoute component={AdminSupport} allowedRoles={["admin", "super_admin"]} />} />
       <Route path="/admin/refunds" component={() => <ProtectedRoute component={AdminRefunds} allowedRoles={["admin", "super_admin"]} />} />
+      <Route path="/admin/trip-analytics" component={() => <ProtectedRoute component={AdminTripAnalytics} allowedRoles={["admin", "super_admin"]} />} />
 
       {/* Super Admin routes */}
       <Route path="/super-admin/dashboard" component={() => <ProtectedRoute component={SuperAdminDashboard} allowedRoles={["super_admin"]} />} />

@@ -15,6 +15,7 @@ import {
   Map, ArrowLeft, Calendar, Users, Wallet, Edit2, Trash2, XCircle,
   CheckCircle, Clock, Tag, Heart, Plane, Sparkles, AlertTriangle,
 } from "lucide-react";
+import { TripRecommendations } from "@/components/trip-recommendations";
 import { useToast } from "@/hooks/use-toast";
 
 const TRAVEL_TYPES = [
@@ -375,6 +376,22 @@ export default function TripDetail({ params }: Props) {
           </div>
         )}
       </div>
+
+      {/* AI Recommendations Section */}
+      {trip.status !== "cancelled" && (
+        <div className="space-y-2">
+          <div className="flex items-center gap-2">
+            <Sparkles className="w-4 h-4 text-amber-500" />
+            <h2 className="font-bold text-foreground text-sm">Smart Recommendations</h2>
+          </div>
+          <TripRecommendations
+            tripRef={params.ref}
+            tripStatus={trip.status}
+            interests={trip.interests ?? []}
+            budgetCategory={trip.budgetCategory}
+          />
+        </div>
+      )}
 
       {/* Edit Dialog */}
       <Dialog open={editOpen} onOpenChange={setEditOpen}>

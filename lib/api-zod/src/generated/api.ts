@@ -6012,3 +6012,195 @@ export const OverrideRefundResponse = zod.object({
 })
 
 
+/**
+ * @summary Generate smart recommendations for a trip plan
+ */
+export const GenerateTripRecommendationsParams = zod.object({
+  "ref": zod.coerce.string()
+})
+
+export const GenerateTripRecommendationsResponse = zod.object({
+  "id": zod.number(),
+  "tripId": zod.number(),
+  "tripRef": zod.string(),
+  "hotels": zod.array(zod.object({
+  "id": zod.number(),
+  "name": zod.string(),
+  "category": zod.string(),
+  "address": zod.string().nullish(),
+  "googleMapLink": zod.string().nullish(),
+  "amenities": zod.array(zod.string()).optional(),
+  "estimatedCostPerNight": zod.number()
+})),
+  "restaurants": zod.array(zod.object({
+  "id": zod.number(),
+  "name": zod.string(),
+  "cuisineType": zod.string().nullish(),
+  "address": zod.string().nullish(),
+  "estimatedCostPerPerson": zod.number()
+})),
+  "spas": zod.array(zod.object({
+  "id": zod.number(),
+  "name": zod.string(),
+  "address": zod.string().nullish(),
+  "estimatedCostPerSession": zod.number()
+})),
+  "touristPlaces": zod.array(zod.object({
+  "name": zod.string(),
+  "description": zod.string().nullish(),
+  "ticketPriceIndian": zod.number(),
+  "googleMapsLink": zod.string(),
+  "lat": zod.number(),
+  "lng": zod.number(),
+  "interests": zod.array(zod.string()),
+  "bestTime": zod.string().nullish(),
+  "duration": zod.string().nullish()
+})),
+  "itinerary": zod.array(zod.object({
+  "day": zod.number().optional(),
+  "date": zod.string().nullish(),
+  "title": zod.string().optional(),
+  "theme": zod.string().optional(),
+  "dailyCost": zod.number().optional(),
+  "activities": zod.array(zod.object({
+  "time": zod.string(),
+  "type": zod.string(),
+  "name": zod.string(),
+  "description": zod.string().nullish(),
+  "duration": zod.string().nullish(),
+  "estimatedCost": zod.number().nullish(),
+  "googleMapsLink": zod.string().nullish()
+})).optional(),
+  "required": zod.unknown().optional()
+})),
+  "costEstimation": zod.object({
+  "hotelCost": zod.number(),
+  "restaurantCost": zod.number(),
+  "spaCost": zod.number(),
+  "ticketCost": zod.number(),
+  "travelCost": zod.number(),
+  "miscCost": zod.number(),
+  "totalCost": zod.number(),
+  "perPersonCost": zod.number(),
+  "items": zod.array(zod.object({
+  "category": zod.string(),
+  "label": zod.string(),
+  "cost": zod.number(),
+  "breakdown": zod.string()
+}))
+}).nullish(),
+  "generatedAt": zod.string(),
+  "updatedAt": zod.string()
+})
+
+
+/**
+ * @summary Get existing recommendations for a trip
+ */
+export const GetTripRecommendationsParams = zod.object({
+  "ref": zod.coerce.string()
+})
+
+export const GetTripRecommendationsResponse = zod.object({
+  "id": zod.number(),
+  "tripId": zod.number(),
+  "tripRef": zod.string(),
+  "hotels": zod.array(zod.object({
+  "id": zod.number(),
+  "name": zod.string(),
+  "category": zod.string(),
+  "address": zod.string().nullish(),
+  "googleMapLink": zod.string().nullish(),
+  "amenities": zod.array(zod.string()).optional(),
+  "estimatedCostPerNight": zod.number()
+})),
+  "restaurants": zod.array(zod.object({
+  "id": zod.number(),
+  "name": zod.string(),
+  "cuisineType": zod.string().nullish(),
+  "address": zod.string().nullish(),
+  "estimatedCostPerPerson": zod.number()
+})),
+  "spas": zod.array(zod.object({
+  "id": zod.number(),
+  "name": zod.string(),
+  "address": zod.string().nullish(),
+  "estimatedCostPerSession": zod.number()
+})),
+  "touristPlaces": zod.array(zod.object({
+  "name": zod.string(),
+  "description": zod.string().nullish(),
+  "ticketPriceIndian": zod.number(),
+  "googleMapsLink": zod.string(),
+  "lat": zod.number(),
+  "lng": zod.number(),
+  "interests": zod.array(zod.string()),
+  "bestTime": zod.string().nullish(),
+  "duration": zod.string().nullish()
+})),
+  "itinerary": zod.array(zod.object({
+  "day": zod.number().optional(),
+  "date": zod.string().nullish(),
+  "title": zod.string().optional(),
+  "theme": zod.string().optional(),
+  "dailyCost": zod.number().optional(),
+  "activities": zod.array(zod.object({
+  "time": zod.string(),
+  "type": zod.string(),
+  "name": zod.string(),
+  "description": zod.string().nullish(),
+  "duration": zod.string().nullish(),
+  "estimatedCost": zod.number().nullish(),
+  "googleMapsLink": zod.string().nullish()
+})).optional(),
+  "required": zod.unknown().optional()
+})),
+  "costEstimation": zod.object({
+  "hotelCost": zod.number(),
+  "restaurantCost": zod.number(),
+  "spaCost": zod.number(),
+  "ticketCost": zod.number(),
+  "travelCost": zod.number(),
+  "miscCost": zod.number(),
+  "totalCost": zod.number(),
+  "perPersonCost": zod.number(),
+  "items": zod.array(zod.object({
+  "category": zod.string(),
+  "label": zod.string(),
+  "cost": zod.number(),
+  "breakdown": zod.string()
+}))
+}).nullish(),
+  "generatedAt": zod.string(),
+  "updatedAt": zod.string()
+})
+
+
+/**
+ * @summary Admin trip planner analytics
+ */
+export const GetTripAnalyticsResponse = zod.object({
+  "totalTrips": zod.number(),
+  "recommendationsGenerated": zod.number(),
+  "byStatus": zod.record(zod.string(), zod.number()),
+  "byTravelType": zod.record(zod.string(), zod.number()),
+  "byBudgetCat": zod.record(zod.string(), zod.number()),
+  "topInterests": zod.array(zod.object({
+  "interest": zod.string(),
+  "count": zod.number()
+})),
+  "topHotels": zod.array(zod.object({
+  "name": zod.string(),
+  "count": zod.number()
+})),
+  "topRestaurants": zod.array(zod.object({
+  "name": zod.string(),
+  "count": zod.number()
+})),
+  "topPlaces": zod.array(zod.object({
+  "name": zod.string(),
+  "count": zod.number()
+}))
+})
+
+

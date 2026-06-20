@@ -2305,6 +2305,134 @@ export interface OverrideRefundInput {
   reason?: string;
 }
 
+export type TripRecommendationHotelsItem = {
+  id: number;
+  name: string;
+  category: string;
+  address?: string | null;
+  googleMapLink?: string | null;
+  amenities?: string[];
+  estimatedCostPerNight: number;
+};
+
+export type TripRecommendationRestaurantsItem = {
+  id: number;
+  name: string;
+  cuisineType?: string | null;
+  address?: string | null;
+  estimatedCostPerPerson: number;
+};
+
+export type TripRecommendationSpasItem = {
+  id: number;
+  name: string;
+  address?: string | null;
+  estimatedCostPerSession: number;
+};
+
+export type TripRecommendationTouristPlacesItem = {
+  name: string;
+  description?: string | null;
+  ticketPriceIndian: number;
+  googleMapsLink: string;
+  lat: number;
+  lng: number;
+  interests: string[];
+  bestTime?: string | null;
+  duration?: string | null;
+};
+
+export type TripRecommendationItineraryItemActivitiesItem = {
+  time: string;
+  type: string;
+  name: string;
+  description?: string | null;
+  duration?: string | null;
+  estimatedCost?: number | null;
+  googleMapsLink?: string | null;
+};
+
+export type TripRecommendationItineraryItem = {
+  day?: number;
+  date?: string | null;
+  title?: string;
+  theme?: string;
+  dailyCost?: number;
+  activities?: TripRecommendationItineraryItemActivitiesItem[];
+  required?: unknown;
+};
+
+export type TripRecommendationCostEstimationItemsItem = {
+  category: string;
+  label: string;
+  cost: number;
+  breakdown: string;
+};
+
+export type TripRecommendationCostEstimation = {
+  hotelCost: number;
+  restaurantCost: number;
+  spaCost: number;
+  ticketCost: number;
+  travelCost: number;
+  miscCost: number;
+  totalCost: number;
+  perPersonCost: number;
+  items: TripRecommendationCostEstimationItemsItem[];
+} | null;
+
+export interface TripRecommendation {
+  id: number;
+  tripId: number;
+  tripRef: string;
+  hotels: TripRecommendationHotelsItem[];
+  restaurants: TripRecommendationRestaurantsItem[];
+  spas: TripRecommendationSpasItem[];
+  touristPlaces: TripRecommendationTouristPlacesItem[];
+  itinerary: TripRecommendationItineraryItem[];
+  costEstimation?: TripRecommendationCostEstimation;
+  generatedAt: string;
+  updatedAt: string;
+}
+
+export type TripAnalyticsByStatus = {[key: string]: number};
+
+export type TripAnalyticsByTravelType = {[key: string]: number};
+
+export type TripAnalyticsByBudgetCat = {[key: string]: number};
+
+export type TripAnalyticsTopInterestsItem = {
+  interest: string;
+  count: number;
+};
+
+export type TripAnalyticsTopHotelsItem = {
+  name: string;
+  count: number;
+};
+
+export type TripAnalyticsTopRestaurantsItem = {
+  name: string;
+  count: number;
+};
+
+export type TripAnalyticsTopPlacesItem = {
+  name: string;
+  count: number;
+};
+
+export interface TripAnalytics {
+  totalTrips: number;
+  recommendationsGenerated: number;
+  byStatus: TripAnalyticsByStatus;
+  byTravelType: TripAnalyticsByTravelType;
+  byBudgetCat: TripAnalyticsByBudgetCat;
+  topInterests: TripAnalyticsTopInterestsItem[];
+  topHotels: TripAnalyticsTopHotelsItem[];
+  topRestaurants: TripAnalyticsTopRestaurantsItem[];
+  topPlaces: TripAnalyticsTopPlacesItem[];
+}
+
 export type ListUsersParams = {
 role?: string;
 status?: string;

@@ -200,7 +200,9 @@ import type {
   TouristPlaceTip,
   TouristPlaceTipInput,
   TouristPlacesPage,
+  TripAnalytics,
   TripPlan,
+  TripRecommendation,
   UnreadCount,
   UpdateCommissionConfigInput,
   UpdateTicketStatusBody,
@@ -14899,4 +14901,228 @@ export const useOverrideRefund = <TError = ErrorType<unknown>,
       > => {
       return useMutation(getOverrideRefundMutationOptions(options));
     }
+
+export const getGenerateTripRecommendationsUrl = (ref: string,) => {
+
+
+
+
+  return `/api/trips/${ref}/recommendations`
+}
+
+/**
+ * @summary Generate smart recommendations for a trip plan
+ */
+export const generateTripRecommendations = async (ref: string, options?: RequestInit): Promise<TripRecommendation> => {
+
+  return customFetch<TripRecommendation>(getGenerateTripRecommendationsUrl(ref),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+export const getGenerateTripRecommendationsMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof generateTripRecommendations>>, TError,{ref: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof generateTripRecommendations>>, TError,{ref: string}, TContext> => {
+
+const mutationKey = ['generateTripRecommendations'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof generateTripRecommendations>>, {ref: string}> = (props) => {
+          const {ref} = props ?? {};
+
+          return  generateTripRecommendations(ref,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type GenerateTripRecommendationsMutationResult = NonNullable<Awaited<ReturnType<typeof generateTripRecommendations>>>
+
+    export type GenerateTripRecommendationsMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Generate smart recommendations for a trip plan
+ */
+export const useGenerateTripRecommendations = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof generateTripRecommendations>>, TError,{ref: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof generateTripRecommendations>>,
+        TError,
+        {ref: string},
+        TContext
+      > => {
+      return useMutation(getGenerateTripRecommendationsMutationOptions(options));
+    }
+
+export const getGetTripRecommendationsUrl = (ref: string,) => {
+
+
+
+
+  return `/api/trips/${ref}/recommendations`
+}
+
+/**
+ * @summary Get existing recommendations for a trip
+ */
+export const getTripRecommendations = async (ref: string, options?: RequestInit): Promise<TripRecommendation> => {
+
+  return customFetch<TripRecommendation>(getGetTripRecommendationsUrl(ref),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetTripRecommendationsQueryKey = (ref: string,) => {
+    return [
+    `/api/trips/${ref}/recommendations`
+    ] as const;
+    }
+
+
+export const getGetTripRecommendationsQueryOptions = <TData = Awaited<ReturnType<typeof getTripRecommendations>>, TError = ErrorType<void>>(ref: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getTripRecommendations>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetTripRecommendationsQueryKey(ref);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getTripRecommendations>>> = ({ signal }) => getTripRecommendations(ref, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: !!(ref), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getTripRecommendations>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetTripRecommendationsQueryResult = NonNullable<Awaited<ReturnType<typeof getTripRecommendations>>>
+export type GetTripRecommendationsQueryError = ErrorType<void>
+
+
+/**
+ * @summary Get existing recommendations for a trip
+ */
+
+export function useGetTripRecommendations<TData = Awaited<ReturnType<typeof getTripRecommendations>>, TError = ErrorType<void>>(
+ ref: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getTripRecommendations>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetTripRecommendationsQueryOptions(ref,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getGetTripAnalyticsUrl = () => {
+
+
+
+
+  return `/api/admin/trip-analytics`
+}
+
+/**
+ * @summary Admin trip planner analytics
+ */
+export const getTripAnalytics = async ( options?: RequestInit): Promise<TripAnalytics> => {
+
+  return customFetch<TripAnalytics>(getGetTripAnalyticsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetTripAnalyticsQueryKey = () => {
+    return [
+    `/api/admin/trip-analytics`
+    ] as const;
+    }
+
+
+export const getGetTripAnalyticsQueryOptions = <TData = Awaited<ReturnType<typeof getTripAnalytics>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getTripAnalytics>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetTripAnalyticsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getTripAnalytics>>> = ({ signal }) => getTripAnalytics({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getTripAnalytics>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetTripAnalyticsQueryResult = NonNullable<Awaited<ReturnType<typeof getTripAnalytics>>>
+export type GetTripAnalyticsQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Admin trip planner analytics
+ */
+
+export function useGetTripAnalytics<TData = Awaited<ReturnType<typeof getTripAnalytics>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getTripAnalytics>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetTripAnalyticsQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
 

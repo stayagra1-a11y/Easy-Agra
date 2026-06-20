@@ -4382,6 +4382,58 @@ paths:
               schema:
                 $ref: "#/components/schemas/Refund"
 
+
+  # ─── Trip Recommendations ───────────────────────────────────────────────────
+
+  /trips/{ref}/recommendations:
+    post:
+      operationId: generateTripRecommendations
+      tags: [trips]
+      summary: Generate smart recommendations for a trip plan
+      parameters:
+        - name: ref
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Generated recommendation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TripRecommendation"
+    get:
+      operationId: getTripRecommendations
+      tags: [trips]
+      summary: Get existing recommendations for a trip
+      parameters:
+        - name: ref
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Existing recommendation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TripRecommendation"
+        "404":
+          description: No recommendations yet
+
+  /admin/trip-analytics:
+    get:
+      operationId: getTripAnalytics
+      tags: [trips]
+      summary: Admin trip planner analytics
+      responses:
+        "200":
+          description: Trip analytics
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TripAnalytics"
+
 components:
   schemas:
     HealthStatus:
@@ -7901,3 +7953,151 @@ components:
           enum: [approve, reject]
         reason: { type: string }
       required: [action]
+
+    TripRecommendation:
+      type: object
+      properties:
+        id: { type: integer }
+        tripId: { type: integer }
+        tripRef: { type: string }
+        hotels:
+          type: array
+          items:
+            type: object
+            properties:
+              id: { type: integer }
+              name: { type: string }
+              category: { type: string }
+              address: { type: string, nullable: true }
+              googleMapLink: { type: string, nullable: true }
+              amenities: { type: array, items: { type: string } }
+              estimatedCostPerNight: { type: number }
+            required: [id, name, category, estimatedCostPerNight]
+        restaurants:
+          type: array
+          items:
+            type: object
+            properties:
+              id: { type: integer }
+              name: { type: string }
+              cuisineType: { type: string, nullable: true }
+              address: { type: string, nullable: true }
+              estimatedCostPerPerson: { type: number }
+            required: [id, name, estimatedCostPerPerson]
+        spas:
+          type: array
+          items:
+            type: object
+            properties:
+              id: { type: integer }
+              name: { type: string }
+              address: { type: string, nullable: true }
+              estimatedCostPerSession: { type: number }
+            required: [id, name, estimatedCostPerSession]
+        touristPlaces:
+          type: array
+          items:
+            type: object
+            properties:
+              name: { type: string }
+              description: { type: string, nullable: true }
+              ticketPriceIndian: { type: number }
+              googleMapsLink: { type: string }
+              lat: { type: number }
+              lng: { type: number }
+              interests: { type: array, items: { type: string } }
+              bestTime: { type: string, nullable: true }
+              duration: { type: string, nullable: true }
+            required: [name, ticketPriceIndian, googleMapsLink, lat, lng, interests]
+        itinerary:
+          type: array
+          items:
+            type: object
+            properties:
+              day: { type: integer }
+              date: { type: string, nullable: true }
+              title: { type: string }
+              theme: { type: string }
+              dailyCost: { type: number }
+              activities:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    time: { type: string }
+                    type: { type: string }
+                    name: { type: string }
+                    description: { type: string, nullable: true }
+                    duration: { type: string, nullable: true }
+                    estimatedCost: { type: number, nullable: true }
+                    googleMapsLink: { type: string, nullable: true }
+                  required: [time, type, name]
+              required: [day, title, theme, dailyCost, activities]
+        costEstimation:
+          type: object
+          nullable: true
+          properties:
+            hotelCost: { type: number }
+            restaurantCost: { type: number }
+            spaCost: { type: number }
+            ticketCost: { type: number }
+            travelCost: { type: number }
+            miscCost: { type: number }
+            totalCost: { type: number }
+            perPersonCost: { type: number }
+            items:
+              type: array
+              items:
+                type: object
+                properties:
+                  category: { type: string }
+                  label: { type: string }
+                  cost: { type: number }
+                  breakdown: { type: string }
+                required: [category, label, cost, breakdown]
+          required: [hotelCost, restaurantCost, spaCost, ticketCost, travelCost, miscCost, totalCost, perPersonCost, items]
+        generatedAt: { type: string }
+        updatedAt: { type: string }
+      required: [id, tripId, tripRef, hotels, restaurants, spas, touristPlaces, itinerary, generatedAt, updatedAt]
+
+    TripAnalytics:
+      type: object
+      properties:
+        totalTrips: { type: integer }
+        recommendationsGenerated: { type: integer }
+        byStatus: { type: object, additionalProperties: { type: integer } }
+        byTravelType: { type: object, additionalProperties: { type: integer } }
+        byBudgetCat: { type: object, additionalProperties: { type: integer } }
+        topInterests:
+          type: array
+          items:
+            type: object
+            properties:
+              interest: { type: string }
+              count: { type: integer }
+            required: [interest, count]
+        topHotels:
+          type: array
+          items:
+            type: object
+            properties:
+              name: { type: string }
+              count: { type: integer }
+            required: [name, count]
+        topRestaurants:
+          type: array
+          items:
+            type: object
+            properties:
+              name: { type: string }
+              count: { type: integer }
+            required: [name, count]
+        topPlaces:
+          type: array
+          items:
+            type: object
+            properties:
+              name: { type: string }
+              count: { type: integer }
+            required: [name, count]
+      required: [totalTrips, recommendationsGenerated, byStatus, byTravelType, byBudgetCat, topInterests, topHotels, topRestaurants, topPlaces]
