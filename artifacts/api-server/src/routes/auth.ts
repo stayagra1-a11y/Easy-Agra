@@ -140,16 +140,18 @@ router.post("/auth/resend-verification", async (req, res): Promise<void> => {
 
 // ── Login ─────────────────────────────────────────────────────────────────────
 router.post("/auth/login", async (req, res): Promise<void> => {
-  const { email, password, rememberMe } = req.body;
-  if (!email || !password) {
-    res.status(400).json({ error: "Email and password are required" });
+  const { email, mobile, password, rememberMe } = req.body;
+  if ((!email && !mobile) || !password) {
+    res.status(400).json({ error: "Email or mobile number and password are required" });
     return;
   }
 
-  const [user] = await db.select().from(usersTable).where(eq(usersTable.email, email.toLowerCase()));
+  const [user] = await (mobile
+    ? db.select().from(usersTable).where(eq(usersTable.mobile, mobile.trim()))
+    : db.select().from(usersTable).where(eq(usersTable.email, email.toLowerCase())));
 
   if (!user || !user.passwordHash) {
-    res.status(401).json({ error: "Invalid email or password" });
+    res.status(401).json({ error: "Invalid credentials" });
     return;
   }
 

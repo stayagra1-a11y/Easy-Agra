@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link, useLocation, useSearch } from "wouter";
 import { useLogin, getGetMeQueryKey } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
-import { Map, Eye, EyeOff, Loader2 } from "lucide-react";
+import { Map, Eye, EyeOff, Loader2, Phone, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -11,6 +11,9 @@ import { useToast } from "@/hooks/use-toast";
 
 const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
 
+function isMobile(val: string) {
+  return /^[6-9]\d{9}$/.test(val.trim());
+}
 
 export default function Login() {
   const [, setLocation] = useLocation();
@@ -18,7 +21,7 @@ export default function Login() {
   const params = new URLSearchParams(search);
   const urlError = params.get("error");
 
-  const [email, setEmail] = useState("");
+  const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -28,11 +31,16 @@ export default function Login() {
   const { toast } = useToast();
   const loginMutation = useLogin();
 
+  const isMobileInput = isMobile(identifier);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setUnverifiedEmail(null);
     try {
-      const result = await loginMutation.mutateAsync({ data: { email, password, rememberMe } });
+      const payload = isMobileInput
+        ? { mobile: identifier.trim(), password, rememberMe }
+        : { email: identifier.trim(), password, rememberMe };
+      const result = await loginMutation.mutateAsync({ data: payload });
       queryClient.setQueryData(getGetMeQueryKey(), result.user);
       const role = result.user.role;
       if (role === "super_admin") setLocation("/super-admin/dashboard");
@@ -44,7 +52,7 @@ export default function Login() {
     } catch (err: any) {
       const data = err?.response?.data;
       if (data?.requiresVerification) {
-        setUnverifiedEmail(data.email || email);
+        setUnverifiedEmail(data.email || identifier);
       } else {
         toast({ title: "Login failed", description: data?.error || "Invalid credentials", variant: "destructive" });
       }
@@ -69,7 +77,6 @@ export default function Login() {
     }
   };
 
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary/95 via-primary to-primary/80 flex flex-col">
       <div className="h-1 bg-accent" />
@@ -89,7 +96,6 @@ export default function Login() {
           <h2 className="text-xl font-bold text-foreground mb-1">Welcome back</h2>
           <p className="text-sm text-muted-foreground mb-5">Sign in to your account</p>
 
-
           {/* Email verification banner */}
           {unverifiedEmail && (
             <div className="mb-4 bg-amber-50 border border-amber-200 rounded-lg px-4 py-3 space-y-2">
@@ -105,11 +111,29 @@ export default function Login() {
             </div>
           )}
 
-
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-1.5">
-              <Label htmlFor="email">Email address</Label>
-              <Input id="email" type="email" placeholder="you@example.com" value={email} onChange={(e) => setEmail(e.target.value)} required autoComplete="email" />
+              <Label htmlFor="identifier">Email or Mobile Number</Label>
+              <div className="relative">
+                {isMobileInput
+                  ? <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  : <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                }
+                <Input
+                  id="identifier"
+                  type="text"
+                  inputMode={identifier.length > 0 && /^\d/.test(identifier) ? "numeric" : "email"}
+                  placeholder="you@example.com or 9876543210"
+                  value={identifier}
+                  onChange={(e) => setIdentifier(e.target.value)}
+                  required
+                  autoComplete="username"
+                  className="pl-9"
+                />
+              </div>
+              {identifier.length >= 10 && /^\d+$/.test(identifier) && !isMobileInput && (
+                <p className="text-xs text-amber-600">Mobile number must start with 6-9 and be 10 digits</p>
+              )}
             </div>
 
             <div className="space-y-1.5">

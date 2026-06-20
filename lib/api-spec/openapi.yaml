@@ -4575,12 +4575,13 @@ components:
       properties:
         email:
           type: string
+        mobile:
+          type: string
         password:
           type: string
         rememberMe:
           type: boolean
       required:
-        - email
         - password
 
     AuthResponse:

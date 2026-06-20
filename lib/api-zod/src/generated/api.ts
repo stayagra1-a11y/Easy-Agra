@@ -33,7 +33,8 @@ export const RegisterBody = zod.object({
  * @summary Login
  */
 export const LoginBody = zod.object({
-  "email": zod.string(),
+  "email": zod.string().optional(),
+  "mobile": zod.string().optional(),
   "password": zod.string(),
   "rememberMe": zod.boolean().optional()
 })

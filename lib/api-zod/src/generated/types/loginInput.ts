@@ -7,7 +7,8 @@
  */
 
 export interface LoginInput {
-  email: string;
+  email?: string;
+  mobile?: string;
   password: string;
   rememberMe?: boolean;
 }
