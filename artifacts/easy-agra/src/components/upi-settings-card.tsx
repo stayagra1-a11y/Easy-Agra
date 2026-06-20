@@ -29,13 +29,17 @@ export function UpiSettingsCard({ entityType, entityId, currentUpiId, currentQrI
     ? `${BASE}/api/restaurants/${entityId}/upi`
     : `${BASE}/api/spas/${entityId}/upi`;
 
-  const handleQrChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleQrChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     setQrFile(file);
-    const reader = new FileReader();
-    reader.onload = (ev) => setQrPreview(ev.target?.result as string);
-    reader.readAsDataURL(file);
+    try {
+      const { uploadToCloudinary } = await import("@/lib/cloudinary");
+      const url = await uploadToCloudinary(file);
+      setQrPreview(url);
+    } catch {
+      toast({ title: "QR upload failed", variant: "destructive" });
+    }
   };
 
   const handleSave = async () => {
@@ -43,17 +47,7 @@ export function UpiSettingsCard({ entityType, entityId, currentUpiId, currentQrI
 
     setSaving(true);
     try {
-      let qrImageUrl = qrPreview;
-
-      // If new QR file uploaded, convert to base64 data URL (stored as-is for simplicity)
-      // In production this would upload to object storage
-      if (qrFile) {
-        qrImageUrl = await new Promise<string>((resolve) => {
-          const reader = new FileReader();
-          reader.onload = (e) => resolve(e.target?.result as string);
-          reader.readAsDataURL(qrFile);
-        });
-      }
+      const qrImageUrl = qrPreview;
 
       const res = await fetch(endpoint, {
         method: "PATCH",
