@@ -57,7 +57,15 @@ import OwnerReservations from "@/pages/restaurant-owner/owner-reservations";
 import SpaOwnerDashboard from "@/pages/spa-owner/dashboard";
 import OwnerSpas from "@/pages/spa-owner/spas";
 import SpaForm from "@/pages/spa-owner/spa-form";
+import SpaServices from "@/pages/spa-owner/spa-services";
+import OwnerAppointments from "@/pages/spa-owner/appointments";
 import AdminSpas from "@/pages/admin/admin-spas";
+
+// Customer - spas
+import CustomerSpas from "@/pages/customer/spas";
+import SpaDetail from "@/pages/customer/spa-detail";
+import BookSpa from "@/pages/customer/book-spa";
+import MySpaAppointments from "@/pages/customer/my-spa-appointments";
 
 // Customer - restaurants & reservations
 import CustomerRestaurants from "@/pages/customer/restaurants";
@@ -170,7 +178,15 @@ function Router() {
       <Route path="/spa-owner/dashboard" component={() => <ProtectedRoute component={SpaOwnerDashboard} allowedRoles={["spa_owner"]} />} />
       <Route path="/spa-owner/spas/new" component={() => <ProtectedRoute component={SpaForm} allowedRoles={["spa_owner"]} />} />
       <Route path="/spa-owner/spas/:id/edit" component={() => <ProtectedRoute component={SpaForm} allowedRoles={["spa_owner"]} />} />
+      <Route path="/spa-owner/spas/:id/services" component={() => <ProtectedRoute component={SpaServices} allowedRoles={["spa_owner"]} />} />
       <Route path="/spa-owner/spas" component={() => <ProtectedRoute component={OwnerSpas} allowedRoles={["spa_owner"]} />} />
+      <Route path="/spa-owner/appointments" component={() => <ProtectedRoute component={OwnerAppointments} allowedRoles={["spa_owner"]} />} />
+
+      {/* Customer spa routes */}
+      <Route path="/spas/:id/book" component={() => <ProtectedRoute component={BookSpa} allowedRoles={["customer"]} />} />
+      <Route path="/spas/:id" component={() => <ProtectedRoute component={SpaDetail} allowedRoles={["customer"]} />} />
+      <Route path="/spas" component={() => <ProtectedRoute component={CustomerSpas} allowedRoles={["customer"]} />} />
+      <Route path="/my-spa-appointments" component={() => <ProtectedRoute component={MySpaAppointments} allowedRoles={["customer"]} />} />
 
       {/* Admin routes */}
       <Route path="/admin/dashboard" component={() => <ProtectedRoute component={AdminDashboard} allowedRoles={["admin", "super_admin"]} />} />

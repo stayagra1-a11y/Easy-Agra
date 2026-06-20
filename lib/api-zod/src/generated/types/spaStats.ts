@@ -11,4 +11,7 @@ export interface SpaStats {
   activeSpas: number;
   pendingSpas: number;
   draftSpas: number;
+  totalAppointments: number;
+  pendingAppointments: number;
+  monthlyRevenue: number;
 }

@@ -29,6 +29,7 @@ const bottomNav: NavItem[] = [
   { href: "/restaurant-owner/restaurants", icon: Utensils, label: "Restaurants", roles: ["restaurant_owner"] },
   { href: "/restaurant-owner/reservations", icon: CalendarCheck, label: "Reservations", roles: ["restaurant_owner"] },
   { href: "/spa-owner/spas", icon: Sparkles, label: "Spas", roles: ["spa_owner"] },
+  { href: "/spa-owner/appointments", icon: CalendarCheck, label: "Appts", roles: ["spa_owner"] },
   { href: "/notifications", icon: Bell, label: "Alerts" },
   { href: "/profile", icon: User, label: "Profile" },
 ];

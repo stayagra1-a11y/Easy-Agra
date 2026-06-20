@@ -167,6 +167,14 @@ export default function OwnerSpas() {
 
           <div className="flex gap-2 flex-wrap">
             {!isDeleted && (
+              <Link href={`/spa-owner/spas/${spa.id}/services`}>
+                <Button size="sm" variant="outline" className="gap-1.5 border-primary/40 text-primary hover:bg-primary/5">
+                  <Sparkles className="h-3.5 w-3.5" />
+                  Services
+                </Button>
+              </Link>
+            )}
+            {!isDeleted && (
               <Link href={`/spa-owner/spas/${spa.id}/edit`}>
                 <Button size="sm" variant="outline" className="gap-1.5">
                   <Pencil className="h-3.5 w-3.5" />

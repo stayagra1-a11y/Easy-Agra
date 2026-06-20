@@ -3093,7 +3093,10 @@ export const GetSpaOwnerStatsResponse = zod.object({
   "totalSpas": zod.number(),
   "activeSpas": zod.number(),
   "pendingSpas": zod.number(),
-  "draftSpas": zod.number()
+  "draftSpas": zod.number(),
+  "totalAppointments": zod.number(),
+  "pendingAppointments": zod.number(),
+  "monthlyRevenue": zod.number()
 })
 
 
@@ -3312,6 +3315,365 @@ export const UpdateSpaStatusResponse = zod.object({
   "deletedAt": zod.string().nullish(),
   "ownerName": zod.string().nullish(),
   "ownerEmail": zod.string().nullish(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+
+
+/**
+ * @summary Get services for a spa
+ */
+export const GetSpaServicesParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const GetSpaServicesResponseItem = zod.object({
+  "id": zod.number(),
+  "spaId": zod.number(),
+  "name": zod.string(),
+  "category": zod.enum(['full_body_massage', 'head_massage', 'foot_massage', 'aromatherapy', 'facial', 'beauty_treatment', 'couples_therapy', 'wellness_package']),
+  "description": zod.string().nullish(),
+  "duration": zod.number(),
+  "price": zod.number(),
+  "serviceImage": zod.string().nullish(),
+  "isAvailable": zod.boolean(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+export const GetSpaServicesResponse = zod.array(GetSpaServicesResponseItem)
+
+
+/**
+ * @summary Add service to spa (owner)
+ */
+export const CreateSpaServiceParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const CreateSpaServiceBody = zod.object({
+  "name": zod.string(),
+  "category": zod.enum(['full_body_massage', 'head_massage', 'foot_massage', 'aromatherapy', 'facial', 'beauty_treatment', 'couples_therapy', 'wellness_package']).optional(),
+  "description": zod.string().nullish(),
+  "duration": zod.number(),
+  "price": zod.number(),
+  "serviceImage": zod.string().nullish(),
+  "isAvailable": zod.boolean().optional()
+})
+
+
+/**
+ * @summary Update spa service (owner)
+ */
+export const UpdateSpaServiceParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const UpdateSpaServiceResponse = zod.object({
+  "id": zod.number(),
+  "spaId": zod.number(),
+  "name": zod.string(),
+  "category": zod.enum(['full_body_massage', 'head_massage', 'foot_massage', 'aromatherapy', 'facial', 'beauty_treatment', 'couples_therapy', 'wellness_package']),
+  "description": zod.string().nullish(),
+  "duration": zod.number(),
+  "price": zod.number(),
+  "serviceImage": zod.string().nullish(),
+  "isAvailable": zod.boolean(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+
+
+/**
+ * @summary Delete spa service (owner)
+ */
+export const DeleteSpaServiceParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const DeleteSpaServiceResponse = zod.object({
+  "success": zod.boolean()
+})
+
+
+/**
+ * @summary Get customer's own appointments
+ */
+export const GetMySpaAppointmentsQueryParams = zod.object({
+  "status": zod.coerce.string().optional(),
+  "page": zod.coerce.number().optional(),
+  "limit": zod.coerce.number().optional()
+})
+
+export const GetMySpaAppointmentsResponse = zod.object({
+  "appointments": zod.array(zod.object({
+  "id": zod.number(),
+  "appointmentRef": zod.string(),
+  "spaId": zod.number(),
+  "serviceId": zod.number().nullish(),
+  "customerId": zod.number(),
+  "ownerId": zod.number(),
+  "customerName": zod.string(),
+  "customerMobile": zod.string(),
+  "customerEmail": zod.string().nullish(),
+  "serviceName": zod.string(),
+  "appointmentDate": zod.string(),
+  "appointmentTime": zod.string(),
+  "numberOfPersons": zod.number(),
+  "specialRequest": zod.string().nullish(),
+  "amount": zod.number().nullish(),
+  "status": zod.enum(['pending', 'confirmed', 'rejected', 'completed', 'cancelled']),
+  "rejectionReason": zod.string().nullish(),
+  "cancelReason": zod.string().nullish(),
+  "confirmedAt": zod.string().nullish(),
+  "completedAt": zod.string().nullish(),
+  "cancelledAt": zod.string().nullish(),
+  "spaName": zod.string().nullish(),
+  "spaCity": zod.string().nullish(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})),
+  "total": zod.number(),
+  "page": zod.number(),
+  "limit": zod.number()
+})
+
+
+/**
+ * @summary Get all appointments for owner's spas
+ */
+export const GetOwnerSpaAppointmentsQueryParams = zod.object({
+  "spaId": zod.coerce.number().optional(),
+  "status": zod.coerce.string().optional(),
+  "page": zod.coerce.number().optional(),
+  "limit": zod.coerce.number().optional()
+})
+
+export const GetOwnerSpaAppointmentsResponse = zod.object({
+  "appointments": zod.array(zod.object({
+  "id": zod.number(),
+  "appointmentRef": zod.string(),
+  "spaId": zod.number(),
+  "serviceId": zod.number().nullish(),
+  "customerId": zod.number(),
+  "ownerId": zod.number(),
+  "customerName": zod.string(),
+  "customerMobile": zod.string(),
+  "customerEmail": zod.string().nullish(),
+  "serviceName": zod.string(),
+  "appointmentDate": zod.string(),
+  "appointmentTime": zod.string(),
+  "numberOfPersons": zod.number(),
+  "specialRequest": zod.string().nullish(),
+  "amount": zod.number().nullish(),
+  "status": zod.enum(['pending', 'confirmed', 'rejected', 'completed', 'cancelled']),
+  "rejectionReason": zod.string().nullish(),
+  "cancelReason": zod.string().nullish(),
+  "confirmedAt": zod.string().nullish(),
+  "completedAt": zod.string().nullish(),
+  "cancelledAt": zod.string().nullish(),
+  "spaName": zod.string().nullish(),
+  "spaCity": zod.string().nullish(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})),
+  "total": zod.number(),
+  "page": zod.number(),
+  "limit": zod.number()
+})
+
+
+/**
+ * @summary Book a spa appointment (customer)
+ */
+export const CreateSpaAppointmentBody = zod.object({
+  "spaId": zod.number(),
+  "serviceId": zod.number().nullish(),
+  "customerName": zod.string(),
+  "customerMobile": zod.string(),
+  "customerEmail": zod.string().nullish(),
+  "serviceName": zod.string(),
+  "appointmentDate": zod.string(),
+  "appointmentTime": zod.string(),
+  "numberOfPersons": zod.number().optional(),
+  "specialRequest": zod.string().nullish()
+})
+
+
+/**
+ * @summary Get appointment detail
+ */
+export const GetSpaAppointmentByIdParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const GetSpaAppointmentByIdResponse = zod.object({
+  "id": zod.number(),
+  "appointmentRef": zod.string(),
+  "spaId": zod.number(),
+  "serviceId": zod.number().nullish(),
+  "customerId": zod.number(),
+  "ownerId": zod.number(),
+  "customerName": zod.string(),
+  "customerMobile": zod.string(),
+  "customerEmail": zod.string().nullish(),
+  "serviceName": zod.string(),
+  "appointmentDate": zod.string(),
+  "appointmentTime": zod.string(),
+  "numberOfPersons": zod.number(),
+  "specialRequest": zod.string().nullish(),
+  "amount": zod.number().nullish(),
+  "status": zod.enum(['pending', 'confirmed', 'rejected', 'completed', 'cancelled']),
+  "rejectionReason": zod.string().nullish(),
+  "cancelReason": zod.string().nullish(),
+  "confirmedAt": zod.string().nullish(),
+  "completedAt": zod.string().nullish(),
+  "cancelledAt": zod.string().nullish(),
+  "spaName": zod.string().nullish(),
+  "spaCity": zod.string().nullish(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+
+
+/**
+ * @summary Confirm appointment (owner)
+ */
+export const ConfirmSpaAppointmentParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const ConfirmSpaAppointmentResponse = zod.object({
+  "id": zod.number(),
+  "appointmentRef": zod.string(),
+  "spaId": zod.number(),
+  "serviceId": zod.number().nullish(),
+  "customerId": zod.number(),
+  "ownerId": zod.number(),
+  "customerName": zod.string(),
+  "customerMobile": zod.string(),
+  "customerEmail": zod.string().nullish(),
+  "serviceName": zod.string(),
+  "appointmentDate": zod.string(),
+  "appointmentTime": zod.string(),
+  "numberOfPersons": zod.number(),
+  "specialRequest": zod.string().nullish(),
+  "amount": zod.number().nullish(),
+  "status": zod.enum(['pending', 'confirmed', 'rejected', 'completed', 'cancelled']),
+  "rejectionReason": zod.string().nullish(),
+  "cancelReason": zod.string().nullish(),
+  "confirmedAt": zod.string().nullish(),
+  "completedAt": zod.string().nullish(),
+  "cancelledAt": zod.string().nullish(),
+  "spaName": zod.string().nullish(),
+  "spaCity": zod.string().nullish(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+
+
+/**
+ * @summary Reject appointment (owner)
+ */
+export const RejectSpaAppointmentParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const RejectSpaAppointmentResponse = zod.object({
+  "id": zod.number(),
+  "appointmentRef": zod.string(),
+  "spaId": zod.number(),
+  "serviceId": zod.number().nullish(),
+  "customerId": zod.number(),
+  "ownerId": zod.number(),
+  "customerName": zod.string(),
+  "customerMobile": zod.string(),
+  "customerEmail": zod.string().nullish(),
+  "serviceName": zod.string(),
+  "appointmentDate": zod.string(),
+  "appointmentTime": zod.string(),
+  "numberOfPersons": zod.number(),
+  "specialRequest": zod.string().nullish(),
+  "amount": zod.number().nullish(),
+  "status": zod.enum(['pending', 'confirmed', 'rejected', 'completed', 'cancelled']),
+  "rejectionReason": zod.string().nullish(),
+  "cancelReason": zod.string().nullish(),
+  "confirmedAt": zod.string().nullish(),
+  "completedAt": zod.string().nullish(),
+  "cancelledAt": zod.string().nullish(),
+  "spaName": zod.string().nullish(),
+  "spaCity": zod.string().nullish(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+
+
+/**
+ * @summary Complete appointment (owner)
+ */
+export const CompleteSpaAppointmentParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const CompleteSpaAppointmentResponse = zod.object({
+  "id": zod.number(),
+  "appointmentRef": zod.string(),
+  "spaId": zod.number(),
+  "serviceId": zod.number().nullish(),
+  "customerId": zod.number(),
+  "ownerId": zod.number(),
+  "customerName": zod.string(),
+  "customerMobile": zod.string(),
+  "customerEmail": zod.string().nullish(),
+  "serviceName": zod.string(),
+  "appointmentDate": zod.string(),
+  "appointmentTime": zod.string(),
+  "numberOfPersons": zod.number(),
+  "specialRequest": zod.string().nullish(),
+  "amount": zod.number().nullish(),
+  "status": zod.enum(['pending', 'confirmed', 'rejected', 'completed', 'cancelled']),
+  "rejectionReason": zod.string().nullish(),
+  "cancelReason": zod.string().nullish(),
+  "confirmedAt": zod.string().nullish(),
+  "completedAt": zod.string().nullish(),
+  "cancelledAt": zod.string().nullish(),
+  "spaName": zod.string().nullish(),
+  "spaCity": zod.string().nullish(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+
+
+/**
+ * @summary Cancel appointment (customer)
+ */
+export const CancelSpaAppointmentParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const CancelSpaAppointmentResponse = zod.object({
+  "id": zod.number(),
+  "appointmentRef": zod.string(),
+  "spaId": zod.number(),
+  "serviceId": zod.number().nullish(),
+  "customerId": zod.number(),
+  "ownerId": zod.number(),
+  "customerName": zod.string(),
+  "customerMobile": zod.string(),
+  "customerEmail": zod.string().nullish(),
+  "serviceName": zod.string(),
+  "appointmentDate": zod.string(),
+  "appointmentTime": zod.string(),
+  "numberOfPersons": zod.number(),
+  "specialRequest": zod.string().nullish(),
+  "amount": zod.number().nullish(),
+  "status": zod.enum(['pending', 'confirmed', 'rejected', 'completed', 'cancelled']),
+  "rejectionReason": zod.string().nullish(),
+  "cancelReason": zod.string().nullish(),
+  "confirmedAt": zod.string().nullish(),
+  "completedAt": zod.string().nullish(),
+  "cancelledAt": zod.string().nullish(),
+  "spaName": zod.string().nullish(),
+  "spaCity": zod.string().nullish(),
   "createdAt": zod.string(),
   "updatedAt": zod.string()
 })

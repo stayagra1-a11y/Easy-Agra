@@ -34,6 +34,10 @@ tags:
     description: Hotel reviews and ratings
   - name: spas
     description: Spa management
+  - name: spa-services
+    description: Spa service management
+  - name: spa-appointments
+    description: Spa appointment booking
 
 paths:
   /healthz:
@@ -2530,6 +2534,261 @@ paths:
               schema:
                 $ref: "#/components/schemas/Spa"
 
+  /spas/{id}/services:
+    get:
+      operationId: getSpaServices
+      tags: [spa-services]
+      summary: Get services for a spa
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: List of services
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SpaService"
+    post:
+      operationId: createSpaService
+      tags: [spa-services]
+      summary: Add service to spa (owner)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SpaServiceInput"
+      responses:
+        "201":
+          description: Created service
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SpaService"
+
+  /spa-services/{id}:
+    put:
+      operationId: updateSpaService
+      tags: [spa-services]
+      summary: Update spa service (owner)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Updated service
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SpaService"
+    delete:
+      operationId: deleteSpaService
+      tags: [spa-services]
+      summary: Delete spa service (owner)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                required:
+                  - success
+
+  /spa-appointments/my:
+    get:
+      operationId: getMySpaAppointments
+      tags: [spa-appointments]
+      summary: Get customer's own appointments
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+        - name: page
+          in: query
+          schema:
+            type: integer
+        - name: limit
+          in: query
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Paginated appointments
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SpaAppointmentsPage"
+
+  /spa-appointments/owner:
+    get:
+      operationId: getOwnerSpaAppointments
+      tags: [spa-appointments]
+      summary: Get all appointments for owner's spas
+      parameters:
+        - name: spaId
+          in: query
+          schema:
+            type: integer
+        - name: status
+          in: query
+          schema:
+            type: string
+        - name: page
+          in: query
+          schema:
+            type: integer
+        - name: limit
+          in: query
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Paginated appointments
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SpaAppointmentsPage"
+
+  /spa-appointments:
+    post:
+      operationId: createSpaAppointment
+      tags: [spa-appointments]
+      summary: Book a spa appointment (customer)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SpaAppointmentInput"
+      responses:
+        "201":
+          description: Created appointment
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SpaAppointmentDetail"
+
+  /spa-appointments/{id}:
+    get:
+      operationId: getSpaAppointmentById
+      tags: [spa-appointments]
+      summary: Get appointment detail
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Appointment detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SpaAppointmentDetail"
+
+  /spa-appointments/{id}/confirm:
+    put:
+      operationId: confirmSpaAppointment
+      tags: [spa-appointments]
+      summary: Confirm appointment (owner)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Confirmed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SpaAppointmentDetail"
+
+  /spa-appointments/{id}/reject:
+    put:
+      operationId: rejectSpaAppointment
+      tags: [spa-appointments]
+      summary: Reject appointment (owner)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Rejected
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SpaAppointmentDetail"
+
+  /spa-appointments/{id}/complete:
+    put:
+      operationId: completeSpaAppointment
+      tags: [spa-appointments]
+      summary: Complete appointment (owner)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Completed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SpaAppointmentDetail"
+
+  /spa-appointments/{id}/cancel:
+    put:
+      operationId: cancelSpaAppointment
+      tags: [spa-appointments]
+      summary: Cancel appointment (customer)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Cancelled
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SpaAppointmentDetail"
+
 components:
   schemas:
     HealthStatus:
@@ -4655,11 +4914,20 @@ components:
           type: integer
         draftSpas:
           type: integer
+        totalAppointments:
+          type: integer
+        pendingAppointments:
+          type: integer
+        monthlyRevenue:
+          type: number
       required:
         - totalSpas
         - activeSpas
         - pendingSpas
         - draftSpas
+        - totalAppointments
+        - pendingAppointments
+        - monthlyRevenue
 
     SpaStatusUpdate:
       type: object
@@ -4672,3 +4940,201 @@ components:
           nullable: true
       required:
         - status
+
+    SpaService:
+      type: object
+      properties:
+        id:
+          type: integer
+        spaId:
+          type: integer
+        name:
+          type: string
+        category:
+          type: string
+          enum: [full_body_massage, head_massage, foot_massage, aromatherapy, facial, beauty_treatment, couples_therapy, wellness_package]
+        description:
+          type: string
+          nullable: true
+        duration:
+          type: integer
+        price:
+          type: number
+        serviceImage:
+          type: string
+          nullable: true
+        isAvailable:
+          type: boolean
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+      required:
+        - id
+        - spaId
+        - name
+        - category
+        - duration
+        - price
+        - isAvailable
+        - createdAt
+        - updatedAt
+
+    SpaServiceInput:
+      type: object
+      properties:
+        name:
+          type: string
+        category:
+          type: string
+          enum: [full_body_massage, head_massage, foot_massage, aromatherapy, facial, beauty_treatment, couples_therapy, wellness_package]
+        description:
+          type: string
+          nullable: true
+        duration:
+          type: integer
+        price:
+          type: number
+        serviceImage:
+          type: string
+          nullable: true
+        isAvailable:
+          type: boolean
+      required:
+        - name
+        - duration
+        - price
+
+    SpaAppointmentDetail:
+      type: object
+      properties:
+        id:
+          type: integer
+        appointmentRef:
+          type: string
+        spaId:
+          type: integer
+        serviceId:
+          type: integer
+          nullable: true
+        customerId:
+          type: integer
+        ownerId:
+          type: integer
+        customerName:
+          type: string
+        customerMobile:
+          type: string
+        customerEmail:
+          type: string
+          nullable: true
+        serviceName:
+          type: string
+        appointmentDate:
+          type: string
+        appointmentTime:
+          type: string
+        numberOfPersons:
+          type: integer
+        specialRequest:
+          type: string
+          nullable: true
+        amount:
+          type: number
+          nullable: true
+        status:
+          type: string
+          enum: [pending, confirmed, rejected, completed, cancelled]
+        rejectionReason:
+          type: string
+          nullable: true
+        cancelReason:
+          type: string
+          nullable: true
+        confirmedAt:
+          type: string
+          nullable: true
+        completedAt:
+          type: string
+          nullable: true
+        cancelledAt:
+          type: string
+          nullable: true
+        spaName:
+          type: string
+          nullable: true
+        spaCity:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+      required:
+        - id
+        - appointmentRef
+        - spaId
+        - customerId
+        - ownerId
+        - customerName
+        - customerMobile
+        - serviceName
+        - appointmentDate
+        - appointmentTime
+        - numberOfPersons
+        - status
+        - createdAt
+        - updatedAt
+
+    SpaAppointmentInput:
+      type: object
+      properties:
+        spaId:
+          type: integer
+        serviceId:
+          type: integer
+          nullable: true
+        customerName:
+          type: string
+        customerMobile:
+          type: string
+        customerEmail:
+          type: string
+          nullable: true
+        serviceName:
+          type: string
+        appointmentDate:
+          type: string
+        appointmentTime:
+          type: string
+        numberOfPersons:
+          type: integer
+        specialRequest:
+          type: string
+          nullable: true
+      required:
+        - spaId
+        - customerName
+        - customerMobile
+        - serviceName
+        - appointmentDate
+        - appointmentTime
+
+    SpaAppointmentsPage:
+      type: object
+      properties:
+        appointments:
+          type: array
+          items:
+            $ref: "#/components/schemas/SpaAppointmentDetail"
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+      required:
+        - appointments
+        - total
+        - page
+        - limit

@@ -1180,6 +1180,9 @@ export interface SpaStats {
   activeSpas: number;
   pendingSpas: number;
   draftSpas: number;
+  totalAppointments: number;
+  pendingAppointments: number;
+  monthlyRevenue: number;
 }
 
 export type SpaStatusUpdateStatus = typeof SpaStatusUpdateStatus[keyof typeof SpaStatusUpdateStatus];
@@ -1196,6 +1199,117 @@ export const SpaStatusUpdateStatus = {
 export interface SpaStatusUpdate {
   status: SpaStatusUpdateStatus;
   rejectionReason?: string | null;
+}
+
+export type SpaServiceCategory = typeof SpaServiceCategory[keyof typeof SpaServiceCategory];
+
+
+export const SpaServiceCategory = {
+  full_body_massage: 'full_body_massage',
+  head_massage: 'head_massage',
+  foot_massage: 'foot_massage',
+  aromatherapy: 'aromatherapy',
+  facial: 'facial',
+  beauty_treatment: 'beauty_treatment',
+  couples_therapy: 'couples_therapy',
+  wellness_package: 'wellness_package',
+} as const;
+
+export interface SpaService {
+  id: number;
+  spaId: number;
+  name: string;
+  category: SpaServiceCategory;
+  description?: string | null;
+  duration: number;
+  price: number;
+  serviceImage?: string | null;
+  isAvailable: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type SpaServiceInputCategory = typeof SpaServiceInputCategory[keyof typeof SpaServiceInputCategory];
+
+
+export const SpaServiceInputCategory = {
+  full_body_massage: 'full_body_massage',
+  head_massage: 'head_massage',
+  foot_massage: 'foot_massage',
+  aromatherapy: 'aromatherapy',
+  facial: 'facial',
+  beauty_treatment: 'beauty_treatment',
+  couples_therapy: 'couples_therapy',
+  wellness_package: 'wellness_package',
+} as const;
+
+export interface SpaServiceInput {
+  name: string;
+  category?: SpaServiceInputCategory;
+  description?: string | null;
+  duration: number;
+  price: number;
+  serviceImage?: string | null;
+  isAvailable?: boolean;
+}
+
+export type SpaAppointmentDetailStatus = typeof SpaAppointmentDetailStatus[keyof typeof SpaAppointmentDetailStatus];
+
+
+export const SpaAppointmentDetailStatus = {
+  pending: 'pending',
+  confirmed: 'confirmed',
+  rejected: 'rejected',
+  completed: 'completed',
+  cancelled: 'cancelled',
+} as const;
+
+export interface SpaAppointmentDetail {
+  id: number;
+  appointmentRef: string;
+  spaId: number;
+  serviceId?: number | null;
+  customerId: number;
+  ownerId: number;
+  customerName: string;
+  customerMobile: string;
+  customerEmail?: string | null;
+  serviceName: string;
+  appointmentDate: string;
+  appointmentTime: string;
+  numberOfPersons: number;
+  specialRequest?: string | null;
+  amount?: number | null;
+  status: SpaAppointmentDetailStatus;
+  rejectionReason?: string | null;
+  cancelReason?: string | null;
+  confirmedAt?: string | null;
+  completedAt?: string | null;
+  cancelledAt?: string | null;
+  spaName?: string | null;
+  spaCity?: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface SpaAppointmentInput {
+  spaId: number;
+  serviceId?: number | null;
+  customerName: string;
+  customerMobile: string;
+  customerEmail?: string | null;
+  serviceName: string;
+  appointmentDate: string;
+  appointmentTime: string;
+  numberOfPersons?: number;
+  specialRequest?: string | null;
+}
+
+export interface SpaAppointmentsPage {
+  appointments: SpaAppointmentDetail[];
+  total: number;
+  page: number;
+  limit: number;
 }
 
 export type ListUsersParams = {
@@ -1322,5 +1436,22 @@ limit?: number;
 
 export type DeleteSpa200 = {
   success: boolean;
+};
+
+export type DeleteSpaService200 = {
+  success: boolean;
+};
+
+export type GetMySpaAppointmentsParams = {
+status?: string;
+page?: number;
+limit?: number;
+};
+
+export type GetOwnerSpaAppointmentsParams = {
+spaId?: number;
+status?: string;
+page?: number;
+limit?: number;
 };
 

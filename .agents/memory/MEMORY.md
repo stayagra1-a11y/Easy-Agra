@@ -1,8 +1,1 @@
-- [Easy Agra API types](easy-agra-api-types.md) — DashboardStats is flat (no .stats wrapper); OwnerRequestRejectInput uses `reason` not `rejectionReason`; logout/markAllNotificationsRead take void not {}
-- [Easy Agra useGetMyOwnerRequest](easy-agra-query-key.md) — queryKey is required when passing custom query options; use inline `queryKey: ["getMyOwnerRequest"]`
-- [Easy Agra enum casting](easy-agra-enum-casting.md) — Orval generates separate enum types per schema (RoomInputRoomType vs RoomUpdateRoomType); cast with `as unknown as RoomUpdateRoomType` when reusing payload across create/update
-- [Easy Agra route order](easy-agra-route-order.md) — Static segments MUST be registered before dynamic ones: /rooms/stats before /rooms/:id, /hotels/stats before /hotels/:id
-- [Orval zod+schemas naming conflict](orval-zod-types-conflict.md) — path param + inline requestBody causes TS2308; remove requestBody from spec, backend still accepts it at runtime
-- [Express 5 params type](express-params-type.md) — req.params.id is `string | string[]` in Express 5 TS types; always cast `req.params.id as string` before parseInt
-- [Hotel schema column names](hotel-schema-fields.md) — hotel photo columns are `coverImage` / `galleryImages`, NOT `coverPhoto` / `galleryPhotos`
-- [Orval conditional query v5](orval-conditional-query.md) — TanStack Query v5 UseQueryOptions requires queryKey; pass `{ query: { enabled: ... } as any }` for conditional hooks in Orval-generated hooks
+- [Spa 7B patterns](spa-7b-patterns.md) — key decisions and gotchas for the spa services + appointments system

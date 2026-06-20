@@ -37,11 +37,14 @@ import type {
   DeleteRestaurant200,
   DeleteReview200,
   DeleteSpa200,
+  DeleteSpaService200,
   DeleteTable200,
   EligibleBooking,
   ErrorResponse,
   ForgotPasswordInput,
   GetAllSpasParams,
+  GetMySpaAppointmentsParams,
+  GetOwnerSpaAppointmentsParams,
   GetRoomStatsParams,
   GetTopRatedHotelsParams,
   HealthStatus,
@@ -99,7 +102,12 @@ import type {
   RoomUpdate,
   RoomsPage,
   Spa,
+  SpaAppointmentDetail,
+  SpaAppointmentInput,
+  SpaAppointmentsPage,
   SpaInput,
+  SpaService,
+  SpaServiceInput,
   SpaStats,
   SpaStatusUpdate,
   SpasPage,
@@ -8407,5 +8415,890 @@ export const useUpdateSpaStatus = <TError = ErrorType<unknown>,
         TContext
       > => {
       return useMutation(getUpdateSpaStatusMutationOptions(options));
+    }
+
+export const getGetSpaServicesUrl = (id: number,) => {
+
+
+
+
+  return `/api/spas/${id}/services`
+}
+
+/**
+ * @summary Get services for a spa
+ */
+export const getSpaServices = async (id: number, options?: RequestInit): Promise<SpaService[]> => {
+
+  return customFetch<SpaService[]>(getGetSpaServicesUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetSpaServicesQueryKey = (id: number,) => {
+    return [
+    `/api/spas/${id}/services`
+    ] as const;
+    }
+
+
+export const getGetSpaServicesQueryOptions = <TData = Awaited<ReturnType<typeof getSpaServices>>, TError = ErrorType<unknown>>(id: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getSpaServices>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetSpaServicesQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getSpaServices>>> = ({ signal }) => getSpaServices(id, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: !!(id), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getSpaServices>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetSpaServicesQueryResult = NonNullable<Awaited<ReturnType<typeof getSpaServices>>>
+export type GetSpaServicesQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Get services for a spa
+ */
+
+export function useGetSpaServices<TData = Awaited<ReturnType<typeof getSpaServices>>, TError = ErrorType<unknown>>(
+ id: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getSpaServices>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetSpaServicesQueryOptions(id,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getCreateSpaServiceUrl = (id: number,) => {
+
+
+
+
+  return `/api/spas/${id}/services`
+}
+
+/**
+ * @summary Add service to spa (owner)
+ */
+export const createSpaService = async (id: number,
+    spaServiceInput: SpaServiceInput, options?: RequestInit): Promise<SpaService> => {
+
+  return customFetch<SpaService>(getCreateSpaServiceUrl(id),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      spaServiceInput,)
+  }
+);}
+
+
+
+
+export const getCreateSpaServiceMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createSpaService>>, TError,{id: number;data: BodyType<SpaServiceInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createSpaService>>, TError,{id: number;data: BodyType<SpaServiceInput>}, TContext> => {
+
+const mutationKey = ['createSpaService'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createSpaService>>, {id: number;data: BodyType<SpaServiceInput>}> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  createSpaService(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateSpaServiceMutationResult = NonNullable<Awaited<ReturnType<typeof createSpaService>>>
+    export type CreateSpaServiceMutationBody = BodyType<SpaServiceInput>
+    export type CreateSpaServiceMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Add service to spa (owner)
+ */
+export const useCreateSpaService = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createSpaService>>, TError,{id: number;data: BodyType<SpaServiceInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof createSpaService>>,
+        TError,
+        {id: number;data: BodyType<SpaServiceInput>},
+        TContext
+      > => {
+      return useMutation(getCreateSpaServiceMutationOptions(options));
+    }
+
+export const getUpdateSpaServiceUrl = (id: number,) => {
+
+
+
+
+  return `/api/spa-services/${id}`
+}
+
+/**
+ * @summary Update spa service (owner)
+ */
+export const updateSpaService = async (id: number, options?: RequestInit): Promise<SpaService> => {
+
+  return customFetch<SpaService>(getUpdateSpaServiceUrl(id),
+  {
+    ...options,
+    method: 'PUT'
+
+
+  }
+);}
+
+
+
+
+export const getUpdateSpaServiceMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateSpaService>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateSpaService>>, TError,{id: number}, TContext> => {
+
+const mutationKey = ['updateSpaService'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateSpaService>>, {id: number}> = (props) => {
+          const {id} = props ?? {};
+
+          return  updateSpaService(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateSpaServiceMutationResult = NonNullable<Awaited<ReturnType<typeof updateSpaService>>>
+
+    export type UpdateSpaServiceMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Update spa service (owner)
+ */
+export const useUpdateSpaService = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateSpaService>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof updateSpaService>>,
+        TError,
+        {id: number},
+        TContext
+      > => {
+      return useMutation(getUpdateSpaServiceMutationOptions(options));
+    }
+
+export const getDeleteSpaServiceUrl = (id: number,) => {
+
+
+
+
+  return `/api/spa-services/${id}`
+}
+
+/**
+ * @summary Delete spa service (owner)
+ */
+export const deleteSpaService = async (id: number, options?: RequestInit): Promise<DeleteSpaService200> => {
+
+  return customFetch<DeleteSpaService200>(getDeleteSpaServiceUrl(id),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+export const getDeleteSpaServiceMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteSpaService>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteSpaService>>, TError,{id: number}, TContext> => {
+
+const mutationKey = ['deleteSpaService'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteSpaService>>, {id: number}> = (props) => {
+          const {id} = props ?? {};
+
+          return  deleteSpaService(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteSpaServiceMutationResult = NonNullable<Awaited<ReturnType<typeof deleteSpaService>>>
+
+    export type DeleteSpaServiceMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Delete spa service (owner)
+ */
+export const useDeleteSpaService = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteSpaService>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof deleteSpaService>>,
+        TError,
+        {id: number},
+        TContext
+      > => {
+      return useMutation(getDeleteSpaServiceMutationOptions(options));
+    }
+
+export const getGetMySpaAppointmentsUrl = (params?: GetMySpaAppointmentsParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/spa-appointments/my?${stringifiedParams}` : `/api/spa-appointments/my`
+}
+
+/**
+ * @summary Get customer's own appointments
+ */
+export const getMySpaAppointments = async (params?: GetMySpaAppointmentsParams, options?: RequestInit): Promise<SpaAppointmentsPage> => {
+
+  return customFetch<SpaAppointmentsPage>(getGetMySpaAppointmentsUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetMySpaAppointmentsQueryKey = (params?: GetMySpaAppointmentsParams,) => {
+    return [
+    `/api/spa-appointments/my`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getGetMySpaAppointmentsQueryOptions = <TData = Awaited<ReturnType<typeof getMySpaAppointments>>, TError = ErrorType<unknown>>(params?: GetMySpaAppointmentsParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getMySpaAppointments>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetMySpaAppointmentsQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getMySpaAppointments>>> = ({ signal }) => getMySpaAppointments(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getMySpaAppointments>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetMySpaAppointmentsQueryResult = NonNullable<Awaited<ReturnType<typeof getMySpaAppointments>>>
+export type GetMySpaAppointmentsQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Get customer's own appointments
+ */
+
+export function useGetMySpaAppointments<TData = Awaited<ReturnType<typeof getMySpaAppointments>>, TError = ErrorType<unknown>>(
+ params?: GetMySpaAppointmentsParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getMySpaAppointments>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetMySpaAppointmentsQueryOptions(params,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getGetOwnerSpaAppointmentsUrl = (params?: GetOwnerSpaAppointmentsParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/spa-appointments/owner?${stringifiedParams}` : `/api/spa-appointments/owner`
+}
+
+/**
+ * @summary Get all appointments for owner's spas
+ */
+export const getOwnerSpaAppointments = async (params?: GetOwnerSpaAppointmentsParams, options?: RequestInit): Promise<SpaAppointmentsPage> => {
+
+  return customFetch<SpaAppointmentsPage>(getGetOwnerSpaAppointmentsUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetOwnerSpaAppointmentsQueryKey = (params?: GetOwnerSpaAppointmentsParams,) => {
+    return [
+    `/api/spa-appointments/owner`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getGetOwnerSpaAppointmentsQueryOptions = <TData = Awaited<ReturnType<typeof getOwnerSpaAppointments>>, TError = ErrorType<unknown>>(params?: GetOwnerSpaAppointmentsParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getOwnerSpaAppointments>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetOwnerSpaAppointmentsQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getOwnerSpaAppointments>>> = ({ signal }) => getOwnerSpaAppointments(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getOwnerSpaAppointments>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetOwnerSpaAppointmentsQueryResult = NonNullable<Awaited<ReturnType<typeof getOwnerSpaAppointments>>>
+export type GetOwnerSpaAppointmentsQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Get all appointments for owner's spas
+ */
+
+export function useGetOwnerSpaAppointments<TData = Awaited<ReturnType<typeof getOwnerSpaAppointments>>, TError = ErrorType<unknown>>(
+ params?: GetOwnerSpaAppointmentsParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getOwnerSpaAppointments>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetOwnerSpaAppointmentsQueryOptions(params,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getCreateSpaAppointmentUrl = () => {
+
+
+
+
+  return `/api/spa-appointments`
+}
+
+/**
+ * @summary Book a spa appointment (customer)
+ */
+export const createSpaAppointment = async (spaAppointmentInput: SpaAppointmentInput, options?: RequestInit): Promise<SpaAppointmentDetail> => {
+
+  return customFetch<SpaAppointmentDetail>(getCreateSpaAppointmentUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      spaAppointmentInput,)
+  }
+);}
+
+
+
+
+export const getCreateSpaAppointmentMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createSpaAppointment>>, TError,{data: BodyType<SpaAppointmentInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createSpaAppointment>>, TError,{data: BodyType<SpaAppointmentInput>}, TContext> => {
+
+const mutationKey = ['createSpaAppointment'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createSpaAppointment>>, {data: BodyType<SpaAppointmentInput>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  createSpaAppointment(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateSpaAppointmentMutationResult = NonNullable<Awaited<ReturnType<typeof createSpaAppointment>>>
+    export type CreateSpaAppointmentMutationBody = BodyType<SpaAppointmentInput>
+    export type CreateSpaAppointmentMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Book a spa appointment (customer)
+ */
+export const useCreateSpaAppointment = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createSpaAppointment>>, TError,{data: BodyType<SpaAppointmentInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof createSpaAppointment>>,
+        TError,
+        {data: BodyType<SpaAppointmentInput>},
+        TContext
+      > => {
+      return useMutation(getCreateSpaAppointmentMutationOptions(options));
+    }
+
+export const getGetSpaAppointmentByIdUrl = (id: number,) => {
+
+
+
+
+  return `/api/spa-appointments/${id}`
+}
+
+/**
+ * @summary Get appointment detail
+ */
+export const getSpaAppointmentById = async (id: number, options?: RequestInit): Promise<SpaAppointmentDetail> => {
+
+  return customFetch<SpaAppointmentDetail>(getGetSpaAppointmentByIdUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetSpaAppointmentByIdQueryKey = (id: number,) => {
+    return [
+    `/api/spa-appointments/${id}`
+    ] as const;
+    }
+
+
+export const getGetSpaAppointmentByIdQueryOptions = <TData = Awaited<ReturnType<typeof getSpaAppointmentById>>, TError = ErrorType<unknown>>(id: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getSpaAppointmentById>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetSpaAppointmentByIdQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getSpaAppointmentById>>> = ({ signal }) => getSpaAppointmentById(id, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: !!(id), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getSpaAppointmentById>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetSpaAppointmentByIdQueryResult = NonNullable<Awaited<ReturnType<typeof getSpaAppointmentById>>>
+export type GetSpaAppointmentByIdQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Get appointment detail
+ */
+
+export function useGetSpaAppointmentById<TData = Awaited<ReturnType<typeof getSpaAppointmentById>>, TError = ErrorType<unknown>>(
+ id: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getSpaAppointmentById>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetSpaAppointmentByIdQueryOptions(id,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getConfirmSpaAppointmentUrl = (id: number,) => {
+
+
+
+
+  return `/api/spa-appointments/${id}/confirm`
+}
+
+/**
+ * @summary Confirm appointment (owner)
+ */
+export const confirmSpaAppointment = async (id: number, options?: RequestInit): Promise<SpaAppointmentDetail> => {
+
+  return customFetch<SpaAppointmentDetail>(getConfirmSpaAppointmentUrl(id),
+  {
+    ...options,
+    method: 'PUT'
+
+
+  }
+);}
+
+
+
+
+export const getConfirmSpaAppointmentMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof confirmSpaAppointment>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof confirmSpaAppointment>>, TError,{id: number}, TContext> => {
+
+const mutationKey = ['confirmSpaAppointment'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof confirmSpaAppointment>>, {id: number}> = (props) => {
+          const {id} = props ?? {};
+
+          return  confirmSpaAppointment(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ConfirmSpaAppointmentMutationResult = NonNullable<Awaited<ReturnType<typeof confirmSpaAppointment>>>
+
+    export type ConfirmSpaAppointmentMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Confirm appointment (owner)
+ */
+export const useConfirmSpaAppointment = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof confirmSpaAppointment>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof confirmSpaAppointment>>,
+        TError,
+        {id: number},
+        TContext
+      > => {
+      return useMutation(getConfirmSpaAppointmentMutationOptions(options));
+    }
+
+export const getRejectSpaAppointmentUrl = (id: number,) => {
+
+
+
+
+  return `/api/spa-appointments/${id}/reject`
+}
+
+/**
+ * @summary Reject appointment (owner)
+ */
+export const rejectSpaAppointment = async (id: number, options?: RequestInit): Promise<SpaAppointmentDetail> => {
+
+  return customFetch<SpaAppointmentDetail>(getRejectSpaAppointmentUrl(id),
+  {
+    ...options,
+    method: 'PUT'
+
+
+  }
+);}
+
+
+
+
+export const getRejectSpaAppointmentMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof rejectSpaAppointment>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof rejectSpaAppointment>>, TError,{id: number}, TContext> => {
+
+const mutationKey = ['rejectSpaAppointment'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof rejectSpaAppointment>>, {id: number}> = (props) => {
+          const {id} = props ?? {};
+
+          return  rejectSpaAppointment(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RejectSpaAppointmentMutationResult = NonNullable<Awaited<ReturnType<typeof rejectSpaAppointment>>>
+
+    export type RejectSpaAppointmentMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Reject appointment (owner)
+ */
+export const useRejectSpaAppointment = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof rejectSpaAppointment>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof rejectSpaAppointment>>,
+        TError,
+        {id: number},
+        TContext
+      > => {
+      return useMutation(getRejectSpaAppointmentMutationOptions(options));
+    }
+
+export const getCompleteSpaAppointmentUrl = (id: number,) => {
+
+
+
+
+  return `/api/spa-appointments/${id}/complete`
+}
+
+/**
+ * @summary Complete appointment (owner)
+ */
+export const completeSpaAppointment = async (id: number, options?: RequestInit): Promise<SpaAppointmentDetail> => {
+
+  return customFetch<SpaAppointmentDetail>(getCompleteSpaAppointmentUrl(id),
+  {
+    ...options,
+    method: 'PUT'
+
+
+  }
+);}
+
+
+
+
+export const getCompleteSpaAppointmentMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof completeSpaAppointment>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof completeSpaAppointment>>, TError,{id: number}, TContext> => {
+
+const mutationKey = ['completeSpaAppointment'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof completeSpaAppointment>>, {id: number}> = (props) => {
+          const {id} = props ?? {};
+
+          return  completeSpaAppointment(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CompleteSpaAppointmentMutationResult = NonNullable<Awaited<ReturnType<typeof completeSpaAppointment>>>
+
+    export type CompleteSpaAppointmentMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Complete appointment (owner)
+ */
+export const useCompleteSpaAppointment = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof completeSpaAppointment>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof completeSpaAppointment>>,
+        TError,
+        {id: number},
+        TContext
+      > => {
+      return useMutation(getCompleteSpaAppointmentMutationOptions(options));
+    }
+
+export const getCancelSpaAppointmentUrl = (id: number,) => {
+
+
+
+
+  return `/api/spa-appointments/${id}/cancel`
+}
+
+/**
+ * @summary Cancel appointment (customer)
+ */
+export const cancelSpaAppointment = async (id: number, options?: RequestInit): Promise<SpaAppointmentDetail> => {
+
+  return customFetch<SpaAppointmentDetail>(getCancelSpaAppointmentUrl(id),
+  {
+    ...options,
+    method: 'PUT'
+
+
+  }
+);}
+
+
+
+
+export const getCancelSpaAppointmentMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof cancelSpaAppointment>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof cancelSpaAppointment>>, TError,{id: number}, TContext> => {
+
+const mutationKey = ['cancelSpaAppointment'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof cancelSpaAppointment>>, {id: number}> = (props) => {
+          const {id} = props ?? {};
+
+          return  cancelSpaAppointment(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CancelSpaAppointmentMutationResult = NonNullable<Awaited<ReturnType<typeof cancelSpaAppointment>>>
+
+    export type CancelSpaAppointmentMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Cancel appointment (customer)
+ */
+export const useCancelSpaAppointment = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof cancelSpaAppointment>>, TError,{id: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof cancelSpaAppointment>>,
+        TError,
+        {id: number},
+        TContext
+      > => {
+      return useMutation(getCancelSpaAppointmentMutationOptions(options));
     }
 

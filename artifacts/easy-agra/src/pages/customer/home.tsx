@@ -27,9 +27,9 @@ export default function CustomerHome() {
   const { data: ownerRequest } = useGetMyOwnerRequest({ query: { retry: false, queryKey: ["getMyOwnerRequest"] } });
 
   const features = [
+    { icon: UtensilsCrossed, label: "Restaurants", color: "bg-orange-50 text-orange-600", href: "/restaurants" },
+    { icon: Sparkles, label: "Spas", color: "bg-purple-50 text-purple-600", href: "/spas" },
     { icon: Building2, label: "Hotels", color: "bg-blue-50 text-blue-600", coming: true },
-    { icon: UtensilsCrossed, label: "Restaurants", color: "bg-orange-50 text-orange-600", coming: true },
-    { icon: Sparkles, label: "Spas", color: "bg-purple-50 text-purple-600", coming: true },
     { icon: MapPin, label: "Places", color: "bg-green-50 text-green-600", coming: true },
   ];
 
@@ -65,15 +65,18 @@ export default function CustomerHome() {
         <div>
           <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">Explore Agra</h2>
           <div className="grid grid-cols-4 gap-3">
-            {features.map(({ icon: Icon, label, color, coming }) => (
-              <button key={label} className="flex flex-col items-center gap-1.5 group">
-                <div className={`h-12 w-12 rounded-xl ${color} flex items-center justify-center transition-transform group-active:scale-95`}>
-                  <Icon className="h-6 w-6" />
+            {features.map(({ icon: Icon, label, color, coming, href }: any) => {
+              const tile = (
+                <div key={label} className="flex flex-col items-center gap-1.5 group cursor-pointer">
+                  <div className={`h-12 w-12 rounded-xl ${color} flex items-center justify-center transition-transform group-active:scale-95`}>
+                    <Icon className="h-6 w-6" />
+                  </div>
+                  <span className="text-xs font-medium text-foreground">{label}</span>
+                  {coming && <span className="text-xs text-muted-foreground">Soon</span>}
                 </div>
-                <span className="text-xs font-medium text-foreground">{label}</span>
-                {coming && <span className="text-xs text-muted-foreground">Soon</span>}
-              </button>
-            ))}
+              );
+              return href ? <Link key={label} href={href}>{tile}</Link> : tile;
+            })}
           </div>
         </div>
 

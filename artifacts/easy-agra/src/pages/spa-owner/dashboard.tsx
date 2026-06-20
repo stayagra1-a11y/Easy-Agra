@@ -4,27 +4,10 @@ import { useGetSpaOwnerStats } from "@workspace/api-client-react";
 import { OwnerLayout } from "@/components/layout/owner-layout";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import {
-  Sparkles,
-  Building2,
-  Clock,
-  CalendarDays,
-  PlusCircle,
-  Settings,
-  Loader2,
+  Sparkles, Building2, Clock, CalendarDays, PlusCircle,
+  Settings, Loader2, CalendarCheck, BadgeIndianRupee, TrendingUp,
 } from "lucide-react";
-
-const FACILITIES = [
-  "Steam Bath",
-  "Sauna",
-  "Massage Rooms",
-  "Jacuzzi",
-  "Aromatherapy",
-  "Couples Spa",
-  "Beauty Treatments",
-  "Wellness Packages",
-];
 
 export default function SpaOwnerDashboard() {
   const { user } = useAuth();
@@ -33,33 +16,48 @@ export default function SpaOwnerDashboard() {
   const statCards = [
     {
       label: "Total Spas",
-      value: isLoading ? "…" : (stats?.totalSpas ?? 0),
+      value: stats?.totalSpas ?? 0,
       icon: Building2,
       color: "text-teal-600 bg-teal-50",
     },
     {
-      label: "Approved Spas",
-      value: isLoading ? "…" : (stats?.activeSpas ?? 0),
+      label: "Approved",
+      value: stats?.activeSpas ?? 0,
       icon: Sparkles,
       color: "text-green-600 bg-green-50",
     },
     {
       label: "Pending Review",
-      value: isLoading ? "…" : (stats?.pendingSpas ?? 0),
+      value: stats?.pendingSpas ?? 0,
       icon: Clock,
       color: "text-amber-600 bg-amber-50",
     },
     {
-      label: "Draft Spas",
-      value: isLoading ? "…" : (stats?.draftSpas ?? 0),
+      label: "Draft",
+      value: stats?.draftSpas ?? 0,
       icon: CalendarDays,
       color: "text-blue-600 bg-blue-50",
     },
+    {
+      label: "Total Appts",
+      value: stats?.totalAppointments ?? 0,
+      icon: CalendarCheck,
+      color: "text-purple-600 bg-purple-50",
+    },
+    {
+      label: "Pending Appts",
+      value: stats?.pendingAppointments ?? 0,
+      icon: TrendingUp,
+      color: "text-orange-600 bg-orange-50",
+    },
   ];
+
+  const monthlyRevenue = stats?.monthlyRevenue ?? 0;
 
   const quickActions = [
     { label: "Add Spa", href: "/spa-owner/spas/new", icon: PlusCircle, variant: "default" as const },
     { label: "Manage Spas", href: "/spa-owner/spas", icon: Settings, variant: "outline" as const },
+    { label: "Appointments", href: "/spa-owner/appointments", icon: CalendarCheck, variant: "outline" as const },
   ];
 
   return (
@@ -79,28 +77,39 @@ export default function SpaOwnerDashboard() {
           </p>
         </div>
 
-        {/* Stats */}
-        <div className="grid grid-cols-2 gap-3">
+        {/* Stats Grid */}
+        <div className="grid grid-cols-3 gap-3">
           {statCards.map(({ label, value, icon: Icon, color }) => (
             <Card key={label}>
-              <CardContent className="p-4">
-                <div
-                  className={`h-9 w-9 rounded-lg ${color} flex items-center justify-center mb-2`}
-                >
+              <CardContent className="p-3">
+                <div className={`h-8 w-8 rounded-lg ${color} flex items-center justify-center mb-2`}>
                   <Icon className="h-4 w-4" />
                 </div>
-                <div className="text-xl font-bold">
+                <div className="text-lg font-bold">
                   {isLoading ? (
-                    <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
-                  ) : (
-                    value
-                  )}
+                    <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+                  ) : value}
                 </div>
-                <div className="text-xs text-muted-foreground">{label}</div>
+                <div className="text-[11px] text-muted-foreground leading-tight">{label}</div>
               </CardContent>
             </Card>
           ))}
         </div>
+
+        {/* Monthly Revenue */}
+        <Card className="bg-gradient-to-r from-emerald-50 to-teal-50 border-emerald-200">
+          <CardContent className="p-4 flex items-center gap-3">
+            <div className="h-10 w-10 rounded-full bg-emerald-100 flex items-center justify-center shrink-0">
+              <BadgeIndianRupee className="h-5 w-5 text-emerald-600" />
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground">This Month's Revenue</p>
+              <p className="text-xl font-bold text-emerald-700">
+                {isLoading ? "…" : `₹${monthlyRevenue.toLocaleString()}`}
+              </p>
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Quick Actions */}
         <Card>
@@ -108,12 +117,12 @@ export default function SpaOwnerDashboard() {
             <p className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
               Quick Actions
             </p>
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-3 gap-2">
               {quickActions.map(({ label, href, icon: Icon, variant }) => (
                 <Link key={href} href={href}>
-                  <Button variant={variant} className="w-full gap-2 h-11">
+                  <Button variant={variant} className="w-full flex flex-col gap-1 h-auto py-3 px-2">
                     <Icon className="h-4 w-4" />
-                    {label}
+                    <span className="text-xs">{label}</span>
                   </Button>
                 </Link>
               ))}
@@ -121,42 +130,27 @@ export default function SpaOwnerDashboard() {
           </CardContent>
         </Card>
 
-        {/* Facilities Reference */}
-        <Card>
-          <CardContent className="p-4">
-            <p className="text-sm font-semibold mb-3">Available Facilities</p>
-            <div className="flex flex-wrap gap-2">
-              {FACILITIES.map((f) => (
-                <Badge key={f} variant="secondary" className="text-xs">
-                  {f}
-                </Badge>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Status Guide */}
-        <Card className="border-dashed border-2 border-primary/20">
-          <CardContent className="p-4 space-y-2">
-            <p className="text-sm font-semibold text-muted-foreground">
-              Spa Approval Workflow
-            </p>
-            {[
-              { status: "Draft", desc: "Saved, not yet submitted", color: "bg-gray-100 text-gray-700" },
-              { status: "Pending", desc: "Awaiting admin review", color: "bg-amber-100 text-amber-700" },
-              { status: "Approved", desc: "Live — visible to customers", color: "bg-green-100 text-green-700" },
-              { status: "Rejected", desc: "Review feedback & resubmit", color: "bg-red-100 text-red-700" },
-              { status: "Suspended", desc: "Contact support", color: "bg-orange-100 text-orange-700" },
-            ].map(({ status, desc, color }) => (
-              <div key={status} className="flex items-center gap-2">
-                <Badge className={`text-xs font-medium border-0 ${color}`}>
-                  {status}
-                </Badge>
-                <span className="text-xs text-muted-foreground">{desc}</span>
+        {/* Pending alert */}
+        {!isLoading && (stats?.pendingAppointments ?? 0) > 0 && (
+          <Card className="border-amber-200 bg-amber-50">
+            <CardContent className="p-4 flex items-center justify-between gap-3">
+              <div className="flex items-center gap-2">
+                <Clock className="h-5 w-5 text-amber-600 shrink-0" />
+                <div>
+                  <p className="text-sm font-semibold text-amber-800">
+                    {stats!.pendingAppointments} appointment{stats!.pendingAppointments !== 1 ? "s" : ""} awaiting response
+                  </p>
+                  <p className="text-xs text-amber-700">Respond promptly to keep customers happy</p>
+                </div>
               </div>
-            ))}
-          </CardContent>
-        </Card>
+              <Link href="/spa-owner/appointments">
+                <Button size="sm" variant="outline" className="border-amber-400 text-amber-700 hover:bg-amber-100 shrink-0">
+                  View
+                </Button>
+              </Link>
+            </CardContent>
+          </Card>
+        )}
       </div>
     </OwnerLayout>
   );

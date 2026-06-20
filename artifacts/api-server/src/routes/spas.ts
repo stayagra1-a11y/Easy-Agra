@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { db, spasTable, usersTable } from "@workspace/db";
+import { db, spasTable, usersTable, spaAppointmentsTable } from "@workspace/db";
 import {
   eq,
   and,
@@ -99,14 +99,58 @@ router.get(
     const pending = rows.filter((r) => r.status === "pending").length;
     const draft = rows.filter((r) => r.status === "draft").length;
 
+    const [apptStats] = await db
+      .select({
+        totalAppointments: sql<number>`count(*)::int`,
+        pendingAppointments: sql<number>`sum(case when ${spaAppointmentsTable.status} = 'pending' then 1 else 0 end)::int`,
+        monthlyRevenue: sql<number>`coalesce(sum(case when ${spaAppointmentsTable.status} = 'completed' and date_trunc('month', ${spaAppointmentsTable.completedAt}) = date_trunc('month', now()) then ${spaAppointmentsTable.amount}::numeric else 0 end), 0)::float`,
+      })
+      .from(spaAppointmentsTable)
+      .where(eq(spaAppointmentsTable.ownerId, cu.id));
+
     res.json({
       totalSpas: total,
       activeSpas: active,
       pendingSpas: pending,
       draftSpas: draft,
+      totalAppointments: apptStats?.totalAppointments ?? 0,
+      pendingAppointments: apptStats?.pendingAppointments ?? 0,
+      monthlyRevenue: parseFloat(String(apptStats?.monthlyRevenue ?? 0)),
     });
   },
 );
+
+// ────────────────────────────────────────────────────────────────────────
+// GET /spas/browse  — public (customers), approved only, BEFORE /spas/:id
+// ────────────────────────────────────────────────────────────────────────
+router.get("/spas/browse", async (req, res): Promise<void> => {
+  const { search, city, page = "1", limit = "20" } = req.query as any;
+  const pageNum = Math.max(1, parseInt(page, 10));
+  const limitNum = Math.min(50, parseInt(limit, 10));
+  const offset = (pageNum - 1) * limitNum;
+
+  const conditions: any[] = [
+    eq(spasTable.status, "approved"),
+    isNull(spasTable.deletedAt),
+  ];
+  if (search) conditions.push(ilike(spasTable.name, `%${search}%`));
+  if (city) conditions.push(ilike(spasTable.city, `%${city}%`));
+
+  const [{ total }] = await db
+    .select({ total: sql<number>`count(*)::int` })
+    .from(spasTable)
+    .where(and(...conditions));
+
+  const spas = await db
+    .select()
+    .from(spasTable)
+    .where(and(...conditions))
+    .orderBy(spasTable.name)
+    .limit(limitNum)
+    .offset(offset);
+
+  res.json({ spas: spas.map((s) => serializeSpa(s)), total, page: pageNum, limit: limitNum });
+});
 
 // ────────────────────────────────────────────────────────────────────────
 // GET /spas  — admin list all
