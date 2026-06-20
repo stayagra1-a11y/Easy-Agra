@@ -22,6 +22,8 @@ export interface RestaurantDetail {
   seatingCapacity?: number | null;
   coverPhoto?: string | null;
   galleryPhotos: string[];
+  upiId?: string | null;
+  upiQrImage?: string | null;
   status: string;
   deletedAt?: string | null;
   createdAt: string;

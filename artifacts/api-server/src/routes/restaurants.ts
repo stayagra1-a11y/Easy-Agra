@@ -493,4 +493,33 @@ router.delete(
   },
 );
 
+// ──────────────────────────────────────────────────
+// PATCH /restaurants/:id/upi — update UPI settings (owner only, any status)
+// ──────────────────────────────────────────────────
+router.patch(
+  "/restaurants/:id/upi",
+  requireRole("restaurant_owner"),
+  async (req, res): Promise<void> => {
+    const cu = (req as any).currentUser;
+    const raw = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+    const id = parseInt(raw, 10);
+
+    const [restaurant] = await db.select().from(restaurantsTable).where(eq(restaurantsTable.id, id));
+    if (!restaurant) { res.status(404).json({ error: "Restaurant not found" }); return; }
+    if (restaurant.ownerId !== cu.id) { res.status(403).json({ error: "Access denied" }); return; }
+
+    const { upiId, upiQrImage } = req.body;
+    const [updated] = await db
+      .update(restaurantsTable)
+      .set({
+        upiId: upiId ? String(upiId).trim() : null,
+        upiQrImage: upiQrImage || null,
+      })
+      .where(eq(restaurantsTable.id, id))
+      .returning();
+
+    res.json(updated);
+  },
+);
+
 export default router;

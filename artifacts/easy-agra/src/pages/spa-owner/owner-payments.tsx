@@ -112,6 +112,7 @@ export default function SpaOwnerPayments() {
                   <th className="text-left p-3 font-medium text-muted-foreground">Appointment</th>
                   <th className="text-left p-3 font-medium text-muted-foreground">Customer</th>
                   <th className="text-left p-3 font-medium text-muted-foreground">Method</th>
+                  <th className="text-left p-3 font-medium text-muted-foreground">UTR</th>
                   <th className="text-right p-3 font-medium text-muted-foreground">Amount</th>
                   <th className="text-left p-3 font-medium text-muted-foreground">Status</th>
                   <th className="text-left p-3 font-medium text-muted-foreground">Date</th>
@@ -121,14 +122,14 @@ export default function SpaOwnerPayments() {
                 {isLoading ? (
                   Array.from({ length: 4 }).map((_, i) => (
                     <tr key={i}>
-                      <td colSpan={7} className="p-3">
+                      <td colSpan={8} className="p-3">
                         <Skeleton className="h-5 w-full" />
                       </td>
                     </tr>
                   ))
                 ) : payments.length === 0 ? (
                   <tr>
-                    <td colSpan={7} className="text-center py-12 text-muted-foreground">
+                    <td colSpan={8} className="text-center py-12 text-muted-foreground">
                       <Sparkles className="h-8 w-8 mx-auto mb-2 opacity-30" />
                       <p>No payments yet</p>
                     </td>
@@ -146,6 +147,7 @@ export default function SpaOwnerPayments() {
                         <td className="p-3 font-mono text-xs text-muted-foreground">{payment.bookingRef}</td>
                         <td className="p-3 text-muted-foreground">{(payment as any).customerName ?? "—"}</td>
                         <td className="p-3 text-muted-foreground">{method}</td>
+                        <td className="p-3 font-mono text-xs text-muted-foreground">{(payment as any).utrNumber ?? "—"}</td>
                         <td className="p-3 text-right font-semibold">{fmtCurrency(payment.paidAmount || payment.amount)}</td>
                         <td className="p-3">
                           <Badge className={`text-xs border ${st.color}`}>

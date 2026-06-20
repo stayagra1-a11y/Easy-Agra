@@ -10,4 +10,6 @@ export interface ConfirmPaymentInput {
   gatewayPaymentId?: string | null;
   gatewaySignature?: string | null;
   paidAmount?: number | null;
+  utrNumber?: string | null;
+  ownerUpiId?: string | null;
 }

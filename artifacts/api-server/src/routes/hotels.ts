@@ -307,6 +307,30 @@ router.post("/hotels/:id/suspend", requireRole("admin", "super_admin"), async (r
 // ──────────────────────────────────────────────────
 // POST /hotels/:id/restore — super_admin only (restore soft-deleted)
 // ──────────────────────────────────────────────────
+// ──────────────────────────────────────────────────
+// PATCH /hotels/:id/upi — update UPI settings (owner only, any status)
+// ──────────────────────────────────────────────────
+router.patch("/hotels/:id/upi", requireRole("hotel_owner"), async (req, res): Promise<void> => {
+  const cu = (req as any).currentUser;
+  const id = parseInt(req.params.id as string, 10);
+  const hotel = await findHotel(id);
+  if (!hotel) { res.status(404).json({ error: "Hotel not found" }); return; }
+  if (hotel.ownerId !== cu.id) { res.status(403).json({ error: "Access denied" }); return; }
+
+  const { upiId, upiQrImage } = req.body;
+  const [updated] = await db
+    .update(hotelsTable)
+    .set({
+      upiId: upiId ? String(upiId).trim() : null,
+      upiQrImage: upiQrImage || null,
+    })
+    .where(eq(hotelsTable.id, id))
+    .returning();
+
+  await logActivity(req, "hotel_updated", `Hotel "${updated.name}" UPI settings updated`, cu.id, cu.role);
+  res.json(serializeHotel(updated));
+});
+
 router.post("/hotels/:id/restore", requireRole("super_admin"), async (req, res): Promise<void> => {
   const cu = (req as any).currentUser;
   const id = parseInt(req.params.id as string, 10);

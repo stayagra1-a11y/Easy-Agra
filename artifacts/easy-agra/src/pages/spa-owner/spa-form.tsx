@@ -17,6 +17,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
 import { Loader2, ArrowLeft, Sparkles, ImagePlus, Trash2 } from "lucide-react";
+import { UpiSettingsCard } from "@/components/upi-settings-card";
 
 const FACILITIES = [
   "Steam Bath",
@@ -448,6 +449,16 @@ export default function SpaForm() {
             </div>
           </CardContent>
         </Card>
+
+        {/* UPI Settings */}
+        {isEdit && editId && (
+          <UpiSettingsCard
+            entityType="spa"
+            entityId={editId}
+            currentUpiId={(existingSpa as any)?.upiId ?? null}
+            currentQrImage={(existingSpa as any)?.upiQrImage ?? null}
+          />
+        )}
 
         {/* Submit */}
         <Button type="submit" className="w-full" disabled={saving}>

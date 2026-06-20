@@ -7,6 +7,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -30,6 +31,9 @@ import {
   ChevronRight,
   Tag,
   X,
+  QrCode,
+  Copy,
+  Check,
 } from "lucide-react";
 
 export type BookingType = "hotel" | "restaurant" | "spa";
@@ -46,6 +50,8 @@ interface PaymentModalProps {
   amount: number;
   advanceAmount?: number;
   label?: string;
+  ownerUpiId?: string | null;
+  ownerUpiQrImage?: string | null;
 }
 
 const PAYMENT_METHODS = [
@@ -91,7 +97,7 @@ const PAYMENT_METHODS = [
   },
 ] as const;
 
-type Step = "mode" | "method" | "processing" | "success" | "failed";
+type Step = "mode" | "method" | "upi_qr" | "processing" | "success" | "failed";
 
 function fmtCurrency(n: number) {
   return `₹${n.toLocaleString("en-IN", { minimumFractionDigits: 0 })}`;
@@ -114,6 +120,8 @@ export function PaymentModal({
   amount,
   advanceAmount,
   label,
+  ownerUpiId,
+  ownerUpiQrImage,
 }: PaymentModalProps) {
   const { toast } = useToast();
   const [step, setStep] = useState<Step>("mode");
@@ -121,6 +129,9 @@ export function PaymentModal({
   const [selectedMethod, setSelectedMethod] = useState<string | null>(null);
   const [paymentRef, setPaymentRef] = useState<string | null>(null);
   const [resultRef, setResultRef] = useState<string | null>(null);
+  const [utrNumber, setUtrNumber] = useState("");
+  const [utrError, setUtrError] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
 
   const [couponInput, setCouponInput] = useState("");
   const [couponError, setCouponError] = useState<string | null>(null);
@@ -152,6 +163,9 @@ export function PaymentModal({
     setCouponInput("");
     setCouponError(null);
     setAppliedCoupon(null);
+    setUtrNumber("");
+    setUtrError(null);
+    setCopied(false);
     onClose();
   };
 
@@ -188,8 +202,35 @@ export function PaymentModal({
     setStep("method");
   };
 
-  const handlePay = async () => {
+  const handleCopyUpiId = () => {
+    if (!ownerUpiId) return;
+    navigator.clipboard.writeText(ownerUpiId).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  };
+
+  // When Pay is clicked on the method step
+  const handlePay = () => {
     if (!selectedMethod) return;
+    // If UPI is selected and owner has UPI set up, show QR step
+    if (selectedMethod === "upi" && ownerUpiId) {
+      setStep("upi_qr");
+    } else {
+      processPayment(null, null);
+    }
+  };
+
+  // Confirm UPI payment after customer enters UTR
+  const handleUpiConfirm = () => {
+    const utr = utrNumber.trim();
+    if (!utr) { setUtrError("Please enter the UTR / transaction reference number"); return; }
+    if (utr.length < 8) { setUtrError("UTR number should be at least 8 characters"); return; }
+    setUtrError(null);
+    processPayment(utr, ownerUpiId ?? null);
+  };
+
+  const processPayment = async (utr: string | null, upiId: string | null) => {
     setStep("processing");
 
     try {
@@ -212,11 +253,15 @@ export function PaymentModal({
         data: { paymentMethod: selectedMethod as any, paymentGateway: "manual" },
       });
 
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      await new Promise((resolve) => setTimeout(resolve, 1200));
 
       const confirmed = await confirmPayment.mutateAsync({
         ref,
-        data: { paidAmount: basePayable },
+        data: {
+          paidAmount: basePayable,
+          utrNumber: utr ?? undefined,
+          ownerUpiId: upiId ?? undefined,
+        },
       });
 
       setResultRef(confirmed.paymentRef);
@@ -241,6 +286,8 @@ export function PaymentModal({
     setStep("method");
     setSelectedMethod(null);
     setPaymentRef(null);
+    setUtrNumber("");
+    setUtrError(null);
   };
 
   const canShowAdvance = !!advanceAmount && advanceAmount < amount;
@@ -257,7 +304,9 @@ export function PaymentModal({
                 ? "Payment Failed"
                 : step === "processing"
                   ? "Processing Payment"
-                  : "Secure Payment"}
+                  : step === "upi_qr"
+                    ? "Pay via UPI"
+                    : "Secure Payment"}
           </DialogTitle>
         </DialogHeader>
 
@@ -438,6 +487,77 @@ export function PaymentModal({
           </div>
         )}
 
+        {/* ── Step: UPI QR ── */}
+        {step === "upi_qr" && (
+          <div className="space-y-4">
+            <div className="flex flex-col items-center gap-3">
+              {ownerUpiQrImage ? (
+                <img
+                  src={ownerUpiQrImage}
+                  alt="UPI QR Code"
+                  className="h-44 w-44 rounded-2xl border-2 border-primary/20 object-contain bg-white p-2"
+                />
+              ) : (
+                <div className="h-44 w-44 rounded-2xl border-2 border-dashed border-primary/30 bg-primary/5 flex flex-col items-center justify-center gap-2">
+                  <QrCode className="h-12 w-12 text-primary/40" />
+                  <span className="text-xs text-muted-foreground">No QR available</span>
+                </div>
+              )}
+
+              {/* UPI ID */}
+              <div className="w-full bg-muted/60 rounded-xl p-3 flex items-center justify-between gap-2">
+                <div>
+                  <p className="text-xs text-muted-foreground">Pay to UPI ID</p>
+                  <p className="font-semibold text-sm font-mono">{ownerUpiId}</p>
+                </div>
+                <button
+                  onClick={handleCopyUpiId}
+                  className="h-8 w-8 flex items-center justify-center rounded-lg bg-background border hover:bg-muted transition-colors"
+                >
+                  {copied ? <Check className="h-3.5 w-3.5 text-emerald-500" /> : <Copy className="h-3.5 w-3.5 text-muted-foreground" />}
+                </button>
+              </div>
+
+              <p className="text-xs text-center text-muted-foreground">
+                Scan the QR or copy the UPI ID above · open your UPI app and pay{" "}
+                <span className="font-semibold text-primary">{fmtCurrency(basePayable)}</span>
+              </p>
+            </div>
+
+            {/* UTR input */}
+            <div className="space-y-1.5">
+              <Label className="text-sm font-medium">
+                Transaction / UTR Number <span className="text-red-500">*</span>
+              </Label>
+              <Input
+                placeholder="e.g. 123456789012 or T2506201234"
+                value={utrNumber}
+                onChange={(e) => { setUtrNumber(e.target.value); setUtrError(null); }}
+                className={utrError ? "border-red-500" : ""}
+              />
+              {utrError && <p className="text-xs text-red-500">{utrError}</p>}
+              <p className="text-xs text-muted-foreground">
+                After paying, enter the UTR/reference number from your UPI app to confirm
+              </p>
+            </div>
+
+            <div className="flex gap-2">
+              <Button variant="outline" size="sm" className="flex-1" onClick={() => setStep("method")}>
+                Back
+              </Button>
+              <Button
+                size="sm"
+                className="flex-1 bg-primary gap-1"
+                onClick={handleUpiConfirm}
+                disabled={!utrNumber.trim()}
+              >
+                <CheckCircle2 className="h-4 w-4" />
+                Confirm Payment
+              </Button>
+            </div>
+          </div>
+        )}
+
         {/* ── Step: Processing ── */}
         {step === "processing" && (
           <div className="flex flex-col items-center gap-4 py-6">
@@ -478,6 +598,12 @@ export function PaymentModal({
                 <span className="text-muted-foreground">Payment Ref</span>
                 <span className="font-mono text-xs font-medium">{resultRef ?? paymentRef}</span>
               </div>
+              {utrNumber && (
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">UTR Number</span>
+                  <span className="font-mono text-xs font-medium">{utrNumber}</span>
+                </div>
+              )}
               {appliedCoupon && (
                 <div className="flex justify-between text-emerald-600">
                   <span className="flex items-center gap-1"><Tag className="h-3.5 w-3.5" /> Coupon</span>

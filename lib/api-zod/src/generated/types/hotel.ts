@@ -51,6 +51,10 @@ export interface Hotel {
   coverImage?: string | null;
   /** @nullable */
   galleryImages?: string[] | null;
+  /** @nullable */
+  upiId?: string | null;
+  /** @nullable */
+  upiQrImage?: string | null;
   status: HotelStatus;
   /** @nullable */
   rejectionReason?: string | null;

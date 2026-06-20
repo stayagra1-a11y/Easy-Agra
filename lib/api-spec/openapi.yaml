@@ -5062,6 +5062,10 @@ components:
           type: ["array", "null"]
           items:
             type: string
+        upiId:
+          type: ["string", "null"]
+        upiQrImage:
+          type: ["string", "null"]
         status:
           type: string
           enum: [draft, pending, approved, rejected, suspended]
@@ -6136,6 +6140,12 @@ components:
           type: array
           items:
             type: string
+        upiId:
+          type: string
+          nullable: true
+        upiQrImage:
+          type: string
+          nullable: true
         status:
           type: string
         deletedAt:
@@ -6489,6 +6499,12 @@ components:
           type: array
           items:
             type: string
+          nullable: true
+        upiId:
+          type: string
+          nullable: true
+        upiQrImage:
+          type: string
           nullable: true
         status:
           type: string
@@ -7390,6 +7406,12 @@ components:
         paidAmount:
           type: number
           nullable: true
+        utrNumber:
+          type: string
+          nullable: true
+        ownerUpiId:
+          type: string
+          nullable: true
       required: []
 
     Payment:
@@ -7408,6 +7430,8 @@ components:
         paidAmount: { type: number }
         discountAmount: { type: number }
         couponCode: { type: string, nullable: true }
+        utrNumber: { type: string, nullable: true }
+        ownerUpiId: { type: string, nullable: true }
         currency: { type: string }
         paymentMode:
           type: string

@@ -13,6 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ChevronLeft, Camera, X, Utensils } from "lucide-react";
+import { UpiSettingsCard } from "@/components/upi-settings-card";
 import { useToast } from "@/hooks/use-toast";
 
 const CUISINE_TYPES = [
@@ -337,6 +338,15 @@ export default function RestaurantForm() {
               </div>
             </CardContent>
           </Card>
+
+          {isEdit && restaurantId && (
+            <UpiSettingsCard
+              entityType="restaurant"
+              entityId={restaurantId}
+              currentUpiId={(getQuery.data as any)?.upiId ?? null}
+              currentQrImage={(getQuery.data as any)?.upiQrImage ?? null}
+            />
+          )}
 
           <Button type="submit" className="w-full h-12 bg-primary text-base font-semibold" disabled={isPending}>
             {isPending ? "Saving…" : isEdit ? "Update Restaurant" : "Add Restaurant"}

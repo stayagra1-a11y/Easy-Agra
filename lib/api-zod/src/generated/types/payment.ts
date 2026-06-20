@@ -23,6 +23,8 @@ export interface Payment {
   paidAmount: number;
   discountAmount?: number;
   couponCode?: string | null;
+  utrNumber?: string | null;
+  ownerUpiId?: string | null;
   currency: string;
   paymentMode: PaymentPaymentMode;
   paymentMethod?: PaymentPaymentMethod;

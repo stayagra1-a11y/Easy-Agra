@@ -419,6 +419,10 @@ export interface Hotel {
   coverImage?: string | null;
   /** @nullable */
   galleryImages?: string[] | null;
+  /** @nullable */
+  upiId?: string | null;
+  /** @nullable */
+  upiQrImage?: string | null;
   status: HotelStatus;
   /** @nullable */
   rejectionReason?: string | null;
@@ -1003,6 +1007,8 @@ export interface RestaurantDetail {
   seatingCapacity?: number | null;
   coverPhoto?: string | null;
   galleryPhotos: string[];
+  upiId?: string | null;
+  upiQrImage?: string | null;
   status: string;
   deletedAt?: string | null;
   createdAt: string;
@@ -1144,6 +1150,8 @@ export interface Spa {
   coverPhoto?: string | null;
   galleryPhotos?: string[] | null;
   facilities?: string[] | null;
+  upiId?: string | null;
+  upiQrImage?: string | null;
   status: SpaStatus;
   rejectionReason?: string | null;
   deletedAt?: string | null;
@@ -1630,6 +1638,8 @@ export interface ConfirmPaymentInput {
   gatewayPaymentId?: string | null;
   gatewaySignature?: string | null;
   paidAmount?: number | null;
+  utrNumber?: string | null;
+  ownerUpiId?: string | null;
 }
 
 export type PaymentBookingType = typeof PaymentBookingType[keyof typeof PaymentBookingType];
@@ -1692,6 +1702,8 @@ export interface Payment {
   paidAmount: number;
   discountAmount?: number;
   couponCode?: string | null;
+  utrNumber?: string | null;
+  ownerUpiId?: string | null;
   currency: string;
   paymentMode: PaymentPaymentMode;
   paymentMethod?: PaymentPaymentMethod;

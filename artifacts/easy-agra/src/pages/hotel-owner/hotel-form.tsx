@@ -10,7 +10,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, Building2, MapPin, Phone, Info, Wifi, Image, Save, Send, Loader2 } from "lucide-react";
+import { ArrowLeft, Building2, MapPin, Phone, Info, Wifi, Image, Save, Send, Loader2, IndianRupee } from "lucide-react";
+import { UpiSettingsCard } from "@/components/upi-settings-card";
 import { Link, useLocation, useParams } from "wouter";
 import { useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
@@ -272,22 +273,27 @@ export default function HotelForm() {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid grid-cols-5 h-auto p-1 gap-1">
-            <TabsTrigger value="basic" className="flex-col h-12 text-xs gap-0.5 px-1">
+          <TabsList className="flex h-auto p-1 gap-1 overflow-x-auto">
+            <TabsTrigger value="basic" className="flex-col h-12 text-xs gap-0.5 px-2 shrink-0">
               <Building2 className="h-3.5 w-3.5" /> Basic
             </TabsTrigger>
-            <TabsTrigger value="location" className="flex-col h-12 text-xs gap-0.5 px-1">
+            <TabsTrigger value="location" className="flex-col h-12 text-xs gap-0.5 px-2 shrink-0">
               <MapPin className="h-3.5 w-3.5" /> Location
             </TabsTrigger>
-            <TabsTrigger value="contact" className="flex-col h-12 text-xs gap-0.5 px-1">
+            <TabsTrigger value="contact" className="flex-col h-12 text-xs gap-0.5 px-2 shrink-0">
               <Phone className="h-3.5 w-3.5" /> Contact
             </TabsTrigger>
-            <TabsTrigger value="amenities" className="flex-col h-12 text-xs gap-0.5 px-1">
+            <TabsTrigger value="amenities" className="flex-col h-12 text-xs gap-0.5 px-2 shrink-0">
               <Wifi className="h-3.5 w-3.5" /> Amenities
             </TabsTrigger>
-            <TabsTrigger value="media" className="flex-col h-12 text-xs gap-0.5 px-1">
+            <TabsTrigger value="media" className="flex-col h-12 text-xs gap-0.5 px-2 shrink-0">
               <Image className="h-3.5 w-3.5" /> Media
             </TabsTrigger>
+            {isEdit && (
+              <TabsTrigger value="payment" className="flex-col h-12 text-xs gap-0.5 px-2 shrink-0">
+                <IndianRupee className="h-3.5 w-3.5" /> UPI
+              </TabsTrigger>
+            )}
           </TabsList>
 
           {/* Basic Info */}
@@ -473,6 +479,18 @@ export default function HotelForm() {
               </CardContent>
             </Card>
           </TabsContent>
+
+          {/* UPI Payment Settings */}
+          {isEdit && (
+            <TabsContent value="payment" className="mt-3">
+              <UpiSettingsCard
+                entityType="hotel"
+                entityId={parseInt(params.id as string, 10)}
+                currentUpiId={(existingHotel as any)?.upiId ?? null}
+                currentQrImage={(existingHotel as any)?.upiQrImage ?? null}
+              />
+            </TabsContent>
+          )}
         </Tabs>
 
         {/* Save button */}

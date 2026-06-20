@@ -538,7 +538,7 @@ router.post(
       return;
     }
 
-    const { gatewayPaymentId, gatewaySignature, paidAmount } = req.body;
+    const { gatewayPaymentId, gatewaySignature, paidAmount, utrNumber, ownerUpiId } = req.body;
     const confirmedAmount = paidAmount ?? parseNum(payment.amount);
     const now = new Date();
 
@@ -550,6 +550,8 @@ router.post(
         paidAt: now,
         gatewayPaymentId: gatewayPaymentId ?? null,
         gatewaySignature: gatewaySignature ?? null,
+        utrNumber: utrNumber ?? null,
+        ownerUpiId: ownerUpiId ?? null,
       })
       .where(eq(paymentsTable.id, payment.id))
       .returning();

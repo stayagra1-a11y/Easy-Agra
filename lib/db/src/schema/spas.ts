@@ -66,6 +66,9 @@ export const spasTable = pgTable("spas", {
 
   facilities: jsonb("facilities").$type<string[]>(),
 
+  upiId: text("upi_id"),
+  upiQrImage: text("upi_qr_image"),
+
   status: spaStatusEnum("status").notNull().default("draft"),
 
   rejectionReason: text("rejection_reason"),

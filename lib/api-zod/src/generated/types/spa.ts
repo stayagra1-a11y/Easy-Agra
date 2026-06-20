@@ -22,6 +22,8 @@ export interface Spa {
   coverPhoto?: string | null;
   galleryPhotos?: string[] | null;
   facilities?: string[] | null;
+  upiId?: string | null;
+  upiQrImage?: string | null;
   status: SpaStatus;
   rejectionReason?: string | null;
   deletedAt?: string | null;

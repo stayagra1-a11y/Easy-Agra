@@ -571,4 +571,33 @@ router.put(
   },
 );
 
+// ──────────────────────────────────────────────────
+// PATCH /spas/:id/upi — update UPI settings (owner only, any status)
+// ──────────────────────────────────────────────────
+router.patch(
+  "/spas/:id/upi",
+  requireRole("spa_owner"),
+  async (req, res): Promise<void> => {
+    const cu = (req as any).currentUser;
+    const raw = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+    const id = parseInt(raw, 10);
+
+    const [spa] = await db.select().from(spasTable).where(eq(spasTable.id, id));
+    if (!spa) { res.status(404).json({ error: "Spa not found" }); return; }
+    if (spa.ownerId !== cu.id) { res.status(403).json({ error: "Access denied" }); return; }
+
+    const { upiId, upiQrImage } = req.body;
+    const [updated] = await db
+      .update(spasTable)
+      .set({
+        upiId: upiId ? String(upiId).trim() : null,
+        upiQrImage: upiQrImage || null,
+      })
+      .where(eq(spasTable.id, id))
+      .returning();
+
+    res.json(updated);
+  },
+);
+
 export default router;

@@ -69,6 +69,9 @@ export const restaurantsTable = pgTable("restaurants", {
   coverPhoto: text("cover_photo"),
   galleryPhotos: jsonb("gallery_photos").$type<string[]>(),
 
+  upiId: text("upi_id"),
+  upiQrImage: text("upi_qr_image"),
+
   status: restaurantStatusEnum("status").notNull().default("active"),
   deletedAt: timestamp("deleted_at", { withTimezone: true }),
 

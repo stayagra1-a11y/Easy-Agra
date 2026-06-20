@@ -58,6 +58,9 @@ export const hotelsTable = pgTable("hotels", {
   coverImage: text("cover_image"),
   galleryImages: jsonb("gallery_images").$type<string[]>(),
 
+  upiId: text("upi_id"),
+  upiQrImage: text("upi_qr_image"),
+
   status: hotelStatusEnum("status").notNull().default("draft"),
   rejectionReason: text("rejection_reason"),
   reviewedBy: integer("reviewed_by").references(() => usersTable.id),
