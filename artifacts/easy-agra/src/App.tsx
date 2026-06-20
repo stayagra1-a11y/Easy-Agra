@@ -9,6 +9,9 @@ import { Loader2 } from "lucide-react";
 import { OfflineBanner } from "@/components/offline-banner";
 import { PwaInstallBanner } from "@/components/pwa-install-banner";
 
+// Onboarding
+import Onboarding from "@/pages/onboarding";
+
 // Auth
 import Login from "@/pages/auth/login";
 import Register from "@/pages/auth/register";
@@ -180,7 +183,8 @@ function ProtectedRoute({
   }
 
   if (!user) {
-    window.location.href = "/login";
+    const onboarded = localStorage.getItem("ea_onboarded");
+    window.location.href = onboarded ? "/login" : "/onboarding";
     return null;
   }
 
@@ -202,6 +206,9 @@ function ProtectedRoute({
 function Router() {
   return (
     <Switch>
+      {/* Onboarding */}
+      <Route path="/onboarding" component={Onboarding} />
+
       {/* Auth - public */}
       <Route path="/login" component={Login} />
       <Route path="/register" component={Register} />
