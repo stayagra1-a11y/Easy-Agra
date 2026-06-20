@@ -57,7 +57,7 @@ const superAdminNavItems: NavItem[] = [
   { href: "/super-admin/owner-requests", icon: FileCheck, label: "Owner Requests" },
   { href: "/super-admin/platform-settings", icon: Settings, label: "Platform Settings" },
   { href: "/super-admin/coupons", icon: Tag, label: "Coupons" },
-  { href: "/super-admin/featured", icon: Star, label: "Featured Content" },
+  { href: "/super-admin/featured-content", icon: Star, label: "Featured Content" },
   { href: "/super-admin/reports", icon: FileBarChart, label: "Reports & Export" },
   { href: "/super-admin/security", icon: ShieldAlert, label: "Security" },
   { href: "/super-admin/activity-logs", icon: Activity, label: "Activity Logs" },

@@ -4,9 +4,13 @@ import {
   ownerEarningsTable,
   paymentsTable,
   usersTable,
+  refundsTable,
+  bookingsTable,
+  hotelsTable,
+  cancellationsTable,
 } from "@workspace/db";
 import { eq, and, gte, lte, desc, sql } from "drizzle-orm";
-import { requireAuth, requireRole } from "../middlewares/requireAuth";
+import { requireRole } from "../middlewares/requireAuth";
 
 const router = Router();
 
@@ -15,7 +19,7 @@ function parseNum(v: unknown): number {
   return parseFloat(String(v));
 }
 
-async function buildReport(
+async function buildRevenueReport(
   from: string | undefined,
   to: string | undefined,
   filterOwnerId: number | undefined,
@@ -110,29 +114,26 @@ async function buildReport(
 
 router.get(
   "/reports/revenue",
-  requireAuth,
   requireRole("admin", "super_admin"),
   async (req, res) => {
     const { from, to, bookingType } = req.query as Record<string, string>;
-    const report = await buildReport(from, to, undefined, bookingType);
+    const report = await buildRevenueReport(from, to, undefined, bookingType);
     res.json(report);
   },
 );
 
 router.get(
   "/reports/commission",
-  requireAuth,
   requireRole("admin", "super_admin"),
   async (req, res) => {
     const { from, to, bookingType } = req.query as Record<string, string>;
-    const report = await buildReport(from, to, undefined, bookingType);
+    const report = await buildRevenueReport(from, to, undefined, bookingType);
     res.json(report);
   },
 );
 
 router.get(
   "/reports/earnings",
-  requireAuth,
   requireRole("hotel_owner", "restaurant_owner", "spa_owner", "admin", "super_admin"),
   async (req, res) => {
     const user = (req as any).currentUser;
@@ -140,7 +141,7 @@ router.get(
     const ownerIdParam = req.query.ownerId ? parseInt(String(req.query.ownerId)) : undefined;
     const isAdmin = user.role === "admin" || user.role === "super_admin";
     const ownerId = isAdmin ? ownerIdParam : (user.id as number);
-    const report = await buildReport(from, to, ownerId, undefined);
+    const report = await buildRevenueReport(from, to, ownerId, undefined);
     res.json(report);
   },
 );
@@ -165,11 +166,202 @@ router.get(
 );
 
 router.get(
+  "/admin/reports/bookings",
+  requireRole("admin", "super_admin"),
+  async (req, res) => {
+    const { from, to } = req.query as Record<string, string>;
+    const where = [];
+    if (from) where.push(gte(paymentsTable.createdAt, new Date(from)));
+    if (to) where.push(lte(paymentsTable.createdAt, new Date(to)));
+    const whereClause = where.length ? and(...where) : undefined;
+
+    const [byType, byStatus, total, hotelRows] = await Promise.all([
+      db.select({ bookingType: paymentsTable.bookingType, count: sql<number>`count(*)::int`, totalAmount: sql<string>`sum(amount)::text` })
+        .from(paymentsTable).where(whereClause).groupBy(paymentsTable.bookingType),
+      db.select({ status: paymentsTable.paymentStatus, count: sql<number>`count(*)::int` })
+        .from(paymentsTable).where(whereClause).groupBy(paymentsTable.paymentStatus),
+      db.select({ count: sql<number>`count(*)::int` }).from(paymentsTable).where(whereClause),
+      db.select({
+        id: bookingsTable.id,
+        bookingRef: bookingsTable.bookingRef,
+        hotelName: hotelsTable.name,
+        customerName: usersTable.fullName,
+        status: bookingsTable.status,
+        finalAmount: bookingsTable.finalAmount,
+        createdAt: bookingsTable.createdAt,
+      }).from(bookingsTable)
+        .leftJoin(hotelsTable, eq(bookingsTable.hotelId, hotelsTable.id))
+        .leftJoin(usersTable, eq(bookingsTable.customerId, usersTable.id))
+        .where(
+          from || to
+            ? and(
+                ...(from ? [gte(bookingsTable.createdAt, new Date(from))] : []),
+                ...(to ? [lte(bookingsTable.createdAt, new Date(to))] : []),
+              )
+            : undefined,
+        )
+        .orderBy(desc(bookingsTable.createdAt))
+        .limit(50),
+    ]);
+
+    res.json({
+      generatedAt: new Date().toISOString(),
+      period: { from: from ?? "all-time", to: to ?? "all-time" },
+      total: total[0]?.count ?? 0,
+      byType,
+      byStatus,
+      recentHotelBookings: hotelRows,
+    });
+  },
+);
+
+router.get(
+  "/admin/reports/refunds",
+  requireRole("admin", "super_admin"),
+  async (req, res) => {
+    const { from, to } = req.query as Record<string, string>;
+    const payWhere = [];
+    if (from) payWhere.push(gte(refundsTable.createdAt, new Date(from)));
+    if (to) payWhere.push(lte(refundsTable.createdAt, new Date(to)));
+    const payWhereClause = payWhere.length ? and(...payWhere) : undefined;
+
+    const cancelWhere = [];
+    if (from) cancelWhere.push(gte(cancellationsTable.createdAt, new Date(from)));
+    if (to) cancelWhere.push(lte(cancellationsTable.createdAt, new Date(to)));
+    const cancelWhereClause = cancelWhere.length ? and(...cancelWhere) : undefined;
+
+    const [byStatus, totalRefunds, totalCancellations, refundRows, cancelRows] = await Promise.all([
+      db.select({ status: refundsTable.status, count: sql<number>`count(*)::int`, totalAmount: sql<string>`sum(amount)::text` })
+        .from(refundsTable).where(payWhereClause).groupBy(refundsTable.status),
+      db.select({ count: sql<number>`count(*)::int` }).from(refundsTable).where(payWhereClause),
+      db.select({ count: sql<number>`count(*)::int` }).from(cancellationsTable).where(cancelWhereClause),
+      db.select({
+        id: refundsTable.id,
+        refundRef: refundsTable.refundRef,
+        refundAmount: refundsTable.amount,
+        status: refundsTable.status,
+        reason: refundsTable.refundReason,
+        createdAt: refundsTable.createdAt,
+      }).from(refundsTable).where(payWhereClause).orderBy(desc(refundsTable.createdAt)).limit(50),
+      db.select({
+        id: cancellationsTable.id,
+        cancelRef: cancellationsTable.cancelRef,
+        bookingType: cancellationsTable.bookingType,
+        reason: cancellationsTable.reason,
+        status: cancellationsTable.status,
+        createdAt: cancellationsTable.createdAt,
+      }).from(cancellationsTable).where(cancelWhereClause).orderBy(desc(cancellationsTable.createdAt)).limit(50),
+    ]);
+
+    res.json({
+      generatedAt: new Date().toISOString(),
+      period: { from: from ?? "all-time", to: to ?? "all-time" },
+      totalRefunds: totalRefunds[0]?.count ?? 0,
+      totalCancellations: totalCancellations[0]?.count ?? 0,
+      byStatus,
+      recentRefunds: refundRows,
+      recentCancellations: cancelRows,
+    });
+  },
+);
+
+router.get(
+  "/admin/reports/export/:type",
+  requireRole("admin", "super_admin"),
+  async (req, res) => {
+    const raw = Array.isArray(req.params.type) ? req.params.type[0] : req.params.type;
+    const { from, to } = req.query as Record<string, string>;
+
+    if (raw === "revenue") {
+      const report = await buildRevenueReport(from, to, undefined, undefined);
+      const lines = [
+        "Date,Payment Ref,Booking Type,Gross (₹),Commission (₹),Net (₹),Owner,Status",
+        ...report.rows.map((r) =>
+          [r.date, r.paymentRef, r.bookingType, r.gross.toFixed(2), r.commission.toFixed(2), r.net.toFixed(2), `"${r.ownerName}"`, r.status].join(",")
+        ),
+      ];
+      res.setHeader("Content-Type", "text/csv");
+      res.setHeader("Content-Disposition", `attachment; filename="revenue-report-${new Date().toISOString().substring(0, 10)}.csv"`);
+      res.send(lines.join("\n"));
+      return;
+    }
+
+    if (raw === "users") {
+      const users = await db.select({
+        id: usersTable.id,
+        fullName: usersTable.fullName,
+        email: usersTable.email,
+        role: usersTable.role,
+        status: usersTable.status,
+        city: usersTable.city,
+        createdAt: usersTable.createdAt,
+      }).from(usersTable).orderBy(desc(usersTable.createdAt));
+      const lines = [
+        "ID,Full Name,Email,Role,Status,City,Joined",
+        ...users.map((u) =>
+          [u.id, `"${u.fullName}"`, u.email, u.role, u.status, u.city || "", u.createdAt.toISOString().substring(0, 10)].join(",")
+        ),
+      ];
+      res.setHeader("Content-Type", "text/csv");
+      res.setHeader("Content-Disposition", `attachment; filename="users-report-${new Date().toISOString().substring(0, 10)}.csv"`);
+      res.send(lines.join("\n"));
+      return;
+    }
+
+    if (raw === "bookings") {
+      const rows = await db.select({
+        bookingRef: bookingsTable.bookingRef,
+        hotelName: hotelsTable.name,
+        customerName: usersTable.fullName,
+        status: bookingsTable.status,
+        finalAmount: bookingsTable.finalAmount,
+        createdAt: bookingsTable.createdAt,
+      }).from(bookingsTable)
+        .leftJoin(hotelsTable, eq(bookingsTable.hotelId, hotelsTable.id))
+        .leftJoin(usersTable, eq(bookingsTable.customerId, usersTable.id))
+        .orderBy(desc(bookingsTable.createdAt));
+      const lines = [
+        "Booking Ref,Hotel,Customer,Status,Amount (₹),Date",
+        ...rows.map((r) =>
+          [r.bookingRef, `"${r.hotelName ?? ""}"`, `"${r.customerName ?? ""}"`, r.status, parseNum(r.finalAmount).toFixed(2), r.createdAt.toISOString().substring(0, 10)].join(",")
+        ),
+      ];
+      res.setHeader("Content-Type", "text/csv");
+      res.setHeader("Content-Disposition", `attachment; filename="bookings-report-${new Date().toISOString().substring(0, 10)}.csv"`);
+      res.send(lines.join("\n"));
+      return;
+    }
+
+    if (raw === "refunds") {
+      const rows = await db.select({
+        refundRef: refundsTable.refundRef,
+        refundAmount: refundsTable.amount,
+        status: refundsTable.status,
+        reason: refundsTable.refundReason,
+        createdAt: refundsTable.createdAt,
+      }).from(refundsTable).orderBy(desc(refundsTable.createdAt));
+      const lines = [
+        "Refund Ref,Amount (₹),Status,Reason,Date",
+        ...rows.map((r) =>
+          [r.refundRef, parseNum(r.refundAmount).toFixed(2), r.status, `"${r.reason ?? ""}"`, r.createdAt.toISOString().substring(0, 10)].join(",")
+        ),
+      ];
+      res.setHeader("Content-Type", "text/csv");
+      res.setHeader("Content-Disposition", `attachment; filename="refunds-report-${new Date().toISOString().substring(0, 10)}.csv"`);
+      res.send(lines.join("\n"));
+      return;
+    }
+
+    res.status(400).json({ error: `Unknown report type: ${raw}. Use revenue, users, bookings, or refunds.` });
+  },
+);
+
+router.get(
   "/admin/reports/export",
   requireRole("admin", "super_admin"),
   async (req, res) => {
     const { from, to, bookingType } = req.query as Record<string, string>;
-    const report = await buildReport(from, to, undefined, bookingType);
+    const report = await buildRevenueReport(from, to, undefined, bookingType);
 
     const lines = [
       "Date,Payment Ref,Booking Type,Gross (₹),Commission (₹),Net (₹),Owner,Status",

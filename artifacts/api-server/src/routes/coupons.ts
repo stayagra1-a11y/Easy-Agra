@@ -3,6 +3,25 @@ import { db, couponsTable } from "@workspace/db";
 import { eq, ilike, and, desc, sql } from "drizzle-orm";
 import { requireRole } from "../middlewares/requireAuth";
 import { logActivity } from "../lib/auth";
+import { z } from "zod";
+
+const createCouponSchema = z.object({
+  code: z.string().min(1).max(50),
+  name: z.string().min(1).max(100),
+  description: z.string().optional(),
+  type: z.enum(["global", "first_time", "referral", "seasonal"]).default("global"),
+  discountType: z.enum(["percentage", "flat"]),
+  discountValue: z.number().positive(),
+  minOrderValue: z.number().min(0).optional(),
+  maxDiscount: z.number().positive().optional(),
+  applicableOn: z.array(z.enum(["all", "hotel", "restaurant", "spa"])).default(["all"]),
+  startDate: z.string().optional(),
+  endDate: z.string().optional(),
+  maxUses: z.number().int().positive().optional(),
+  isActive: z.boolean().default(true),
+});
+
+const updateCouponSchema = createCouponSchema.partial();
 
 const router = Router();
 

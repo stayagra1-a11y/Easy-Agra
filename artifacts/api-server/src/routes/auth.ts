@@ -81,6 +81,10 @@ router.post("/auth/login", async (req, res): Promise<void> => {
     return;
   }
 
+  if (user.status === "banned") {
+    res.status(403).json({ error: "Your account has been permanently banned. Contact support." });
+    return;
+  }
   if (user.status === "suspended") {
     res.status(403).json({ error: "Your account has been suspended. Contact support." });
     return;

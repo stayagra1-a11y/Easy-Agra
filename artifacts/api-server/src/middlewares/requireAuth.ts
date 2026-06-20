@@ -16,6 +16,11 @@ export async function requireAuth(
     res.status(401).json({ error: "Session invalid" });
     return;
   }
+  if (user.status === "banned") {
+    req.session.destroy(() => {});
+    res.status(403).json({ error: "Your account has been permanently banned. Contact support." });
+    return;
+  }
   if (user.status === "suspended") {
     res.status(403).json({ error: "Account suspended" });
     return;

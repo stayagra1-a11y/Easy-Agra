@@ -309,7 +309,7 @@ function Router() {
       <Route path="/super-admin/support-analytics" component={() => <ProtectedRoute component={SuperAdminSupportAnalytics} allowedRoles={["super_admin"]} />} />
       <Route path="/super-admin/refund-analytics" component={() => <ProtectedRoute component={SuperAdminRefundAnalytics} allowedRoles={["super_admin"]} />} />
       <Route path="/super-admin/coupons" component={() => <ProtectedRoute component={CouponsPage} allowedRoles={["super_admin"]} />} />
-      <Route path="/super-admin/featured" component={() => <ProtectedRoute component={FeaturedContent} allowedRoles={["super_admin"]} />} />
+      <Route path="/super-admin/featured-content" component={() => <ProtectedRoute component={FeaturedContent} allowedRoles={["super_admin"]} />} />
       <Route path="/super-admin/reports" component={() => <ProtectedRoute component={SuperAdminReports} allowedRoles={["super_admin"]} />} />
       <Route path="/super-admin/security" component={() => <ProtectedRoute component={SecurityPage} allowedRoles={["super_admin"]} />} />
 
