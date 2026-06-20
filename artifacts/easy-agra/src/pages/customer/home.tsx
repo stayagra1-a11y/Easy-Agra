@@ -6,7 +6,7 @@ import { CustomerLayout } from "@/components/layout/customer-layout";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Building2, UtensilsCrossed, Sparkles, MapPin, Bell, ChevronRight, Clock, CheckCircle2, XCircle, AlertCircle, Star } from "lucide-react";
+import { BedDouble, UtensilsCrossed, Leaf, Landmark, Bell, ChevronRight, Clock, CheckCircle2, XCircle, AlertCircle, Star, Building2, Sparkles, MapPin } from "lucide-react";
 
 const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
 
@@ -71,10 +71,10 @@ export default function CustomerHome() {
     );
 
   const features = [
-    { icon: UtensilsCrossed, label: "Restaurants", color: "bg-orange-50 text-orange-600", href: "/restaurants" },
-    { icon: Sparkles, label: "Spas", color: "bg-purple-50 text-purple-600", href: "/spas" },
-    { icon: MapPin, label: "Places", color: "bg-green-50 text-green-600", href: "/places" },
-    { icon: Building2, label: "Hotels", color: "bg-blue-50 text-blue-600", href: "/hotels" },
+    { icon: BedDouble, label: "Hotels", color: "bg-blue-50 text-blue-600", href: "/hotels" },
+    { icon: Landmark, label: "Famous Places", color: "bg-amber-50 text-amber-600", href: "/places" },
+    { icon: UtensilsCrossed, label: "Best Restaurants", color: "bg-orange-50 text-orange-600", href: "/restaurants" },
+    { icon: Leaf, label: "Spas", color: "bg-green-50 text-green-600", href: "/spas" },
   ];
 
   return (
@@ -108,15 +108,14 @@ export default function CustomerHome() {
         {/* Quick links */}
         <div>
           <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">Explore Agra</h2>
-          <div className="grid grid-cols-4 gap-3">
-            {features.map(({ icon: Icon, label, color, coming, href }: any) => {
+          <div className="grid grid-cols-4 gap-2">
+            {features.map(({ icon: Icon, label, color, href }: any) => {
               const tile = (
-                <div key={label} className="flex flex-col items-center gap-1.5 group cursor-pointer">
-                  <div className={`h-12 w-12 rounded-xl ${color} flex items-center justify-center transition-transform group-active:scale-95`}>
-                    <Icon className="h-6 w-6" />
+                <div key={label} className="flex flex-col items-center gap-2 group cursor-pointer">
+                  <div className={`h-16 w-16 rounded-2xl ${color} flex items-center justify-center transition-transform group-active:scale-95 shadow-sm`}>
+                    <Icon className="h-8 w-8" />
                   </div>
-                  <span className="text-xs font-medium text-foreground">{label}</span>
-                  {coming && <span className="text-xs text-muted-foreground">Soon</span>}
+                  <span className="text-xs font-medium text-foreground text-center leading-tight">{label}</span>
                 </div>
               );
               return href ? <Link key={label} href={href}>{tile}</Link> : tile;
