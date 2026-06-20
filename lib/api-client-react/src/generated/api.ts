@@ -23,6 +23,7 @@ import type {
   ActivityLog,
   ActivityLogsPage,
   AddTicketMessageBody,
+  AdminCancellationInput,
   AnnouncementInput,
   AssignTicketBody,
   AuthResponse,
@@ -33,6 +34,7 @@ import type {
   BookingRejectInput,
   BookingStats,
   BookingsPage,
+  CancellationDetail,
   ChangePasswordInput,
   CommissionConfig,
   ConfirmPaymentInput,
@@ -57,6 +59,8 @@ import type {
   FailPaymentInput,
   FavoriteToggleResult,
   ForgotPasswordInput,
+  GetAdminCancellations200,
+  GetAdminCancellationsParams,
   GetAdminPaymentsParams,
   GetAdminRefunds200,
   GetAdminRefundsParams,
@@ -66,10 +70,13 @@ import type {
   GetEarningsAnalyticsParams,
   GetEarningsOwner200,
   GetEarningsOwnerParams,
+  GetMyCancellations200,
   GetMyFavoritePlaces200,
   GetMyPaymentsParams,
   GetMyRefunds200,
   GetMySpaAppointmentsParams,
+  GetOwnerCancellations200,
+  GetOwnerCancellationsParams,
   GetOwnerPaymentsParams,
   GetOwnerSpaAppointmentsParams,
   GetPayoutsAdmin200,
@@ -113,6 +120,7 @@ import type {
   NearbyRecommendations,
   Notification,
   NotificationsPage,
+  OverrideRefundInput,
   OwnerRequest,
   OwnerRequestInput,
   OwnerRequestRejectInput,
@@ -128,15 +136,19 @@ import type {
   PlatformEarningsAnalytics,
   PlatformSettings,
   PlatformSettingsUpdate,
+  ProcessCancellationInput,
   ProcessPayoutInput,
   ProcessRefundInput,
   Refund,
+  RefundAnalytics,
+  RefundDetail,
   RefundRequestInput,
   RegisterInput,
   RemoveReview200,
   ReorderImagesInput,
   ReorderTouristPlaceImages200,
   ReportReview200,
+  RequestCancellationInput,
   RequestPayoutInput,
   ReservationDetail,
   ReservationInput,
@@ -14124,4 +14136,767 @@ export function useGetSupportAnalytics<TData = Awaited<ReturnType<typeof getSupp
 
 
 
+
+export const getRequestCancellationUrl = () => {
+
+
+
+
+  return `/api/cancellations`
+}
+
+/**
+ * @summary Customer requests cancellation of a booking
+ */
+export const requestCancellation = async (requestCancellationInput: RequestCancellationInput, options?: RequestInit): Promise<CancellationDetail> => {
+
+  return customFetch<CancellationDetail>(getRequestCancellationUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      requestCancellationInput,)
+  }
+);}
+
+
+
+
+export const getRequestCancellationMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof requestCancellation>>, TError,{data: BodyType<RequestCancellationInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof requestCancellation>>, TError,{data: BodyType<RequestCancellationInput>}, TContext> => {
+
+const mutationKey = ['requestCancellation'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof requestCancellation>>, {data: BodyType<RequestCancellationInput>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  requestCancellation(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RequestCancellationMutationResult = NonNullable<Awaited<ReturnType<typeof requestCancellation>>>
+    export type RequestCancellationMutationBody = BodyType<RequestCancellationInput>
+    export type RequestCancellationMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Customer requests cancellation of a booking
+ */
+export const useRequestCancellation = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof requestCancellation>>, TError,{data: BodyType<RequestCancellationInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof requestCancellation>>,
+        TError,
+        {data: BodyType<RequestCancellationInput>},
+        TContext
+      > => {
+      return useMutation(getRequestCancellationMutationOptions(options));
+    }
+
+export const getGetMyCancellationsUrl = () => {
+
+
+
+
+  return `/api/cancellations`
+}
+
+/**
+ * @summary Customer's own cancellation requests
+ */
+export const getMyCancellations = async ( options?: RequestInit): Promise<GetMyCancellations200> => {
+
+  return customFetch<GetMyCancellations200>(getGetMyCancellationsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetMyCancellationsQueryKey = () => {
+    return [
+    `/api/cancellations`
+    ] as const;
+    }
+
+
+export const getGetMyCancellationsQueryOptions = <TData = Awaited<ReturnType<typeof getMyCancellations>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getMyCancellations>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetMyCancellationsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getMyCancellations>>> = ({ signal }) => getMyCancellations({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getMyCancellations>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetMyCancellationsQueryResult = NonNullable<Awaited<ReturnType<typeof getMyCancellations>>>
+export type GetMyCancellationsQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Customer's own cancellation requests
+ */
+
+export function useGetMyCancellations<TData = Awaited<ReturnType<typeof getMyCancellations>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getMyCancellations>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetMyCancellationsQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getGetCancellationUrl = (ref: string,) => {
+
+
+
+
+  return `/api/cancellations/${ref}`
+}
+
+/**
+ * @summary Get single cancellation by ref
+ */
+export const getCancellation = async (ref: string, options?: RequestInit): Promise<CancellationDetail> => {
+
+  return customFetch<CancellationDetail>(getGetCancellationUrl(ref),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetCancellationQueryKey = (ref: string,) => {
+    return [
+    `/api/cancellations/${ref}`
+    ] as const;
+    }
+
+
+export const getGetCancellationQueryOptions = <TData = Awaited<ReturnType<typeof getCancellation>>, TError = ErrorType<unknown>>(ref: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getCancellation>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetCancellationQueryKey(ref);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getCancellation>>> = ({ signal }) => getCancellation(ref, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: !!(ref), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getCancellation>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetCancellationQueryResult = NonNullable<Awaited<ReturnType<typeof getCancellation>>>
+export type GetCancellationQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Get single cancellation by ref
+ */
+
+export function useGetCancellation<TData = Awaited<ReturnType<typeof getCancellation>>, TError = ErrorType<unknown>>(
+ ref: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getCancellation>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetCancellationQueryOptions(ref,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getGetOwnerCancellationsUrl = (params?: GetOwnerCancellationsParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/owner/cancellations?${stringifiedParams}` : `/api/owner/cancellations`
+}
+
+/**
+ * @summary Owner incoming cancellation requests
+ */
+export const getOwnerCancellations = async (params?: GetOwnerCancellationsParams, options?: RequestInit): Promise<GetOwnerCancellations200> => {
+
+  return customFetch<GetOwnerCancellations200>(getGetOwnerCancellationsUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetOwnerCancellationsQueryKey = (params?: GetOwnerCancellationsParams,) => {
+    return [
+    `/api/owner/cancellations`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getGetOwnerCancellationsQueryOptions = <TData = Awaited<ReturnType<typeof getOwnerCancellations>>, TError = ErrorType<unknown>>(params?: GetOwnerCancellationsParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getOwnerCancellations>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetOwnerCancellationsQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getOwnerCancellations>>> = ({ signal }) => getOwnerCancellations(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getOwnerCancellations>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetOwnerCancellationsQueryResult = NonNullable<Awaited<ReturnType<typeof getOwnerCancellations>>>
+export type GetOwnerCancellationsQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Owner incoming cancellation requests
+ */
+
+export function useGetOwnerCancellations<TData = Awaited<ReturnType<typeof getOwnerCancellations>>, TError = ErrorType<unknown>>(
+ params?: GetOwnerCancellationsParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getOwnerCancellations>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetOwnerCancellationsQueryOptions(params,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getProcessOwnerCancellationUrl = (ref: string,) => {
+
+
+
+
+  return `/api/owner/cancellations/${ref}`
+}
+
+/**
+ * @summary Owner approves or rejects a cancellation
+ */
+export const processOwnerCancellation = async (ref: string,
+    processCancellationInput: ProcessCancellationInput, options?: RequestInit): Promise<CancellationDetail> => {
+
+  return customFetch<CancellationDetail>(getProcessOwnerCancellationUrl(ref),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      processCancellationInput,)
+  }
+);}
+
+
+
+
+export const getProcessOwnerCancellationMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof processOwnerCancellation>>, TError,{ref: string;data: BodyType<ProcessCancellationInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof processOwnerCancellation>>, TError,{ref: string;data: BodyType<ProcessCancellationInput>}, TContext> => {
+
+const mutationKey = ['processOwnerCancellation'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof processOwnerCancellation>>, {ref: string;data: BodyType<ProcessCancellationInput>}> = (props) => {
+          const {ref,data} = props ?? {};
+
+          return  processOwnerCancellation(ref,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ProcessOwnerCancellationMutationResult = NonNullable<Awaited<ReturnType<typeof processOwnerCancellation>>>
+    export type ProcessOwnerCancellationMutationBody = BodyType<ProcessCancellationInput>
+    export type ProcessOwnerCancellationMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Owner approves or rejects a cancellation
+ */
+export const useProcessOwnerCancellation = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof processOwnerCancellation>>, TError,{ref: string;data: BodyType<ProcessCancellationInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof processOwnerCancellation>>,
+        TError,
+        {ref: string;data: BodyType<ProcessCancellationInput>},
+        TContext
+      > => {
+      return useMutation(getProcessOwnerCancellationMutationOptions(options));
+    }
+
+export const getGetAdminCancellationsUrl = (params?: GetAdminCancellationsParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/admin/cancellations?${stringifiedParams}` : `/api/admin/cancellations`
+}
+
+/**
+ * @summary Admin list all cancellations
+ */
+export const getAdminCancellations = async (params?: GetAdminCancellationsParams, options?: RequestInit): Promise<GetAdminCancellations200> => {
+
+  return customFetch<GetAdminCancellations200>(getGetAdminCancellationsUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetAdminCancellationsQueryKey = (params?: GetAdminCancellationsParams,) => {
+    return [
+    `/api/admin/cancellations`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getGetAdminCancellationsQueryOptions = <TData = Awaited<ReturnType<typeof getAdminCancellations>>, TError = ErrorType<unknown>>(params?: GetAdminCancellationsParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getAdminCancellations>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetAdminCancellationsQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getAdminCancellations>>> = ({ signal }) => getAdminCancellations(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getAdminCancellations>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetAdminCancellationsQueryResult = NonNullable<Awaited<ReturnType<typeof getAdminCancellations>>>
+export type GetAdminCancellationsQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Admin list all cancellations
+ */
+
+export function useGetAdminCancellations<TData = Awaited<ReturnType<typeof getAdminCancellations>>, TError = ErrorType<unknown>>(
+ params?: GetAdminCancellationsParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getAdminCancellations>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetAdminCancellationsQueryOptions(params,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getProcessAdminCancellationUrl = (ref: string,) => {
+
+
+
+
+  return `/api/admin/cancellations/${ref}`
+}
+
+/**
+ * @summary Admin approves or rejects a cancellation
+ */
+export const processAdminCancellation = async (ref: string,
+    adminCancellationInput: AdminCancellationInput, options?: RequestInit): Promise<CancellationDetail> => {
+
+  return customFetch<CancellationDetail>(getProcessAdminCancellationUrl(ref),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      adminCancellationInput,)
+  }
+);}
+
+
+
+
+export const getProcessAdminCancellationMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof processAdminCancellation>>, TError,{ref: string;data: BodyType<AdminCancellationInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof processAdminCancellation>>, TError,{ref: string;data: BodyType<AdminCancellationInput>}, TContext> => {
+
+const mutationKey = ['processAdminCancellation'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof processAdminCancellation>>, {ref: string;data: BodyType<AdminCancellationInput>}> = (props) => {
+          const {ref,data} = props ?? {};
+
+          return  processAdminCancellation(ref,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ProcessAdminCancellationMutationResult = NonNullable<Awaited<ReturnType<typeof processAdminCancellation>>>
+    export type ProcessAdminCancellationMutationBody = BodyType<AdminCancellationInput>
+    export type ProcessAdminCancellationMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Admin approves or rejects a cancellation
+ */
+export const useProcessAdminCancellation = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof processAdminCancellation>>, TError,{ref: string;data: BodyType<AdminCancellationInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof processAdminCancellation>>,
+        TError,
+        {ref: string;data: BodyType<AdminCancellationInput>},
+        TContext
+      > => {
+      return useMutation(getProcessAdminCancellationMutationOptions(options));
+    }
+
+export const getGetRefundAnalyticsUrl = () => {
+
+
+
+
+  return `/api/refunds/analytics`
+}
+
+/**
+ * @summary Super admin refund analytics
+ */
+export const getRefundAnalytics = async ( options?: RequestInit): Promise<RefundAnalytics> => {
+
+  return customFetch<RefundAnalytics>(getGetRefundAnalyticsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetRefundAnalyticsQueryKey = () => {
+    return [
+    `/api/refunds/analytics`
+    ] as const;
+    }
+
+
+export const getGetRefundAnalyticsQueryOptions = <TData = Awaited<ReturnType<typeof getRefundAnalytics>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getRefundAnalytics>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetRefundAnalyticsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getRefundAnalytics>>> = ({ signal }) => getRefundAnalytics({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getRefundAnalytics>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetRefundAnalyticsQueryResult = NonNullable<Awaited<ReturnType<typeof getRefundAnalytics>>>
+export type GetRefundAnalyticsQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Super admin refund analytics
+ */
+
+export function useGetRefundAnalytics<TData = Awaited<ReturnType<typeof getRefundAnalytics>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getRefundAnalytics>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetRefundAnalyticsQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getGetRefundByRefUrl = (ref: string,) => {
+
+
+
+
+  return `/api/refunds/${ref}`
+}
+
+/**
+ * @summary Get single refund by ref
+ */
+export const getRefundByRef = async (ref: string, options?: RequestInit): Promise<RefundDetail> => {
+
+  return customFetch<RefundDetail>(getGetRefundByRefUrl(ref),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetRefundByRefQueryKey = (ref: string,) => {
+    return [
+    `/api/refunds/${ref}`
+    ] as const;
+    }
+
+
+export const getGetRefundByRefQueryOptions = <TData = Awaited<ReturnType<typeof getRefundByRef>>, TError = ErrorType<unknown>>(ref: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getRefundByRef>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetRefundByRefQueryKey(ref);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getRefundByRef>>> = ({ signal }) => getRefundByRef(ref, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: !!(ref), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getRefundByRef>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetRefundByRefQueryResult = NonNullable<Awaited<ReturnType<typeof getRefundByRef>>>
+export type GetRefundByRefQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Get single refund by ref
+ */
+
+export function useGetRefundByRef<TData = Awaited<ReturnType<typeof getRefundByRef>>, TError = ErrorType<unknown>>(
+ ref: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getRefundByRef>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetRefundByRefQueryOptions(ref,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getOverrideRefundUrl = (ref: string,) => {
+
+
+
+
+  return `/api/refunds/admin/${ref}/override`
+}
+
+/**
+ * @summary Super admin overrides a refund decision
+ */
+export const overrideRefund = async (ref: string,
+    overrideRefundInput: OverrideRefundInput, options?: RequestInit): Promise<Refund> => {
+
+  return customFetch<Refund>(getOverrideRefundUrl(ref),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      overrideRefundInput,)
+  }
+);}
+
+
+
+
+export const getOverrideRefundMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof overrideRefund>>, TError,{ref: string;data: BodyType<OverrideRefundInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof overrideRefund>>, TError,{ref: string;data: BodyType<OverrideRefundInput>}, TContext> => {
+
+const mutationKey = ['overrideRefund'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof overrideRefund>>, {ref: string;data: BodyType<OverrideRefundInput>}> = (props) => {
+          const {ref,data} = props ?? {};
+
+          return  overrideRefund(ref,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type OverrideRefundMutationResult = NonNullable<Awaited<ReturnType<typeof overrideRefund>>>
+    export type OverrideRefundMutationBody = BodyType<OverrideRefundInput>
+    export type OverrideRefundMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Super admin overrides a refund decision
+ */
+export const useOverrideRefund = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof overrideRefund>>, TError,{ref: string;data: BodyType<OverrideRefundInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof overrideRefund>>,
+        TError,
+        {ref: string;data: BodyType<OverrideRefundInput>},
+        TContext
+      > => {
+      return useMutation(getOverrideRefundMutationOptions(options));
+    }
 

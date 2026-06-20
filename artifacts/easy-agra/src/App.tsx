@@ -87,6 +87,19 @@ import AdminSupport from "@/pages/admin/support";
 // Super Admin - support analytics
 import SuperAdminSupportAnalytics from "@/pages/super-admin/support-analytics";
 
+// Customer - refunds & cancellations
+import CustomerRefunds from "@/pages/customer/refunds";
+import RefundDetail from "@/pages/customer/refund-detail";
+
+// Owner - cancellations
+import OwnerCancellations from "@/pages/owner/cancellations";
+
+// Admin - refunds
+import AdminRefunds from "@/pages/admin/refunds";
+
+// Super Admin - refund analytics
+import SuperAdminRefundAnalytics from "@/pages/super-admin/refund-analytics";
+
 // Owner - payments
 import HotelOwnerPayments from "@/pages/hotel-owner/owner-payments";
 import RestaurantOwnerPayments from "@/pages/restaurant-owner/owner-payments";
@@ -249,6 +262,13 @@ function Router() {
       <Route path="/support/tickets" component={() => <ProtectedRoute component={CustomerSupportTickets} allowedRoles={["customer"]} />} />
       <Route path="/support/tickets/:ref" component={() => <ProtectedRoute component={SupportTicketDetail} allowedRoles={["customer"]} />} />
 
+      {/* Customer - refunds & cancellations */}
+      <Route path="/refunds" component={() => <ProtectedRoute component={CustomerRefunds} allowedRoles={["customer"]} />} />
+      <Route path="/refunds/:ref" component={() => <ProtectedRoute component={RefundDetail} allowedRoles={["customer"]} />} />
+
+      {/* Owner - cancellations */}
+      <Route path="/owner/cancellations" component={() => <ProtectedRoute component={OwnerCancellations} allowedRoles={["hotel_owner", "restaurant_owner", "spa_owner"]} />} />
+
       {/* Admin routes */}
       <Route path="/admin/dashboard" component={() => <ProtectedRoute component={AdminDashboard} allowedRoles={["admin", "super_admin"]} />} />
       <Route path="/admin/users" component={() => <ProtectedRoute component={AdminUsers} allowedRoles={["admin", "super_admin"]} />} />
@@ -269,6 +289,7 @@ function Router() {
       <Route path="/admin/tourist-places/:id/photos" component={() => <ProtectedRoute component={TouristPlacePhotos} allowedRoles={["admin", "super_admin"]} />} />
       <Route path="/admin/tourist-places" component={() => <ProtectedRoute component={AdminTouristPlaces} allowedRoles={["admin", "super_admin"]} />} />
       <Route path="/admin/support" component={() => <ProtectedRoute component={AdminSupport} allowedRoles={["admin", "super_admin"]} />} />
+      <Route path="/admin/refunds" component={() => <ProtectedRoute component={AdminRefunds} allowedRoles={["admin", "super_admin"]} />} />
 
       {/* Super Admin routes */}
       <Route path="/super-admin/dashboard" component={() => <ProtectedRoute component={SuperAdminDashboard} allowedRoles={["super_admin"]} />} />
@@ -278,6 +299,7 @@ function Router() {
       <Route path="/super-admin/activity-logs" component={() => <ProtectedRoute component={SuperAdminActivityLogs} allowedRoles={["super_admin"]} />} />
       <Route path="/super-admin/owner-requests" component={() => <ProtectedRoute component={SuperAdminOwnerRequests} allowedRoles={["super_admin"]} />} />
       <Route path="/super-admin/support-analytics" component={() => <ProtectedRoute component={SuperAdminSupportAnalytics} allowedRoles={["super_admin"]} />} />
+      <Route path="/super-admin/refund-analytics" component={() => <ProtectedRoute component={SuperAdminRefundAnalytics} allowedRoles={["super_admin"]} />} />
 
       {/* Fallback */}
       <Route component={NotFound} />

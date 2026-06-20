@@ -2221,6 +2221,90 @@ export interface SupportAnalytics {
   byPriority: SupportAnalyticsByPriorityItem[];
 }
 
+export type RequestCancellationInputBookingType = typeof RequestCancellationInputBookingType[keyof typeof RequestCancellationInputBookingType];
+
+
+export const RequestCancellationInputBookingType = {
+  hotel: 'hotel',
+  restaurant: 'restaurant',
+  spa: 'spa',
+} as const;
+
+export interface RequestCancellationInput {
+  bookingType: RequestCancellationInputBookingType;
+  bookingRef: string;
+  reason: string;
+}
+
+export type ProcessCancellationInputAction = typeof ProcessCancellationInputAction[keyof typeof ProcessCancellationInputAction];
+
+
+export const ProcessCancellationInputAction = {
+  approve: 'approve',
+  reject: 'reject',
+} as const;
+
+export interface ProcessCancellationInput {
+  action: ProcessCancellationInputAction;
+  note?: string;
+}
+
+export type AdminCancellationInputAction = typeof AdminCancellationInputAction[keyof typeof AdminCancellationInputAction];
+
+
+export const AdminCancellationInputAction = {
+  approve: 'approve',
+  reject: 'reject',
+} as const;
+
+export interface AdminCancellationInput {
+  action: AdminCancellationInputAction;
+  adminNote?: string;
+}
+
+export interface CancellationDetail {
+  id: number;
+  cancelRef: string;
+  bookingType: string;
+  bookingId: number;
+  bookingRef: string;
+  customerId: number;
+  ownerId?: number | null;
+  reason: string;
+  status: string;
+  ownerNote?: string | null;
+  adminNote?: string | null;
+  processedBy?: number | null;
+  processedAt?: string | null;
+  createdAt: string;
+  updatedAt: string;
+  customerName?: string | null;
+  ownerName?: string | null;
+}
+
+export interface RefundAnalytics {
+  totalRequests: number;
+  approvedCount: number;
+  rejectedCount: number;
+  processedCount: number;
+  pendingCount: number;
+  totalRefundedAmount: number;
+  approvalRate: number;
+}
+
+export type OverrideRefundInputAction = typeof OverrideRefundInputAction[keyof typeof OverrideRefundInputAction];
+
+
+export const OverrideRefundInputAction = {
+  approve: 'approve',
+  reject: 'reject',
+} as const;
+
+export interface OverrideRefundInput {
+  action: OverrideRefundInputAction;
+  reason?: string;
+}
+
 export type ListUsersParams = {
 role?: string;
 status?: string;
@@ -2575,5 +2659,29 @@ export type UpdateTicketStatusBody = {
 
 export type AssignTicketBody = {
   assignedTo: number | null;
+};
+
+export type GetMyCancellations200 = {
+  cancellations: CancellationDetail[];
+  total: number;
+};
+
+export type GetOwnerCancellationsParams = {
+status?: string;
+};
+
+export type GetOwnerCancellations200 = {
+  cancellations: CancellationDetail[];
+  total: number;
+};
+
+export type GetAdminCancellationsParams = {
+status?: string;
+bookingType?: string;
+};
+
+export type GetAdminCancellations200 = {
+  cancellations: CancellationDetail[];
+  total: number;
 };
 

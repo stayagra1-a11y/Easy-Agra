@@ -96,6 +96,20 @@ export const refundStatusEnum = pgEnum("refund_status", [
   "processed",
 ]);
 
+export const refundReasonEnum = pgEnum("refund_reason", [
+  "change_of_plan",
+  "wrong_booking",
+  "service_issue",
+  "emergency",
+  "other",
+]);
+
+export const refundTypeEnum = pgEnum("refund_type", [
+  "full",
+  "partial",
+  "no_refund",
+]);
+
 export const refundsTable = pgTable("refunds", {
   id: serial("id").primaryKey(),
   refundRef: text("refund_ref").notNull().unique(),
@@ -116,6 +130,14 @@ export const refundsTable = pgTable("refunds", {
   rejectionReason: text("rejection_reason"),
   notes: text("notes"),
   gatewayRefundId: text("gateway_refund_id"),
+
+  refundReason: refundReasonEnum("refund_reason"),
+  refundType: refundTypeEnum("refund_type"),
+  customerId: integer("customer_id").references(() => usersTable.id),
+  bookingRef: text("booking_ref"),
+  cancellationRef: text("cancellation_ref"),
+  overriddenBy: integer("overridden_by").references(() => usersTable.id),
+  adminNotes: text("admin_notes"),
 
   createdAt: timestamp("created_at", { withTimezone: true })
     .notNull()

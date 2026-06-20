@@ -14,3 +14,4 @@ export * from "./payments";
 export * from "./commissions";
 export * from "./trip_plans";
 export * from "./support_tickets";
+export * from "./cancellations";

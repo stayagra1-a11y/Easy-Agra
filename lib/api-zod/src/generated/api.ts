@@ -5723,3 +5723,292 @@ export const GetSupportAnalyticsResponse = zod.object({
 })
 
 
+/**
+ * @summary Customer requests cancellation of a booking
+ */
+export const RequestCancellationBody = zod.object({
+  "bookingType": zod.enum(['hotel', 'restaurant', 'spa']),
+  "bookingRef": zod.string(),
+  "reason": zod.string()
+})
+
+
+/**
+ * @summary Customer's own cancellation requests
+ */
+export const GetMyCancellationsResponse = zod.object({
+  "cancellations": zod.array(zod.object({
+  "id": zod.number(),
+  "cancelRef": zod.string(),
+  "bookingType": zod.string(),
+  "bookingId": zod.number(),
+  "bookingRef": zod.string(),
+  "customerId": zod.number(),
+  "ownerId": zod.number().nullish(),
+  "reason": zod.string(),
+  "status": zod.string(),
+  "ownerNote": zod.string().nullish(),
+  "adminNote": zod.string().nullish(),
+  "processedBy": zod.number().nullish(),
+  "processedAt": zod.string().nullish(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string(),
+  "customerName": zod.string().nullish(),
+  "ownerName": zod.string().nullish()
+})),
+  "total": zod.number()
+})
+
+
+/**
+ * @summary Get single cancellation by ref
+ */
+export const GetCancellationParams = zod.object({
+  "ref": zod.coerce.string()
+})
+
+export const GetCancellationResponse = zod.object({
+  "id": zod.number(),
+  "cancelRef": zod.string(),
+  "bookingType": zod.string(),
+  "bookingId": zod.number(),
+  "bookingRef": zod.string(),
+  "customerId": zod.number(),
+  "ownerId": zod.number().nullish(),
+  "reason": zod.string(),
+  "status": zod.string(),
+  "ownerNote": zod.string().nullish(),
+  "adminNote": zod.string().nullish(),
+  "processedBy": zod.number().nullish(),
+  "processedAt": zod.string().nullish(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string(),
+  "customerName": zod.string().nullish(),
+  "ownerName": zod.string().nullish()
+})
+
+
+/**
+ * @summary Owner incoming cancellation requests
+ */
+export const GetOwnerCancellationsQueryParams = zod.object({
+  "status": zod.coerce.string().optional()
+})
+
+export const GetOwnerCancellationsResponse = zod.object({
+  "cancellations": zod.array(zod.object({
+  "id": zod.number(),
+  "cancelRef": zod.string(),
+  "bookingType": zod.string(),
+  "bookingId": zod.number(),
+  "bookingRef": zod.string(),
+  "customerId": zod.number(),
+  "ownerId": zod.number().nullish(),
+  "reason": zod.string(),
+  "status": zod.string(),
+  "ownerNote": zod.string().nullish(),
+  "adminNote": zod.string().nullish(),
+  "processedBy": zod.number().nullish(),
+  "processedAt": zod.string().nullish(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string(),
+  "customerName": zod.string().nullish(),
+  "ownerName": zod.string().nullish()
+})),
+  "total": zod.number()
+})
+
+
+/**
+ * @summary Owner approves or rejects a cancellation
+ */
+export const ProcessOwnerCancellationParams = zod.object({
+  "ref": zod.coerce.string()
+})
+
+export const ProcessOwnerCancellationBody = zod.object({
+  "action": zod.enum(['approve', 'reject']),
+  "note": zod.string().optional()
+})
+
+export const ProcessOwnerCancellationResponse = zod.object({
+  "id": zod.number(),
+  "cancelRef": zod.string(),
+  "bookingType": zod.string(),
+  "bookingId": zod.number(),
+  "bookingRef": zod.string(),
+  "customerId": zod.number(),
+  "ownerId": zod.number().nullish(),
+  "reason": zod.string(),
+  "status": zod.string(),
+  "ownerNote": zod.string().nullish(),
+  "adminNote": zod.string().nullish(),
+  "processedBy": zod.number().nullish(),
+  "processedAt": zod.string().nullish(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string(),
+  "customerName": zod.string().nullish(),
+  "ownerName": zod.string().nullish()
+})
+
+
+/**
+ * @summary Admin list all cancellations
+ */
+export const GetAdminCancellationsQueryParams = zod.object({
+  "status": zod.coerce.string().optional(),
+  "bookingType": zod.coerce.string().optional()
+})
+
+export const GetAdminCancellationsResponse = zod.object({
+  "cancellations": zod.array(zod.object({
+  "id": zod.number(),
+  "cancelRef": zod.string(),
+  "bookingType": zod.string(),
+  "bookingId": zod.number(),
+  "bookingRef": zod.string(),
+  "customerId": zod.number(),
+  "ownerId": zod.number().nullish(),
+  "reason": zod.string(),
+  "status": zod.string(),
+  "ownerNote": zod.string().nullish(),
+  "adminNote": zod.string().nullish(),
+  "processedBy": zod.number().nullish(),
+  "processedAt": zod.string().nullish(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string(),
+  "customerName": zod.string().nullish(),
+  "ownerName": zod.string().nullish()
+})),
+  "total": zod.number()
+})
+
+
+/**
+ * @summary Admin approves or rejects a cancellation
+ */
+export const ProcessAdminCancellationParams = zod.object({
+  "ref": zod.coerce.string()
+})
+
+export const ProcessAdminCancellationBody = zod.object({
+  "action": zod.enum(['approve', 'reject']),
+  "adminNote": zod.string().optional()
+})
+
+export const ProcessAdminCancellationResponse = zod.object({
+  "id": zod.number(),
+  "cancelRef": zod.string(),
+  "bookingType": zod.string(),
+  "bookingId": zod.number(),
+  "bookingRef": zod.string(),
+  "customerId": zod.number(),
+  "ownerId": zod.number().nullish(),
+  "reason": zod.string(),
+  "status": zod.string(),
+  "ownerNote": zod.string().nullish(),
+  "adminNote": zod.string().nullish(),
+  "processedBy": zod.number().nullish(),
+  "processedAt": zod.string().nullish(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string(),
+  "customerName": zod.string().nullish(),
+  "ownerName": zod.string().nullish()
+})
+
+
+/**
+ * @summary Super admin refund analytics
+ */
+export const GetRefundAnalyticsResponse = zod.object({
+  "totalRequests": zod.number(),
+  "approvedCount": zod.number(),
+  "rejectedCount": zod.number(),
+  "processedCount": zod.number(),
+  "pendingCount": zod.number(),
+  "totalRefundedAmount": zod.number(),
+  "approvalRate": zod.number()
+})
+
+
+/**
+ * @summary Get single refund by ref
+ */
+export const GetRefundByRefParams = zod.object({
+  "ref": zod.coerce.string()
+})
+
+export const GetRefundByRefResponse = zod.object({
+  "id": zod.number(),
+  "refundRef": zod.string(),
+  "paymentId": zod.number(),
+  "amount": zod.number(),
+  "reason": zod.string(),
+  "status": zod.enum(['pending', 'approved', 'rejected', 'processed']),
+  "requestedBy": zod.number(),
+  "processedBy": zod.number().nullish(),
+  "processedAt": zod.string().nullish(),
+  "rejectionReason": zod.string().nullish(),
+  "notes": zod.string().nullish(),
+  "gatewayRefundId": zod.string().nullish(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+}).and(zod.object({
+  "payment": zod.object({
+  "id": zod.number(),
+  "paymentRef": zod.string(),
+  "bookingType": zod.enum(['hotel', 'restaurant', 'spa']),
+  "bookingId": zod.number(),
+  "bookingRef": zod.string(),
+  "customerId": zod.number(),
+  "ownerId": zod.number(),
+  "amount": zod.number(),
+  "paidAmount": zod.number(),
+  "currency": zod.string(),
+  "paymentMode": zod.enum(['full', 'advance']),
+  "paymentMethod": zod.enum(['upi', 'credit_card', 'debit_card', 'net_banking', 'wallet']).nullish(),
+  "paymentStatus": zod.enum(['pending', 'successful', 'failed', 'refunded', 'partially_refunded']),
+  "paymentGateway": zod.enum(['razorpay', 'stripe', 'manual']),
+  "gatewayOrderId": zod.string().nullish(),
+  "gatewayPaymentId": zod.string().nullish(),
+  "failureReason": zod.string().nullish(),
+  "notes": zod.string().nullish(),
+  "paidAt": zod.string().nullish(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+}).optional(),
+  "requestedByName": zod.string().nullish(),
+  "processedByName": zod.string().nullish()
+}))
+
+
+/**
+ * @summary Super admin overrides a refund decision
+ */
+export const OverrideRefundParams = zod.object({
+  "ref": zod.coerce.string()
+})
+
+export const OverrideRefundBody = zod.object({
+  "action": zod.enum(['approve', 'reject']),
+  "reason": zod.string().optional()
+})
+
+export const OverrideRefundResponse = zod.object({
+  "id": zod.number(),
+  "refundRef": zod.string(),
+  "paymentId": zod.number(),
+  "amount": zod.number(),
+  "reason": zod.string(),
+  "status": zod.enum(['pending', 'approved', 'rejected', 'processed']),
+  "requestedBy": zod.number(),
+  "processedBy": zod.number().nullish(),
+  "processedAt": zod.string().nullish(),
+  "rejectionReason": zod.string().nullish(),
+  "notes": zod.string().nullish(),
+  "gatewayRefundId": zod.string().nullish(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+
+

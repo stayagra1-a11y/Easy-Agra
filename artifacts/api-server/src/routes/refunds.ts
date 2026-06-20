@@ -308,4 +308,152 @@ router.put(
   },
 );
 
+// ─────────────────────────────────────────────────
+// GET /refunds/analytics — super admin analytics
+// MUST be before /refunds/:ref
+// ─────────────────────────────────────────────────
+router.get(
+  "/refunds/analytics",
+  requireRole("admin", "super_admin"),
+  async (req, res): Promise<void> => {
+    const rows = await db.select().from(refundsTable);
+
+    const totalRequests = rows.length;
+    const approvedCount = rows.filter((r) => r.status === "approved").length;
+    const rejectedCount = rows.filter((r) => r.status === "rejected").length;
+    const processedCount = rows.filter((r) => r.status === "processed").length;
+    const pendingCount = rows.filter((r) => r.status === "pending").length;
+    const totalRefundedAmount = rows
+      .filter((r) => r.status === "approved" || r.status === "processed")
+      .reduce((sum, r) => sum + parseNum(r.amount), 0);
+    const approvalRate =
+      totalRequests > 0
+        ? Math.round(((approvedCount + processedCount) / totalRequests) * 100)
+        : 0;
+
+    res.json({
+      totalRequests,
+      approvedCount,
+      rejectedCount,
+      processedCount,
+      pendingCount,
+      totalRefundedAmount,
+      approvalRate,
+    });
+  },
+);
+
+// ─────────────────────────────────────────────────
+// GET /refunds/:ref — get single refund by refundRef string
+// ─────────────────────────────────────────────────
+router.get(
+  "/refunds/:ref",
+  requireAuth,
+  async (req, res): Promise<void> => {
+    const user = (req as any).currentUser;
+    const [refund] = await db
+      .select()
+      .from(refundsTable)
+      .where(eq(refundsTable.refundRef, req.params.ref as string));
+
+    if (!refund) {
+      res.status(404).json({ error: "Refund not found" });
+      return;
+    }
+
+    const isAdmin = ["admin", "super_admin"].includes(user.role);
+    const isOwner = refund.requestedBy === user.id || refund.customerId === user.id;
+    if (!isAdmin && !isOwner) {
+      res.status(403).json({ error: "Access denied" });
+      return;
+    }
+
+    const detail = await getRefundWithDetails(refund.id);
+    res.json(detail);
+  },
+);
+
+// ─────────────────────────────────────────────────
+// PATCH /refunds/admin/:ref/override — super admin override
+// ─────────────────────────────────────────────────
+router.patch(
+  "/refunds/admin/:ref/override",
+  requireRole("super_admin"),
+  async (req, res): Promise<void> => {
+    const user = (req as any).currentUser;
+    const [refund] = await db
+      .select()
+      .from(refundsTable)
+      .where(eq(refundsTable.refundRef, req.params.ref as string));
+
+    if (!refund) {
+      res.status(404).json({ error: "Refund not found" });
+      return;
+    }
+
+    const { action, reason } = req.body as {
+      action: "approve" | "reject";
+      reason?: string;
+    };
+    if (!action || !["approve", "reject"].includes(action)) {
+      res.status(400).json({ error: "action must be approve or reject" });
+      return;
+    }
+
+    const now = new Date();
+    const newStatus = action === "approve" ? "approved" : "rejected";
+
+    const [updated] = await db
+      .update(refundsTable)
+      .set({
+        status: newStatus,
+        processedBy: user.id,
+        processedAt: now,
+        overriddenBy: user.id,
+        adminNotes: reason ?? null,
+        rejectionReason: action === "reject" ? (reason ?? null) : null,
+      })
+      .where(eq(refundsTable.id, refund.id))
+      .returning();
+
+    if (action === "approve") {
+      const [payment] = await db
+        .select()
+        .from(paymentsTable)
+        .where(eq(paymentsTable.id, refund.paymentId));
+
+      if (payment) {
+        const refundAmount = parseNum(refund.amount);
+        const paidAmount = parseNum(payment.paidAmount);
+        const isFullRefund = refundAmount >= paidAmount;
+
+        await db
+          .update(paymentsTable)
+          .set({ paymentStatus: isFullRefund ? "refunded" : "partially_refunded" })
+          .where(eq(paymentsTable.id, payment.id));
+
+        await db.insert(transactionsTable).values({
+          transactionRef: genTransactionRef(),
+          paymentId: payment.id,
+          type: isFullRefund ? "refund" : "partial_refund",
+          amount: String(refund.amount),
+          description: `Override refund of ₹${refund.amount} by super admin for ${payment.paymentRef}`,
+          status: "success",
+          metadata: { refundRef: refund.refundRef, overriddenBy: user.id },
+        });
+      }
+    }
+
+    await logActivity(
+      req,
+      `refund_override_${newStatus}`,
+      `Refund ${refund.refundRef} overridden to ${newStatus} by super admin`,
+      user.id,
+      user.role,
+    );
+
+    res.json(serializeRefund(updated));
+  },
+);
+
 export default router;

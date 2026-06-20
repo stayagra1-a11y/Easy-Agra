@@ -4170,6 +4170,218 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/SupportAnalytics' }
 
+
+  # ─── Cancellation paths ─────────────────────────────────────────────────────
+
+  /cancellations:
+    post:
+      operationId: requestCancellation
+      tags: [refunds]
+      summary: Customer requests cancellation of a booking
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RequestCancellationInput"
+      responses:
+        "201":
+          description: Cancellation request created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CancellationDetail"
+    get:
+      operationId: getMyCancellations
+      tags: [refunds]
+      summary: Customer's own cancellation requests
+      responses:
+        "200":
+          description: Cancellation list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  cancellations:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/CancellationDetail"
+                  total: { type: integer }
+                required: [cancellations, total]
+
+  /cancellations/{ref}:
+    get:
+      operationId: getCancellation
+      tags: [refunds]
+      summary: Get single cancellation by ref
+      parameters:
+        - name: ref
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Cancellation detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CancellationDetail"
+
+  /owner/cancellations:
+    get:
+      operationId: getOwnerCancellations
+      tags: [refunds]
+      summary: Owner incoming cancellation requests
+      parameters:
+        - name: status
+          in: query
+          schema: { type: string }
+      responses:
+        "200":
+          description: Owner cancellation list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  cancellations:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/CancellationDetail"
+                  total: { type: integer }
+                required: [cancellations, total]
+
+  /owner/cancellations/{ref}:
+    patch:
+      operationId: processOwnerCancellation
+      tags: [refunds]
+      summary: Owner approves or rejects a cancellation
+      parameters:
+        - name: ref
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProcessCancellationInput"
+      responses:
+        "200":
+          description: Cancellation processed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CancellationDetail"
+
+  /admin/cancellations:
+    get:
+      operationId: getAdminCancellations
+      tags: [refunds]
+      summary: Admin list all cancellations
+      parameters:
+        - name: status
+          in: query
+          schema: { type: string }
+        - name: bookingType
+          in: query
+          schema: { type: string }
+      responses:
+        "200":
+          description: All cancellations
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  cancellations:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/CancellationDetail"
+                  total: { type: integer }
+                required: [cancellations, total]
+
+  /admin/cancellations/{ref}:
+    patch:
+      operationId: processAdminCancellation
+      tags: [refunds]
+      summary: Admin approves or rejects a cancellation
+      parameters:
+        - name: ref
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminCancellationInput"
+      responses:
+        "200":
+          description: Cancellation processed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CancellationDetail"
+
+  /refunds/analytics:
+    get:
+      operationId: getRefundAnalytics
+      tags: [refunds]
+      summary: Super admin refund analytics
+      responses:
+        "200":
+          description: Refund analytics
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RefundAnalytics"
+
+  /refunds/{ref}:
+    get:
+      operationId: getRefundByRef
+      tags: [refunds]
+      summary: Get single refund by ref
+      parameters:
+        - name: ref
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Refund detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RefundDetail"
+
+  /refunds/admin/{ref}/override:
+    patch:
+      operationId: overrideRefund
+      tags: [refunds]
+      summary: Super admin overrides a refund decision
+      parameters:
+        - name: ref
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OverrideRefundInput"
+      responses:
+        "200":
+          description: Refund overridden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Refund"
+
 components:
   schemas:
     HealthStatus:
@@ -7619,3 +7831,73 @@ components:
             required: [priority, count]
       required: [total, open, inProgress, waitingForCustomer, resolved, closed, byCategory, byPriority]
 
+    RequestCancellationInput:
+      type: object
+      properties:
+        bookingType:
+          type: string
+          enum: [hotel, restaurant, spa]
+        bookingRef: { type: string }
+        reason: { type: string }
+      required: [bookingType, bookingRef, reason]
+
+    ProcessCancellationInput:
+      type: object
+      properties:
+        action:
+          type: string
+          enum: [approve, reject]
+        note: { type: string }
+      required: [action]
+
+    AdminCancellationInput:
+      type: object
+      properties:
+        action:
+          type: string
+          enum: [approve, reject]
+        adminNote: { type: string }
+      required: [action]
+
+    CancellationDetail:
+      type: object
+      properties:
+        id: { type: integer }
+        cancelRef: { type: string }
+        bookingType: { type: string }
+        bookingId: { type: integer }
+        bookingRef: { type: string }
+        customerId: { type: integer }
+        ownerId: { type: integer, nullable: true }
+        reason: { type: string }
+        status: { type: string }
+        ownerNote: { type: string, nullable: true }
+        adminNote: { type: string, nullable: true }
+        processedBy: { type: integer, nullable: true }
+        processedAt: { type: string, nullable: true }
+        createdAt: { type: string }
+        updatedAt: { type: string }
+        customerName: { type: string, nullable: true }
+        ownerName: { type: string, nullable: true }
+      required: [id, cancelRef, bookingType, bookingId, bookingRef, customerId, reason, status, createdAt, updatedAt]
+
+    RefundAnalytics:
+      type: object
+      properties:
+        totalRequests: { type: integer }
+        approvedCount: { type: integer }
+        rejectedCount: { type: integer }
+        processedCount: { type: integer }
+        pendingCount: { type: integer }
+        totalRefundedAmount: { type: number }
+        approvalRate: { type: number }
+      required: [totalRequests, approvedCount, rejectedCount, processedCount, pendingCount, totalRefundedAmount, approvalRate]
+
+    OverrideRefundInput:
+      type: object
+      properties:
+        action:
+          type: string
+          enum: [approve, reject]
+        reason: { type: string }
+      required: [action]

@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { LayoutDashboard, Users, FileCheck, Bell, Activity, Settings, LogOut, Map, Menu, X, Shield, BookOpen, BarChart2, Star, Utensils, Sparkles, Landmark, IndianRupee, TrendingUp, FileBarChart, LifeBuoy } from "lucide-react";
+import { LayoutDashboard, Users, FileCheck, Bell, Activity, Settings, LogOut, Map, Menu, X, Shield, BookOpen, BarChart2, Star, Utensils, Sparkles, Landmark, IndianRupee, TrendingUp, FileBarChart, LifeBuoy, ReceiptText } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { useLogout, getGetMeQueryKey } from "@workspace/api-client-react";
@@ -28,6 +28,7 @@ const adminNavItems: NavItem[] = [
   { href: "/admin/restaurants", icon: Utensils, label: "Restaurants" },
   { href: "/admin/spas", icon: Sparkles, label: "Spas" },
   { href: "/admin/support", icon: LifeBuoy, label: "Support Tickets" },
+  { href: "/admin/refunds", icon: ReceiptText, label: "Refunds" },
   { href: "/admin/users", icon: Users, label: "Users" },
   { href: "/admin/owner-requests", icon: FileCheck, label: "Owner Requests" },
   { href: "/admin/activity-logs", icon: Activity, label: "Activity Logs" },
@@ -47,6 +48,8 @@ const superAdminNavItems: NavItem[] = [
   { href: "/admin/spas", icon: Sparkles, label: "Spas" },
   { href: "/admin/support", icon: LifeBuoy, label: "Support Tickets" },
   { href: "/super-admin/support-analytics", icon: BarChart2, label: "Support Analytics" },
+  { href: "/admin/refunds", icon: ReceiptText, label: "Refunds" },
+  { href: "/super-admin/refund-analytics", icon: BarChart2, label: "Refund Analytics" },
   { href: "/super-admin/users", icon: Users, label: "All Users" },
   { href: "/super-admin/admins", icon: Shield, label: "Manage Admins" },
   { href: "/super-admin/owner-requests", icon: FileCheck, label: "Owner Requests" },

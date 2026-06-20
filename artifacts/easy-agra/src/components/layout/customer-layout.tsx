@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { Home, Bell, User, Settings, LogOut, Map, CalendarDays, Star, Utensils, Sparkles, Landmark, IndianRupee, LifeBuoy } from "lucide-react";
+import { Home, Bell, User, Settings, LogOut, Map, CalendarDays, Star, Utensils, Sparkles, Landmark, IndianRupee, LifeBuoy, ReceiptText } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { useGetUnreadNotificationCount, useLogout, getGetMeQueryKey } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
@@ -28,6 +28,7 @@ export function CustomerLayout({ children }: { children: React.ReactNode }) {
     { href: "/places", icon: Landmark, label: "Places" },
     { href: "/trips", icon: Map, label: "Trips" },
     { href: "/support/tickets", icon: LifeBuoy, label: "Support" },
+    { href: "/refunds", icon: ReceiptText, label: "Refunds" },
     { href: "/my-payments", icon: IndianRupee, label: "Payments" },
     { href: "/notifications", icon: Bell, label: "Alerts", badge: unreadData?.count },
     { href: "/profile", icon: User, label: "Profile" },
