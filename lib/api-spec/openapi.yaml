@@ -1871,6 +1871,476 @@ paths:
                     type: boolean
                 required: [success]
 
+  # ── Restaurants ────────────────────────────────────────────────────────
+  /restaurants/my:
+    get:
+      operationId: getMyRestaurants
+      tags: [restaurants]
+      summary: Owner's restaurants
+      responses:
+        "200":
+          description: List of owner's restaurants
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/RestaurantSummary"
+
+  /restaurants:
+    get:
+      operationId: listRestaurants
+      tags: [restaurants]
+      summary: Browse restaurants (public)
+      parameters:
+        - name: search
+          in: query
+          schema:
+            type: string
+        - name: city
+          in: query
+          schema:
+            type: string
+        - name: cuisine
+          in: query
+          schema:
+            type: string
+        - name: page
+          in: query
+          schema:
+            type: integer
+        - name: limit
+          in: query
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Paginated restaurant list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RestaurantsPage"
+    post:
+      operationId: createRestaurant
+      tags: [restaurants]
+      summary: Create restaurant (owner)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RestaurantInput"
+      responses:
+        "201":
+          description: Created restaurant
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RestaurantDetail"
+
+  /restaurants/{id}:
+    get:
+      operationId: getRestaurant
+      tags: [restaurants]
+      summary: Get restaurant detail (public)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Restaurant detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RestaurantDetail"
+    put:
+      operationId: updateRestaurant
+      tags: [restaurants]
+      summary: Update restaurant (owner)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RestaurantInput"
+      responses:
+        "200":
+          description: Updated restaurant
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RestaurantDetail"
+    delete:
+      operationId: deleteRestaurant
+      tags: [restaurants]
+      summary: Soft-delete restaurant (owner)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                required: [success]
+
+  /restaurants/{id}/menu:
+    get:
+      operationId: getRestaurantMenu
+      tags: [restaurants]
+      summary: Get menu for a restaurant
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Menu items
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/MenuItemDetail"
+    post:
+      operationId: addMenuItem
+      tags: [restaurants]
+      summary: Add menu item (owner)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MenuItemInput"
+      responses:
+        "201":
+          description: Created menu item
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MenuItemDetail"
+
+  /menu-items/{id}:
+    put:
+      operationId: updateMenuItem
+      tags: [restaurants]
+      summary: Update menu item (owner)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MenuItemInput"
+      responses:
+        "200":
+          description: Updated menu item
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MenuItemDetail"
+    delete:
+      operationId: deleteMenuItem
+      tags: [restaurants]
+      summary: Delete menu item (owner)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                required: [success]
+
+  /restaurants/{id}/tables:
+    get:
+      operationId: getRestaurantTables
+      tags: [restaurants]
+      summary: Get tables for a restaurant
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Tables
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TableDetail"
+    post:
+      operationId: addTable
+      tags: [restaurants]
+      summary: Add table (owner)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TableInput"
+      responses:
+        "201":
+          description: Created table
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TableDetail"
+
+  /tables/{id}:
+    put:
+      operationId: updateTable
+      tags: [restaurants]
+      summary: Update table (owner)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TableInput"
+      responses:
+        "200":
+          description: Updated table
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TableDetail"
+    delete:
+      operationId: deleteTable
+      tags: [restaurants]
+      summary: Delete table (owner)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                required: [success]
+
+  # ── Reservations ──────────────────────────────────────────────────────
+  /reservations/my:
+    get:
+      operationId: getMyReservations
+      tags: [reservations]
+      summary: Customer's own reservations
+      responses:
+        "200":
+          description: Customer reservations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ReservationDetail"
+
+  /reservations:
+    get:
+      operationId: listReservations
+      tags: [reservations]
+      summary: List reservations (owner/admin)
+      parameters:
+        - name: restaurantId
+          in: query
+          schema:
+            type: integer
+        - name: status
+          in: query
+          schema:
+            type: string
+        - name: date
+          in: query
+          schema:
+            type: string
+        - name: page
+          in: query
+          schema:
+            type: integer
+        - name: limit
+          in: query
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Paginated reservations
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ReservationsPage"
+    post:
+      operationId: createReservation
+      tags: [reservations]
+      summary: Create reservation (customer)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReservationInput"
+      responses:
+        "201":
+          description: Created reservation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ReservationDetail"
+
+  /reservations/{id}:
+    get:
+      operationId: getReservation
+      tags: [reservations]
+      summary: Get reservation detail
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Reservation detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ReservationDetail"
+    delete:
+      operationId: cancelReservation
+      tags: [reservations]
+      summary: Cancel reservation (customer)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Cancelled
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ReservationDetail"
+
+  /reservations/{id}/confirm:
+    patch:
+      operationId: confirmReservation
+      tags: [reservations]
+      summary: Confirm reservation (owner)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Confirmed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ReservationDetail"
+
+  /reservations/{id}/reject:
+    patch:
+      operationId: rejectReservation
+      tags: [reservations]
+      summary: Reject reservation (owner)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Rejected
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ReservationDetail"
+
+  /reservations/{id}/complete:
+    patch:
+      operationId: completeReservation
+      tags: [reservations]
+      summary: Mark reservation complete (owner)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Completed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ReservationDetail"
+
 components:
   schemas:
     HealthStatus:
@@ -3446,3 +3916,404 @@ components:
         - avgRating
         - reviewCount
         - positivePct
+
+    RestaurantSummary:
+      type: object
+      properties:
+        id:
+          type: integer
+        ownerId:
+          type: integer
+        name:
+          type: string
+        description:
+          type: string
+          nullable: true
+        city:
+          type: string
+          nullable: true
+        state:
+          type: string
+          nullable: true
+        cuisineType:
+          type: string
+          nullable: true
+        seatingCapacity:
+          type: integer
+          nullable: true
+        coverPhoto:
+          type: string
+          nullable: true
+        status:
+          type: string
+        openingTime:
+          type: string
+          nullable: true
+        closingTime:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+      required:
+        - id
+        - ownerId
+        - name
+        - status
+        - createdAt
+        - updatedAt
+
+    RestaurantDetail:
+      type: object
+      properties:
+        id:
+          type: integer
+        ownerId:
+          type: integer
+        name:
+          type: string
+        description:
+          type: string
+          nullable: true
+        address:
+          type: string
+          nullable: true
+        city:
+          type: string
+          nullable: true
+        state:
+          type: string
+          nullable: true
+        contactNumber:
+          type: string
+          nullable: true
+        contactEmail:
+          type: string
+          nullable: true
+        openingTime:
+          type: string
+          nullable: true
+        closingTime:
+          type: string
+          nullable: true
+        cuisineType:
+          type: string
+          nullable: true
+        seatingCapacity:
+          type: integer
+          nullable: true
+        coverPhoto:
+          type: string
+          nullable: true
+        galleryPhotos:
+          type: array
+          items:
+            type: string
+        status:
+          type: string
+        deletedAt:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+      required:
+        - id
+        - ownerId
+        - name
+        - galleryPhotos
+        - status
+        - createdAt
+        - updatedAt
+
+    RestaurantInput:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+          nullable: true
+        address:
+          type: string
+          nullable: true
+        city:
+          type: string
+          nullable: true
+        state:
+          type: string
+          nullable: true
+        contactNumber:
+          type: string
+          nullable: true
+        contactEmail:
+          type: string
+          nullable: true
+        openingTime:
+          type: string
+          nullable: true
+        closingTime:
+          type: string
+          nullable: true
+        cuisineType:
+          type: string
+          nullable: true
+        seatingCapacity:
+          type: integer
+          nullable: true
+        coverPhoto:
+          type: string
+          nullable: true
+        galleryPhotos:
+          type: array
+          items:
+            type: string
+      required:
+        - name
+
+    RestaurantsPage:
+      type: object
+      properties:
+        restaurants:
+          type: array
+          items:
+            $ref: "#/components/schemas/RestaurantDetail"
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+      required:
+        - restaurants
+        - total
+        - page
+        - limit
+
+    MenuItemDetail:
+      type: object
+      properties:
+        id:
+          type: integer
+        restaurantId:
+          type: integer
+        name:
+          type: string
+        category:
+          type: string
+        description:
+          type: string
+          nullable: true
+        price:
+          type: number
+        itemPhoto:
+          type: string
+          nullable: true
+        isVeg:
+          type: boolean
+        isAvailable:
+          type: boolean
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+      required:
+        - id
+        - restaurantId
+        - name
+        - category
+        - price
+        - isVeg
+        - isAvailable
+        - createdAt
+        - updatedAt
+
+    MenuItemInput:
+      type: object
+      properties:
+        name:
+          type: string
+        category:
+          type: string
+        description:
+          type: string
+          nullable: true
+        price:
+          type: number
+        itemPhoto:
+          type: string
+          nullable: true
+        isVeg:
+          type: boolean
+        isAvailable:
+          type: boolean
+      required:
+        - name
+        - price
+
+    TableDetail:
+      type: object
+      properties:
+        id:
+          type: integer
+        restaurantId:
+          type: integer
+        tableNumber:
+          type: string
+        capacity:
+          type: integer
+        status:
+          type: string
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+      required:
+        - id
+        - restaurantId
+        - tableNumber
+        - capacity
+        - status
+        - createdAt
+        - updatedAt
+
+    TableInput:
+      type: object
+      properties:
+        tableNumber:
+          type: string
+        capacity:
+          type: integer
+        status:
+          type: string
+      required:
+        - tableNumber
+
+    ReservationDetail:
+      type: object
+      properties:
+        id:
+          type: integer
+        reservationRef:
+          type: string
+        restaurantId:
+          type: integer
+        tableId:
+          type: integer
+          nullable: true
+        customerId:
+          type: integer
+        ownerId:
+          type: integer
+        customerName:
+          type: string
+        customerMobile:
+          type: string
+        customerEmail:
+          type: string
+          nullable: true
+        reservationDate:
+          type: string
+        reservationTime:
+          type: string
+        guestCount:
+          type: integer
+        specialRequest:
+          type: string
+          nullable: true
+        status:
+          type: string
+        rejectionReason:
+          type: string
+          nullable: true
+        cancelReason:
+          type: string
+          nullable: true
+        confirmedAt:
+          type: string
+          nullable: true
+        completedAt:
+          type: string
+          nullable: true
+        cancelledAt:
+          type: string
+          nullable: true
+        restaurantName:
+          type: string
+          nullable: true
+        restaurantCity:
+          type: string
+          nullable: true
+        tableNumber:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+      required:
+        - id
+        - reservationRef
+        - restaurantId
+        - customerId
+        - ownerId
+        - customerName
+        - customerMobile
+        - reservationDate
+        - reservationTime
+        - guestCount
+        - status
+        - createdAt
+        - updatedAt
+
+    ReservationInput:
+      type: object
+      properties:
+        restaurantId:
+          type: integer
+        tableId:
+          type: integer
+          nullable: true
+        customerName:
+          type: string
+        customerMobile:
+          type: string
+        customerEmail:
+          type: string
+          nullable: true
+        reservationDate:
+          type: string
+        reservationTime:
+          type: string
+        guestCount:
+          type: integer
+        specialRequest:
+          type: string
+          nullable: true
+      required:
+        - restaurantId
+        - customerName
+        - customerMobile
+        - reservationDate
+        - reservationTime
+
+    ReservationsPage:
+      type: object
+      properties:
+        reservations:
+          type: array
+          items:
+            $ref: "#/components/schemas/ReservationDetail"
+        total:
+          type: integer
+        page:
+          type: integer
+        limit:
+          type: integer
+      required:
+        - reservations
+        - total
+        - page
+        - limit

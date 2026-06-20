@@ -153,7 +153,7 @@ router.get("/reviews/top-hotels", async (req, res): Promise<void> => {
       hotelId: reviewsTable.hotelId,
       hotelName: hotelsTable.name,
       hotelCity: hotelsTable.city,
-      hotelCoverPhoto: hotelsTable.coverPhoto,
+      hotelCoverPhoto: hotelsTable.coverImage,
       avgRating: sql<number>`round(avg(${reviewsTable.overallRating}),2)::numeric`,
       reviewCount: sql<number>`count(*)::int`,
       avgCleanliness: sql<number>`round(avg(${reviewsTable.cleanlinessRating}),1)::numeric`,
@@ -166,7 +166,7 @@ router.get("/reviews/top-hotels", async (req, res): Promise<void> => {
     .from(reviewsTable)
     .innerJoin(hotelsTable, eq(reviewsTable.hotelId, hotelsTable.id))
     .where(eq(reviewsTable.status, "approved"))
-    .groupBy(reviewsTable.hotelId, hotelsTable.name, hotelsTable.city, hotelsTable.coverPhoto)
+    .groupBy(reviewsTable.hotelId, hotelsTable.name, hotelsTable.city, hotelsTable.coverImage)
     .having(sql`count(*) >= 1`)
     .orderBy(
       desc(sql`round(avg(${reviewsTable.overallRating}),2)`),
@@ -426,7 +426,7 @@ router.post("/reviews", requireRole("customer"), async (req, res): Promise<void>
 // GET /reviews/:id
 // ─────────────────────────────────────────────────
 router.get("/reviews/:id", requireAuth, async (req, res): Promise<void> => {
-  const id = parseInt(req.params.id, 10);
+  const id = parseInt(req.params.id as string, 10);
   const review = await findReview(id);
   if (!review) { res.status(404).json({ error: "Review not found" }); return; }
   res.json(serializeReview(review as any));
@@ -437,7 +437,7 @@ router.get("/reviews/:id", requireAuth, async (req, res): Promise<void> => {
 // ─────────────────────────────────────────────────
 router.put("/reviews/:id", requireRole("customer"), async (req, res): Promise<void> => {
   const cu = (req as any).currentUser;
-  const id = parseInt(req.params.id, 10);
+  const id = parseInt(req.params.id as string, 10);
   const review = await findReview(id);
   if (!review) { res.status(404).json({ error: "Review not found" }); return; }
   if (review.customerId !== cu.id) { res.status(403).json({ error: "Access denied" }); return; }
@@ -485,7 +485,7 @@ router.put("/reviews/:id", requireRole("customer"), async (req, res): Promise<vo
 // ─────────────────────────────────────────────────
 router.delete("/reviews/:id", requireAuth, async (req, res): Promise<void> => {
   const cu = (req as any).currentUser;
-  const id = parseInt(req.params.id, 10);
+  const id = parseInt(req.params.id as string, 10);
   const review = await findReview(id);
   if (!review) { res.status(404).json({ error: "Review not found" }); return; }
 
@@ -510,7 +510,7 @@ router.delete("/reviews/:id", requireAuth, async (req, res): Promise<void> => {
 // ─────────────────────────────────────────────────
 router.post("/reviews/:id/reply", requireRole("hotel_owner", "admin", "super_admin"), async (req, res): Promise<void> => {
   const cu = (req as any).currentUser;
-  const id = parseInt(req.params.id, 10);
+  const id = parseInt(req.params.id as string, 10);
   const { replyTitle, replyMessage } = req.body;
   if (!replyMessage?.trim()) { res.status(400).json({ error: "Reply message is required" }); return; }
 
@@ -536,7 +536,7 @@ router.post("/reviews/:id/reply", requireRole("hotel_owner", "admin", "super_adm
 // ─────────────────────────────────────────────────
 router.post("/reviews/:id/report", requireAuth, async (req, res): Promise<void> => {
   const cu = (req as any).currentUser;
-  const id = parseInt(req.params.id, 10);
+  const id = parseInt(req.params.id as string, 10);
   const { reason } = req.body;
   if (!reason?.trim()) { res.status(400).json({ error: "Report reason is required" }); return; }
 
@@ -565,7 +565,7 @@ router.post("/reviews/:id/report", requireAuth, async (req, res): Promise<void> 
 // ─────────────────────────────────────────────────
 router.post("/reviews/:id/hide", requireRole("admin", "super_admin"), async (req, res): Promise<void> => {
   const cu = (req as any).currentUser;
-  const id = parseInt(req.params.id, 10);
+  const id = parseInt(req.params.id as string, 10);
   const review = await findReview(id);
   if (!review) { res.status(404).json({ error: "Review not found" }); return; }
 
@@ -585,7 +585,7 @@ router.post("/reviews/:id/hide", requireRole("admin", "super_admin"), async (req
 // ─────────────────────────────────────────────────
 router.post("/reviews/:id/restore", requireRole("super_admin"), async (req, res): Promise<void> => {
   const cu = (req as any).currentUser;
-  const id = parseInt(req.params.id, 10);
+  const id = parseInt(req.params.id as string, 10);
   const review = await findReview(id);
   if (!review) { res.status(404).json({ error: "Review not found" }); return; }
 
@@ -604,7 +604,7 @@ router.post("/reviews/:id/restore", requireRole("super_admin"), async (req, res)
 // ─────────────────────────────────────────────────
 router.post("/reviews/:id/remove", requireRole("super_admin"), async (req, res): Promise<void> => {
   const cu = (req as any).currentUser;
-  const id = parseInt(req.params.id, 10);
+  const id = parseInt(req.params.id as string, 10);
   const review = await findReview(id);
   if (!review) { res.status(404).json({ error: "Review not found" }); return; }
 

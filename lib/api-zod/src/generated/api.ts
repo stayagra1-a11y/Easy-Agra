@@ -2467,3 +2467,593 @@ export const RemoveReviewResponse = zod.object({
 })
 
 
+/**
+ * @summary Owner's restaurants
+ */
+export const GetMyRestaurantsResponseItem = zod.object({
+  "id": zod.number(),
+  "ownerId": zod.number(),
+  "name": zod.string(),
+  "description": zod.string().nullish(),
+  "city": zod.string().nullish(),
+  "state": zod.string().nullish(),
+  "cuisineType": zod.string().nullish(),
+  "seatingCapacity": zod.number().nullish(),
+  "coverPhoto": zod.string().nullish(),
+  "status": zod.string(),
+  "openingTime": zod.string().nullish(),
+  "closingTime": zod.string().nullish(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+export const GetMyRestaurantsResponse = zod.array(GetMyRestaurantsResponseItem)
+
+
+/**
+ * @summary Browse restaurants (public)
+ */
+export const ListRestaurantsQueryParams = zod.object({
+  "search": zod.coerce.string().optional(),
+  "city": zod.coerce.string().optional(),
+  "cuisine": zod.coerce.string().optional(),
+  "page": zod.coerce.number().optional(),
+  "limit": zod.coerce.number().optional()
+})
+
+export const ListRestaurantsResponse = zod.object({
+  "restaurants": zod.array(zod.object({
+  "id": zod.number(),
+  "ownerId": zod.number(),
+  "name": zod.string(),
+  "description": zod.string().nullish(),
+  "address": zod.string().nullish(),
+  "city": zod.string().nullish(),
+  "state": zod.string().nullish(),
+  "contactNumber": zod.string().nullish(),
+  "contactEmail": zod.string().nullish(),
+  "openingTime": zod.string().nullish(),
+  "closingTime": zod.string().nullish(),
+  "cuisineType": zod.string().nullish(),
+  "seatingCapacity": zod.number().nullish(),
+  "coverPhoto": zod.string().nullish(),
+  "galleryPhotos": zod.array(zod.string()),
+  "status": zod.string(),
+  "deletedAt": zod.string().nullish(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})),
+  "total": zod.number(),
+  "page": zod.number(),
+  "limit": zod.number()
+})
+
+
+/**
+ * @summary Create restaurant (owner)
+ */
+export const CreateRestaurantBody = zod.object({
+  "name": zod.string(),
+  "description": zod.string().nullish(),
+  "address": zod.string().nullish(),
+  "city": zod.string().nullish(),
+  "state": zod.string().nullish(),
+  "contactNumber": zod.string().nullish(),
+  "contactEmail": zod.string().nullish(),
+  "openingTime": zod.string().nullish(),
+  "closingTime": zod.string().nullish(),
+  "cuisineType": zod.string().nullish(),
+  "seatingCapacity": zod.number().nullish(),
+  "coverPhoto": zod.string().nullish(),
+  "galleryPhotos": zod.array(zod.string()).optional()
+})
+
+
+/**
+ * @summary Get restaurant detail (public)
+ */
+export const GetRestaurantParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const GetRestaurantResponse = zod.object({
+  "id": zod.number(),
+  "ownerId": zod.number(),
+  "name": zod.string(),
+  "description": zod.string().nullish(),
+  "address": zod.string().nullish(),
+  "city": zod.string().nullish(),
+  "state": zod.string().nullish(),
+  "contactNumber": zod.string().nullish(),
+  "contactEmail": zod.string().nullish(),
+  "openingTime": zod.string().nullish(),
+  "closingTime": zod.string().nullish(),
+  "cuisineType": zod.string().nullish(),
+  "seatingCapacity": zod.number().nullish(),
+  "coverPhoto": zod.string().nullish(),
+  "galleryPhotos": zod.array(zod.string()),
+  "status": zod.string(),
+  "deletedAt": zod.string().nullish(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+
+
+/**
+ * @summary Update restaurant (owner)
+ */
+export const UpdateRestaurantParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const UpdateRestaurantBody = zod.object({
+  "name": zod.string(),
+  "description": zod.string().nullish(),
+  "address": zod.string().nullish(),
+  "city": zod.string().nullish(),
+  "state": zod.string().nullish(),
+  "contactNumber": zod.string().nullish(),
+  "contactEmail": zod.string().nullish(),
+  "openingTime": zod.string().nullish(),
+  "closingTime": zod.string().nullish(),
+  "cuisineType": zod.string().nullish(),
+  "seatingCapacity": zod.number().nullish(),
+  "coverPhoto": zod.string().nullish(),
+  "galleryPhotos": zod.array(zod.string()).optional()
+})
+
+export const UpdateRestaurantResponse = zod.object({
+  "id": zod.number(),
+  "ownerId": zod.number(),
+  "name": zod.string(),
+  "description": zod.string().nullish(),
+  "address": zod.string().nullish(),
+  "city": zod.string().nullish(),
+  "state": zod.string().nullish(),
+  "contactNumber": zod.string().nullish(),
+  "contactEmail": zod.string().nullish(),
+  "openingTime": zod.string().nullish(),
+  "closingTime": zod.string().nullish(),
+  "cuisineType": zod.string().nullish(),
+  "seatingCapacity": zod.number().nullish(),
+  "coverPhoto": zod.string().nullish(),
+  "galleryPhotos": zod.array(zod.string()),
+  "status": zod.string(),
+  "deletedAt": zod.string().nullish(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+
+
+/**
+ * @summary Soft-delete restaurant (owner)
+ */
+export const DeleteRestaurantParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const DeleteRestaurantResponse = zod.object({
+  "success": zod.boolean()
+})
+
+
+/**
+ * @summary Get menu for a restaurant
+ */
+export const GetRestaurantMenuParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const GetRestaurantMenuResponseItem = zod.object({
+  "id": zod.number(),
+  "restaurantId": zod.number(),
+  "name": zod.string(),
+  "category": zod.string(),
+  "description": zod.string().nullish(),
+  "price": zod.number(),
+  "itemPhoto": zod.string().nullish(),
+  "isVeg": zod.boolean(),
+  "isAvailable": zod.boolean(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+export const GetRestaurantMenuResponse = zod.array(GetRestaurantMenuResponseItem)
+
+
+/**
+ * @summary Add menu item (owner)
+ */
+export const AddMenuItemParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const AddMenuItemBody = zod.object({
+  "name": zod.string(),
+  "category": zod.string().optional(),
+  "description": zod.string().nullish(),
+  "price": zod.number(),
+  "itemPhoto": zod.string().nullish(),
+  "isVeg": zod.boolean().optional(),
+  "isAvailable": zod.boolean().optional()
+})
+
+
+/**
+ * @summary Update menu item (owner)
+ */
+export const UpdateMenuItemParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const UpdateMenuItemBody = zod.object({
+  "name": zod.string(),
+  "category": zod.string().optional(),
+  "description": zod.string().nullish(),
+  "price": zod.number(),
+  "itemPhoto": zod.string().nullish(),
+  "isVeg": zod.boolean().optional(),
+  "isAvailable": zod.boolean().optional()
+})
+
+export const UpdateMenuItemResponse = zod.object({
+  "id": zod.number(),
+  "restaurantId": zod.number(),
+  "name": zod.string(),
+  "category": zod.string(),
+  "description": zod.string().nullish(),
+  "price": zod.number(),
+  "itemPhoto": zod.string().nullish(),
+  "isVeg": zod.boolean(),
+  "isAvailable": zod.boolean(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+
+
+/**
+ * @summary Delete menu item (owner)
+ */
+export const DeleteMenuItemParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const DeleteMenuItemResponse = zod.object({
+  "success": zod.boolean()
+})
+
+
+/**
+ * @summary Get tables for a restaurant
+ */
+export const GetRestaurantTablesParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const GetRestaurantTablesResponseItem = zod.object({
+  "id": zod.number(),
+  "restaurantId": zod.number(),
+  "tableNumber": zod.string(),
+  "capacity": zod.number(),
+  "status": zod.string(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+export const GetRestaurantTablesResponse = zod.array(GetRestaurantTablesResponseItem)
+
+
+/**
+ * @summary Add table (owner)
+ */
+export const AddTableParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const AddTableBody = zod.object({
+  "tableNumber": zod.string(),
+  "capacity": zod.number().optional(),
+  "status": zod.string().optional()
+})
+
+
+/**
+ * @summary Update table (owner)
+ */
+export const UpdateTableParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const UpdateTableBody = zod.object({
+  "tableNumber": zod.string(),
+  "capacity": zod.number().optional(),
+  "status": zod.string().optional()
+})
+
+export const UpdateTableResponse = zod.object({
+  "id": zod.number(),
+  "restaurantId": zod.number(),
+  "tableNumber": zod.string(),
+  "capacity": zod.number(),
+  "status": zod.string(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+
+
+/**
+ * @summary Delete table (owner)
+ */
+export const DeleteTableParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const DeleteTableResponse = zod.object({
+  "success": zod.boolean()
+})
+
+
+/**
+ * @summary Customer's own reservations
+ */
+export const GetMyReservationsResponseItem = zod.object({
+  "id": zod.number(),
+  "reservationRef": zod.string(),
+  "restaurantId": zod.number(),
+  "tableId": zod.number().nullish(),
+  "customerId": zod.number(),
+  "ownerId": zod.number(),
+  "customerName": zod.string(),
+  "customerMobile": zod.string(),
+  "customerEmail": zod.string().nullish(),
+  "reservationDate": zod.string(),
+  "reservationTime": zod.string(),
+  "guestCount": zod.number(),
+  "specialRequest": zod.string().nullish(),
+  "status": zod.string(),
+  "rejectionReason": zod.string().nullish(),
+  "cancelReason": zod.string().nullish(),
+  "confirmedAt": zod.string().nullish(),
+  "completedAt": zod.string().nullish(),
+  "cancelledAt": zod.string().nullish(),
+  "restaurantName": zod.string().nullish(),
+  "restaurantCity": zod.string().nullish(),
+  "tableNumber": zod.string().nullish(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+export const GetMyReservationsResponse = zod.array(GetMyReservationsResponseItem)
+
+
+/**
+ * @summary List reservations (owner/admin)
+ */
+export const ListReservationsQueryParams = zod.object({
+  "restaurantId": zod.coerce.number().optional(),
+  "status": zod.coerce.string().optional(),
+  "date": zod.coerce.string().optional(),
+  "page": zod.coerce.number().optional(),
+  "limit": zod.coerce.number().optional()
+})
+
+export const ListReservationsResponse = zod.object({
+  "reservations": zod.array(zod.object({
+  "id": zod.number(),
+  "reservationRef": zod.string(),
+  "restaurantId": zod.number(),
+  "tableId": zod.number().nullish(),
+  "customerId": zod.number(),
+  "ownerId": zod.number(),
+  "customerName": zod.string(),
+  "customerMobile": zod.string(),
+  "customerEmail": zod.string().nullish(),
+  "reservationDate": zod.string(),
+  "reservationTime": zod.string(),
+  "guestCount": zod.number(),
+  "specialRequest": zod.string().nullish(),
+  "status": zod.string(),
+  "rejectionReason": zod.string().nullish(),
+  "cancelReason": zod.string().nullish(),
+  "confirmedAt": zod.string().nullish(),
+  "completedAt": zod.string().nullish(),
+  "cancelledAt": zod.string().nullish(),
+  "restaurantName": zod.string().nullish(),
+  "restaurantCity": zod.string().nullish(),
+  "tableNumber": zod.string().nullish(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})),
+  "total": zod.number(),
+  "page": zod.number(),
+  "limit": zod.number()
+})
+
+
+/**
+ * @summary Create reservation (customer)
+ */
+export const CreateReservationBody = zod.object({
+  "restaurantId": zod.number(),
+  "tableId": zod.number().nullish(),
+  "customerName": zod.string(),
+  "customerMobile": zod.string(),
+  "customerEmail": zod.string().nullish(),
+  "reservationDate": zod.string(),
+  "reservationTime": zod.string(),
+  "guestCount": zod.number().optional(),
+  "specialRequest": zod.string().nullish()
+})
+
+
+/**
+ * @summary Get reservation detail
+ */
+export const GetReservationParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const GetReservationResponse = zod.object({
+  "id": zod.number(),
+  "reservationRef": zod.string(),
+  "restaurantId": zod.number(),
+  "tableId": zod.number().nullish(),
+  "customerId": zod.number(),
+  "ownerId": zod.number(),
+  "customerName": zod.string(),
+  "customerMobile": zod.string(),
+  "customerEmail": zod.string().nullish(),
+  "reservationDate": zod.string(),
+  "reservationTime": zod.string(),
+  "guestCount": zod.number(),
+  "specialRequest": zod.string().nullish(),
+  "status": zod.string(),
+  "rejectionReason": zod.string().nullish(),
+  "cancelReason": zod.string().nullish(),
+  "confirmedAt": zod.string().nullish(),
+  "completedAt": zod.string().nullish(),
+  "cancelledAt": zod.string().nullish(),
+  "restaurantName": zod.string().nullish(),
+  "restaurantCity": zod.string().nullish(),
+  "tableNumber": zod.string().nullish(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+
+
+/**
+ * @summary Cancel reservation (customer)
+ */
+export const CancelReservationParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const CancelReservationResponse = zod.object({
+  "id": zod.number(),
+  "reservationRef": zod.string(),
+  "restaurantId": zod.number(),
+  "tableId": zod.number().nullish(),
+  "customerId": zod.number(),
+  "ownerId": zod.number(),
+  "customerName": zod.string(),
+  "customerMobile": zod.string(),
+  "customerEmail": zod.string().nullish(),
+  "reservationDate": zod.string(),
+  "reservationTime": zod.string(),
+  "guestCount": zod.number(),
+  "specialRequest": zod.string().nullish(),
+  "status": zod.string(),
+  "rejectionReason": zod.string().nullish(),
+  "cancelReason": zod.string().nullish(),
+  "confirmedAt": zod.string().nullish(),
+  "completedAt": zod.string().nullish(),
+  "cancelledAt": zod.string().nullish(),
+  "restaurantName": zod.string().nullish(),
+  "restaurantCity": zod.string().nullish(),
+  "tableNumber": zod.string().nullish(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+
+
+/**
+ * @summary Confirm reservation (owner)
+ */
+export const ConfirmReservationParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const ConfirmReservationResponse = zod.object({
+  "id": zod.number(),
+  "reservationRef": zod.string(),
+  "restaurantId": zod.number(),
+  "tableId": zod.number().nullish(),
+  "customerId": zod.number(),
+  "ownerId": zod.number(),
+  "customerName": zod.string(),
+  "customerMobile": zod.string(),
+  "customerEmail": zod.string().nullish(),
+  "reservationDate": zod.string(),
+  "reservationTime": zod.string(),
+  "guestCount": zod.number(),
+  "specialRequest": zod.string().nullish(),
+  "status": zod.string(),
+  "rejectionReason": zod.string().nullish(),
+  "cancelReason": zod.string().nullish(),
+  "confirmedAt": zod.string().nullish(),
+  "completedAt": zod.string().nullish(),
+  "cancelledAt": zod.string().nullish(),
+  "restaurantName": zod.string().nullish(),
+  "restaurantCity": zod.string().nullish(),
+  "tableNumber": zod.string().nullish(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+
+
+/**
+ * @summary Reject reservation (owner)
+ */
+export const RejectReservationParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const RejectReservationResponse = zod.object({
+  "id": zod.number(),
+  "reservationRef": zod.string(),
+  "restaurantId": zod.number(),
+  "tableId": zod.number().nullish(),
+  "customerId": zod.number(),
+  "ownerId": zod.number(),
+  "customerName": zod.string(),
+  "customerMobile": zod.string(),
+  "customerEmail": zod.string().nullish(),
+  "reservationDate": zod.string(),
+  "reservationTime": zod.string(),
+  "guestCount": zod.number(),
+  "specialRequest": zod.string().nullish(),
+  "status": zod.string(),
+  "rejectionReason": zod.string().nullish(),
+  "cancelReason": zod.string().nullish(),
+  "confirmedAt": zod.string().nullish(),
+  "completedAt": zod.string().nullish(),
+  "cancelledAt": zod.string().nullish(),
+  "restaurantName": zod.string().nullish(),
+  "restaurantCity": zod.string().nullish(),
+  "tableNumber": zod.string().nullish(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+
+
+/**
+ * @summary Mark reservation complete (owner)
+ */
+export const CompleteReservationParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const CompleteReservationResponse = zod.object({
+  "id": zod.number(),
+  "reservationRef": zod.string(),
+  "restaurantId": zod.number(),
+  "tableId": zod.number().nullish(),
+  "customerId": zod.number(),
+  "ownerId": zod.number(),
+  "customerName": zod.string(),
+  "customerMobile": zod.string(),
+  "customerEmail": zod.string().nullish(),
+  "reservationDate": zod.string(),
+  "reservationTime": zod.string(),
+  "guestCount": zod.number(),
+  "specialRequest": zod.string().nullish(),
+  "status": zod.string(),
+  "rejectionReason": zod.string().nullish(),
+  "cancelReason": zod.string().nullish(),
+  "confirmedAt": zod.string().nullish(),
+  "completedAt": zod.string().nullish(),
+  "cancelledAt": zod.string().nullish(),
+  "restaurantName": zod.string().nullish(),
+  "restaurantCity": zod.string().nullish(),
+  "tableNumber": zod.string().nullish(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+
+

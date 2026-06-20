@@ -970,6 +970,154 @@ export interface TopRatedHotel {
   positivePct: number;
 }
 
+export interface RestaurantSummary {
+  id: number;
+  ownerId: number;
+  name: string;
+  description?: string | null;
+  city?: string | null;
+  state?: string | null;
+  cuisineType?: string | null;
+  seatingCapacity?: number | null;
+  coverPhoto?: string | null;
+  status: string;
+  openingTime?: string | null;
+  closingTime?: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface RestaurantDetail {
+  id: number;
+  ownerId: number;
+  name: string;
+  description?: string | null;
+  address?: string | null;
+  city?: string | null;
+  state?: string | null;
+  contactNumber?: string | null;
+  contactEmail?: string | null;
+  openingTime?: string | null;
+  closingTime?: string | null;
+  cuisineType?: string | null;
+  seatingCapacity?: number | null;
+  coverPhoto?: string | null;
+  galleryPhotos: string[];
+  status: string;
+  deletedAt?: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface RestaurantInput {
+  name: string;
+  description?: string | null;
+  address?: string | null;
+  city?: string | null;
+  state?: string | null;
+  contactNumber?: string | null;
+  contactEmail?: string | null;
+  openingTime?: string | null;
+  closingTime?: string | null;
+  cuisineType?: string | null;
+  seatingCapacity?: number | null;
+  coverPhoto?: string | null;
+  galleryPhotos?: string[];
+}
+
+export interface RestaurantsPage {
+  restaurants: RestaurantDetail[];
+  total: number;
+  page: number;
+  limit: number;
+}
+
+export interface MenuItemDetail {
+  id: number;
+  restaurantId: number;
+  name: string;
+  category: string;
+  description?: string | null;
+  price: number;
+  itemPhoto?: string | null;
+  isVeg: boolean;
+  isAvailable: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface MenuItemInput {
+  name: string;
+  category?: string;
+  description?: string | null;
+  price: number;
+  itemPhoto?: string | null;
+  isVeg?: boolean;
+  isAvailable?: boolean;
+}
+
+export interface TableDetail {
+  id: number;
+  restaurantId: number;
+  tableNumber: string;
+  capacity: number;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface TableInput {
+  tableNumber: string;
+  capacity?: number;
+  status?: string;
+}
+
+export interface ReservationDetail {
+  id: number;
+  reservationRef: string;
+  restaurantId: number;
+  tableId?: number | null;
+  customerId: number;
+  ownerId: number;
+  customerName: string;
+  customerMobile: string;
+  customerEmail?: string | null;
+  reservationDate: string;
+  reservationTime: string;
+  guestCount: number;
+  specialRequest?: string | null;
+  status: string;
+  rejectionReason?: string | null;
+  cancelReason?: string | null;
+  confirmedAt?: string | null;
+  completedAt?: string | null;
+  cancelledAt?: string | null;
+  restaurantName?: string | null;
+  restaurantCity?: string | null;
+  tableNumber?: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ReservationInput {
+  restaurantId: number;
+  tableId?: number | null;
+  customerName: string;
+  customerMobile: string;
+  customerEmail?: string | null;
+  reservationDate: string;
+  reservationTime: string;
+  guestCount?: number;
+  specialRequest?: string | null;
+}
+
+export interface ReservationsPage {
+  reservations: ReservationDetail[];
+  total: number;
+  page: number;
+  limit: number;
+}
+
 export type ListUsersParams = {
 role?: string;
 status?: string;
@@ -1054,5 +1202,33 @@ export type ReportReview200 = {
 
 export type RemoveReview200 = {
   success: boolean;
+};
+
+export type ListRestaurantsParams = {
+search?: string;
+city?: string;
+cuisine?: string;
+page?: number;
+limit?: number;
+};
+
+export type DeleteRestaurant200 = {
+  success: boolean;
+};
+
+export type DeleteMenuItem200 = {
+  success: boolean;
+};
+
+export type DeleteTable200 = {
+  success: boolean;
+};
+
+export type ListReservationsParams = {
+restaurantId?: number;
+status?: string;
+date?: string;
+page?: number;
+limit?: number;
 };
 

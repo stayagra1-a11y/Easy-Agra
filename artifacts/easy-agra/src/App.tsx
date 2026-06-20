@@ -49,7 +49,21 @@ import HotelOwnerRooms from "@/pages/hotel-owner/rooms";
 import RoomForm from "@/pages/hotel-owner/room-form";
 import HotelReviews from "@/pages/hotel-owner/hotel-reviews";
 import RestaurantOwnerDashboard from "@/pages/restaurant-owner/dashboard";
+import OwnerRestaurants from "@/pages/restaurant-owner/restaurants";
+import RestaurantForm from "@/pages/restaurant-owner/restaurant-form";
+import MenuManagement from "@/pages/restaurant-owner/menu-management";
+import TableManagement from "@/pages/restaurant-owner/table-management";
+import OwnerReservations from "@/pages/restaurant-owner/owner-reservations";
 import SpaOwnerDashboard from "@/pages/spa-owner/dashboard";
+
+// Customer - restaurants & reservations
+import CustomerRestaurants from "@/pages/customer/restaurants";
+import RestaurantDetail from "@/pages/customer/restaurant-detail";
+import MakeReservation from "@/pages/customer/make-reservation";
+import MyReservations from "@/pages/customer/my-reservations";
+
+// Admin - restaurants
+import AdminRestaurants from "@/pages/admin/admin-restaurants";
 
 // Support
 import Contact from "@/pages/support/contact";
@@ -129,6 +143,10 @@ function Router() {
       <Route path="/customer/bookings" component={() => <ProtectedRoute component={MyBookings} allowedRoles={["customer"]} />} />
       <Route path="/customer/write-review/:bookingId" component={() => <ProtectedRoute component={WriteReview} allowedRoles={["customer"]} />} />
       <Route path="/customer/reviews" component={() => <ProtectedRoute component={MyReviews} allowedRoles={["customer"]} />} />
+      <Route path="/restaurants" component={() => <ProtectedRoute component={CustomerRestaurants} allowedRoles={["customer"]} />} />
+      <Route path="/restaurants/:id" component={() => <ProtectedRoute component={RestaurantDetail} allowedRoles={["customer"]} />} />
+      <Route path="/reservations/new" component={() => <ProtectedRoute component={MakeReservation} allowedRoles={["customer"]} />} />
+      <Route path="/my-reservations" component={() => <ProtectedRoute component={MyReservations} allowedRoles={["customer"]} />} />
 
       {/* Owner dashboards */}
       <Route path="/hotel-owner/dashboard" component={() => <ProtectedRoute component={HotelOwnerDashboard} allowedRoles={["hotel_owner"]} />} />
@@ -140,6 +158,12 @@ function Router() {
       <Route path="/hotel-owner/rooms" component={() => <ProtectedRoute component={HotelOwnerRooms} allowedRoles={["hotel_owner"]} />} />
       <Route path="/hotel-owner/reviews" component={() => <ProtectedRoute component={HotelReviews} allowedRoles={["hotel_owner"]} />} />
       <Route path="/restaurant-owner/dashboard" component={() => <ProtectedRoute component={RestaurantOwnerDashboard} allowedRoles={["restaurant_owner"]} />} />
+      <Route path="/restaurant-owner/restaurants/new" component={() => <ProtectedRoute component={RestaurantForm} allowedRoles={["restaurant_owner"]} />} />
+      <Route path="/restaurant-owner/restaurants/:id/edit" component={() => <ProtectedRoute component={RestaurantForm} allowedRoles={["restaurant_owner"]} />} />
+      <Route path="/restaurant-owner/restaurants/:restaurantId/menu" component={() => <ProtectedRoute component={MenuManagement} allowedRoles={["restaurant_owner"]} />} />
+      <Route path="/restaurant-owner/restaurants/:restaurantId/tables" component={() => <ProtectedRoute component={TableManagement} allowedRoles={["restaurant_owner"]} />} />
+      <Route path="/restaurant-owner/restaurants" component={() => <ProtectedRoute component={OwnerRestaurants} allowedRoles={["restaurant_owner"]} />} />
+      <Route path="/restaurant-owner/reservations" component={() => <ProtectedRoute component={OwnerReservations} allowedRoles={["restaurant_owner"]} />} />
       <Route path="/spa-owner/dashboard" component={() => <ProtectedRoute component={SpaOwnerDashboard} allowedRoles={["spa_owner"]} />} />
 
       {/* Admin routes */}
@@ -151,6 +175,7 @@ function Router() {
       <Route path="/admin/bookings" component={() => <ProtectedRoute component={AdminBookings} allowedRoles={["admin", "super_admin"]} />} />
       <Route path="/admin/booking-analytics" component={() => <ProtectedRoute component={BookingAnalytics} allowedRoles={["admin", "super_admin"]} />} />
       <Route path="/admin/reviews" component={() => <ProtectedRoute component={AdminReviews} allowedRoles={["admin", "super_admin"]} />} />
+      <Route path="/admin/restaurants" component={() => <ProtectedRoute component={AdminRestaurants} allowedRoles={["admin", "super_admin"]} />} />
 
       {/* Super Admin routes */}
       <Route path="/super-admin/dashboard" component={() => <ProtectedRoute component={SuperAdminDashboard} allowedRoles={["super_admin"]} />} />
