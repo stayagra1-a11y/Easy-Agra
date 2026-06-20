@@ -44,6 +44,14 @@ tags:
     description: Payment management and processing
   - name: refunds
     description: Refund management
+  - name: commissions
+    description: Platform commission configuration
+  - name: earnings
+    description: Owner earnings and platform revenue
+  - name: payouts
+    description: Owner payout/withdrawal requests
+  - name: reports
+    description: Revenue, commission and earnings reports
 
 paths:
   /healthz:
@@ -3561,6 +3569,315 @@ paths:
               schema:
                 $ref: "#/components/schemas/Refund"
 
+  # ─── Commission paths ──────────────────────────────────────────────────────
+  /commissions/config:
+    get:
+      summary: Get commission configurations
+      tags: [commissions]
+      responses:
+        "200":
+          description: List of commission configs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CommissionConfig"
+    put:
+      summary: Update commission configurations (admin)
+      tags: [commissions]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateCommissionConfigInput"
+      responses:
+        "200":
+          description: Updated configs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CommissionConfig"
+
+  # ─── Earnings paths ────────────────────────────────────────────────────────
+  /earnings/owner:
+    get:
+      summary: Owner's own earnings summary + list
+      tags: [earnings]
+      parameters:
+        - name: page
+          in: query
+          schema: { type: integer, default: 1 }
+        - name: limit
+          in: query
+          schema: { type: integer, default: 20 }
+        - name: status
+          in: query
+          schema: { type: string }
+        - name: from
+          in: query
+          schema: { type: string }
+        - name: to
+          in: query
+          schema: { type: string }
+      responses:
+        "200":
+          description: Owner earnings
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  summary:
+                    $ref: "#/components/schemas/OwnerEarningsSummary"
+                  earnings:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/OwnerEarningDetail"
+                  total: { type: integer }
+                  page: { type: integer }
+                  limit: { type: integer }
+                required: [summary, earnings, total, page, limit]
+
+  /earnings/admin:
+    get:
+      summary: Admin view all owner earnings
+      tags: [earnings]
+      parameters:
+        - name: page
+          in: query
+          schema: { type: integer, default: 1 }
+        - name: limit
+          in: query
+          schema: { type: integer, default: 20 }
+        - name: ownerId
+          in: query
+          schema: { type: integer }
+        - name: bookingType
+          in: query
+          schema: { type: string }
+        - name: status
+          in: query
+          schema: { type: string }
+        - name: from
+          in: query
+          schema: { type: string }
+        - name: to
+          in: query
+          schema: { type: string }
+      responses:
+        "200":
+          description: All earnings
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  earnings:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/OwnerEarningDetail"
+                  total: { type: integer }
+                  page: { type: integer }
+                  limit: { type: integer }
+                required: [earnings, total, page, limit]
+
+  /earnings/analytics:
+    get:
+      summary: Platform earnings analytics (admin)
+      tags: [earnings]
+      parameters:
+        - name: from
+          in: query
+          schema: { type: string }
+        - name: to
+          in: query
+          schema: { type: string }
+      responses:
+        "200":
+          description: Platform earnings analytics
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PlatformEarningsAnalytics"
+
+  # ─── Payout paths ──────────────────────────────────────────────────────────
+  /payouts:
+    post:
+      summary: Owner requests a payout withdrawal
+      tags: [payouts]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RequestPayoutInput"
+      responses:
+        "201":
+          description: Payout request created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Payout"
+
+  /payouts/my:
+    get:
+      summary: Owner's own payout history
+      tags: [payouts]
+      parameters:
+        - name: page
+          in: query
+          schema: { type: integer, default: 1 }
+        - name: limit
+          in: query
+          schema: { type: integer, default: 20 }
+        - name: status
+          in: query
+          schema: { type: string }
+      responses:
+        "200":
+          description: Owner payout history
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  payouts:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Payout"
+                  total: { type: integer }
+                  page: { type: integer }
+                  limit: { type: integer }
+                required: [payouts, total, page, limit]
+
+  /payouts/admin:
+    get:
+      summary: Admin view all payout requests
+      tags: [payouts]
+      parameters:
+        - name: page
+          in: query
+          schema: { type: integer, default: 1 }
+        - name: limit
+          in: query
+          schema: { type: integer, default: 20 }
+        - name: status
+          in: query
+          schema: { type: string }
+        - name: ownerId
+          in: query
+          schema: { type: integer }
+      responses:
+        "200":
+          description: All payout requests
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  payouts:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/PayoutDetail"
+                  total: { type: integer }
+                  page: { type: integer }
+                  limit: { type: integer }
+                required: [payouts, total, page, limit]
+
+  /payouts/{ref}:
+    patch:
+      summary: Admin approve/reject/mark-paid a payout
+      tags: [payouts]
+      parameters:
+        - name: ref
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProcessPayoutInput"
+      responses:
+        "200":
+          description: Updated payout
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PayoutDetail"
+
+  # ─── Report paths ──────────────────────────────────────────────────────────
+  /reports/revenue:
+    get:
+      summary: Platform revenue report (admin)
+      tags: [reports]
+      parameters:
+        - name: from
+          in: query
+          schema: { type: string }
+        - name: to
+          in: query
+          schema: { type: string }
+        - name: bookingType
+          in: query
+          schema: { type: string }
+      responses:
+        "200":
+          description: Revenue report data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RevenueReport"
+
+  /reports/commission:
+    get:
+      summary: Commission report (admin)
+      tags: [reports]
+      parameters:
+        - name: from
+          in: query
+          schema: { type: string }
+        - name: to
+          in: query
+          schema: { type: string }
+        - name: bookingType
+          in: query
+          schema: { type: string }
+      responses:
+        "200":
+          description: Commission report data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RevenueReport"
+
+  /reports/earnings:
+    get:
+      summary: Owner earnings report (owner/admin)
+      tags: [reports]
+      parameters:
+        - name: from
+          in: query
+          schema: { type: string }
+        - name: to
+          in: query
+          schema: { type: string }
+        - name: ownerId
+          in: query
+          schema: { type: integer }
+      responses:
+        "200":
+          description: Earnings report data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RevenueReport"
+
 components:
   schemas:
     HealthStatus:
@@ -6620,3 +6937,251 @@ components:
               $ref: "#/components/schemas/Payment"
             requestedByName: { type: string, nullable: true }
             processedByName: { type: string, nullable: true }
+
+    # ─── Commission schemas ────────────────────────────────
+    CommissionConfig:
+      type: object
+      properties:
+        id: { type: integer }
+        bookingType:
+          type: string
+          enum: [hotel, restaurant, spa]
+        rate: { type: number }
+        isActive: { type: boolean }
+        description: { type: string, nullable: true }
+        updatedBy: { type: integer, nullable: true }
+        createdAt: { type: string }
+        updatedAt: { type: string }
+      required: [id, bookingType, rate, isActive, createdAt, updatedAt]
+
+    UpdateCommissionConfigInput:
+      type: object
+      properties:
+        configs:
+          type: array
+          items:
+            type: object
+            properties:
+              bookingType:
+                type: string
+                enum: [hotel, restaurant, spa]
+              rate: { type: number }
+              isActive: { type: boolean }
+              description: { type: string, nullable: true }
+            required: [bookingType, rate]
+      required: [configs]
+
+    # ─── Earnings schemas ──────────────────────────────────
+    OwnerEarning:
+      type: object
+      properties:
+        id: { type: integer }
+        earningRef: { type: string }
+        paymentId: { type: integer }
+        ownerId: { type: integer }
+        bookingType:
+          type: string
+          enum: [hotel, restaurant, spa]
+        grossAmount: { type: number }
+        commissionRate: { type: number }
+        commissionAmount: { type: number }
+        netAmount: { type: number }
+        status:
+          type: string
+          enum: [pending, credited, withdrawn]
+        creditedAt: { type: string, nullable: true }
+        createdAt: { type: string }
+        updatedAt: { type: string }
+      required: [id, earningRef, paymentId, ownerId, bookingType, grossAmount, commissionRate, commissionAmount, netAmount, status, createdAt, updatedAt]
+
+    OwnerEarningDetail:
+      allOf:
+        - $ref: "#/components/schemas/OwnerEarning"
+        - type: object
+          properties:
+            paymentRef: { type: string }
+            ownerName: { type: string, nullable: true }
+
+    OwnerEarningsSummary:
+      type: object
+      properties:
+        totalEarnings: { type: number }
+        pendingEarnings: { type: number }
+        creditedEarnings: { type: number }
+        withdrawnEarnings: { type: number }
+        totalCommission: { type: number }
+        totalGross: { type: number }
+        monthlyRevenue:
+          type: array
+          items:
+            type: object
+            properties:
+              month: { type: string }
+              gross: { type: number }
+              commission: { type: number }
+              net: { type: number }
+            required: [month, gross, commission, net]
+        byBookingType:
+          type: array
+          items:
+            type: object
+            properties:
+              bookingType: { type: string }
+              gross: { type: number }
+              commission: { type: number }
+              net: { type: number }
+              count: { type: integer }
+            required: [bookingType, gross, commission, net, count]
+      required: [totalEarnings, pendingEarnings, creditedEarnings, withdrawnEarnings, totalCommission, totalGross, monthlyRevenue, byBookingType]
+
+    PlatformEarningsAnalytics:
+      type: object
+      properties:
+        totalPlatformRevenue: { type: number }
+        totalCommissionEarned: { type: number }
+        totalOwnerPayouts: { type: number }
+        pendingPayouts: { type: number }
+        earningsByType:
+          type: array
+          items:
+            type: object
+            properties:
+              bookingType: { type: string }
+              gross: { type: number }
+              commission: { type: number }
+              net: { type: number }
+              count: { type: integer }
+            required: [bookingType, gross, commission, net, count]
+        monthlyCommission:
+          type: array
+          items:
+            type: object
+            properties:
+              month: { type: string }
+              commission: { type: number }
+              gross: { type: number }
+            required: [month, commission, gross]
+        topOwners:
+          type: array
+          items:
+            type: object
+            properties:
+              ownerId: { type: integer }
+              ownerName: { type: string }
+              totalEarnings: { type: number }
+              bookingType: { type: string }
+            required: [ownerId, ownerName, totalEarnings, bookingType]
+      required: [totalPlatformRevenue, totalCommissionEarned, totalOwnerPayouts, pendingPayouts, earningsByType, monthlyCommission, topOwners]
+
+    # ─── Payout schemas ────────────────────────────────────
+    Payout:
+      type: object
+      properties:
+        id: { type: integer }
+        payoutRef: { type: string }
+        ownerId: { type: integer }
+        amount: { type: number }
+        status:
+          type: string
+          enum: [pending, approved, rejected, paid]
+        bankDetails: {}
+        notes: { type: string, nullable: true }
+        rejectionReason: { type: string, nullable: true }
+        processedBy: { type: integer, nullable: true }
+        processedAt: { type: string, nullable: true }
+        paidAt: { type: string, nullable: true }
+        createdAt: { type: string }
+        updatedAt: { type: string }
+      required: [id, payoutRef, ownerId, amount, status, createdAt, updatedAt]
+
+    PayoutDetail:
+      allOf:
+        - $ref: "#/components/schemas/Payout"
+        - type: object
+          properties:
+            ownerName: { type: string, nullable: true }
+            ownerEmail: { type: string, nullable: true }
+            processedByName: { type: string, nullable: true }
+
+    RequestPayoutInput:
+      type: object
+      properties:
+        amount: { type: number }
+        bankDetails:
+          type: object
+          properties:
+            accountName: { type: string }
+            accountNumber: { type: string }
+            ifscCode: { type: string }
+            bankName: { type: string }
+            upiId: { type: string, nullable: true }
+          required: [accountName, accountNumber, ifscCode, bankName]
+        notes: { type: string, nullable: true }
+      required: [amount, bankDetails]
+
+    ProcessPayoutInput:
+      type: object
+      properties:
+        action:
+          type: string
+          enum: [approve, reject, mark_paid]
+        rejectionReason: { type: string, nullable: true }
+        notes: { type: string, nullable: true }
+      required: [action]
+
+    # ─── Report schemas ────────────────────────────────────
+    RevenueReport:
+      type: object
+      properties:
+        generatedAt: { type: string }
+        period:
+          type: object
+          properties:
+            from: { type: string }
+            to: { type: string }
+          required: [from, to]
+        summary:
+          type: object
+          properties:
+            totalRevenue: { type: number }
+            totalCommission: { type: number }
+            totalOwnerEarnings: { type: number }
+            totalPayouts: { type: number }
+            totalBookings: { type: integer }
+          required: [totalRevenue, totalCommission, totalOwnerEarnings, totalPayouts, totalBookings]
+        byType:
+          type: array
+          items:
+            type: object
+            properties:
+              bookingType: { type: string }
+              revenue: { type: number }
+              commission: { type: number }
+              ownerEarnings: { type: number }
+              bookings: { type: integer }
+            required: [bookingType, revenue, commission, ownerEarnings, bookings]
+        monthly:
+          type: array
+          items:
+            type: object
+            properties:
+              month: { type: string }
+              revenue: { type: number }
+              commission: { type: number }
+              ownerEarnings: { type: number }
+            required: [month, revenue, commission, ownerEarnings]
+        rows:
+          type: array
+          items:
+            type: object
+            properties:
+              date: { type: string }
+              paymentRef: { type: string }
+              bookingType: { type: string }
+              gross: { type: number }
+              commission: { type: number }
+              net: { type: number }
+              ownerName: { type: string }
+              status: { type: string }
+            required: [date, paymentRef, bookingType, gross, commission, net, ownerName, status]
+      required: [generatedAt, period, summary, byType, monthly, rows]

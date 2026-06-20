@@ -1785,6 +1785,251 @@ export type RefundDetail = Refund & ({
   processedByName?: string | null;
 });
 
+export type CommissionConfigBookingType = typeof CommissionConfigBookingType[keyof typeof CommissionConfigBookingType];
+
+
+export const CommissionConfigBookingType = {
+  hotel: 'hotel',
+  restaurant: 'restaurant',
+  spa: 'spa',
+} as const;
+
+export interface CommissionConfig {
+  id: number;
+  bookingType: CommissionConfigBookingType;
+  rate: number;
+  isActive: boolean;
+  description?: string | null;
+  updatedBy?: number | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type UpdateCommissionConfigInputConfigsItemBookingType = typeof UpdateCommissionConfigInputConfigsItemBookingType[keyof typeof UpdateCommissionConfigInputConfigsItemBookingType];
+
+
+export const UpdateCommissionConfigInputConfigsItemBookingType = {
+  hotel: 'hotel',
+  restaurant: 'restaurant',
+  spa: 'spa',
+} as const;
+
+export type UpdateCommissionConfigInputConfigsItem = {
+  bookingType: UpdateCommissionConfigInputConfigsItemBookingType;
+  rate: number;
+  isActive?: boolean;
+  description?: string | null;
+};
+
+export interface UpdateCommissionConfigInput {
+  configs: UpdateCommissionConfigInputConfigsItem[];
+}
+
+export type OwnerEarningBookingType = typeof OwnerEarningBookingType[keyof typeof OwnerEarningBookingType];
+
+
+export const OwnerEarningBookingType = {
+  hotel: 'hotel',
+  restaurant: 'restaurant',
+  spa: 'spa',
+} as const;
+
+export type OwnerEarningStatus = typeof OwnerEarningStatus[keyof typeof OwnerEarningStatus];
+
+
+export const OwnerEarningStatus = {
+  pending: 'pending',
+  credited: 'credited',
+  withdrawn: 'withdrawn',
+} as const;
+
+export interface OwnerEarning {
+  id: number;
+  earningRef: string;
+  paymentId: number;
+  ownerId: number;
+  bookingType: OwnerEarningBookingType;
+  grossAmount: number;
+  commissionRate: number;
+  commissionAmount: number;
+  netAmount: number;
+  status: OwnerEarningStatus;
+  creditedAt?: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type OwnerEarningDetail = OwnerEarning & ({
+  paymentRef?: string;
+  ownerName?: string | null;
+});
+
+export type OwnerEarningsSummaryMonthlyRevenueItem = {
+  month: string;
+  gross: number;
+  commission: number;
+  net: number;
+};
+
+export type OwnerEarningsSummaryByBookingTypeItem = {
+  bookingType: string;
+  gross: number;
+  commission: number;
+  net: number;
+  count: number;
+};
+
+export interface OwnerEarningsSummary {
+  totalEarnings: number;
+  pendingEarnings: number;
+  creditedEarnings: number;
+  withdrawnEarnings: number;
+  totalCommission: number;
+  totalGross: number;
+  monthlyRevenue: OwnerEarningsSummaryMonthlyRevenueItem[];
+  byBookingType: OwnerEarningsSummaryByBookingTypeItem[];
+}
+
+export type PlatformEarningsAnalyticsEarningsByTypeItem = {
+  bookingType: string;
+  gross: number;
+  commission: number;
+  net: number;
+  count: number;
+};
+
+export type PlatformEarningsAnalyticsMonthlyCommissionItem = {
+  month: string;
+  commission: number;
+  gross: number;
+};
+
+export type PlatformEarningsAnalyticsTopOwnersItem = {
+  ownerId: number;
+  ownerName: string;
+  totalEarnings: number;
+  bookingType: string;
+};
+
+export interface PlatformEarningsAnalytics {
+  totalPlatformRevenue: number;
+  totalCommissionEarned: number;
+  totalOwnerPayouts: number;
+  pendingPayouts: number;
+  earningsByType: PlatformEarningsAnalyticsEarningsByTypeItem[];
+  monthlyCommission: PlatformEarningsAnalyticsMonthlyCommissionItem[];
+  topOwners: PlatformEarningsAnalyticsTopOwnersItem[];
+}
+
+export type PayoutStatus = typeof PayoutStatus[keyof typeof PayoutStatus];
+
+
+export const PayoutStatus = {
+  pending: 'pending',
+  approved: 'approved',
+  rejected: 'rejected',
+  paid: 'paid',
+} as const;
+
+export interface Payout {
+  id: number;
+  payoutRef: string;
+  ownerId: number;
+  amount: number;
+  status: PayoutStatus;
+  bankDetails?: unknown;
+  notes?: string | null;
+  rejectionReason?: string | null;
+  processedBy?: number | null;
+  processedAt?: string | null;
+  paidAt?: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type PayoutDetail = Payout & ({
+  ownerName?: string | null;
+  ownerEmail?: string | null;
+  processedByName?: string | null;
+});
+
+export type RequestPayoutInputBankDetails = {
+  accountName: string;
+  accountNumber: string;
+  ifscCode: string;
+  bankName: string;
+  upiId?: string | null;
+};
+
+export interface RequestPayoutInput {
+  amount: number;
+  bankDetails: RequestPayoutInputBankDetails;
+  notes?: string | null;
+}
+
+export type ProcessPayoutInputAction = typeof ProcessPayoutInputAction[keyof typeof ProcessPayoutInputAction];
+
+
+export const ProcessPayoutInputAction = {
+  approve: 'approve',
+  reject: 'reject',
+  mark_paid: 'mark_paid',
+} as const;
+
+export interface ProcessPayoutInput {
+  action: ProcessPayoutInputAction;
+  rejectionReason?: string | null;
+  notes?: string | null;
+}
+
+export type RevenueReportPeriod = {
+  from: string;
+  to: string;
+};
+
+export type RevenueReportSummary = {
+  totalRevenue: number;
+  totalCommission: number;
+  totalOwnerEarnings: number;
+  totalPayouts: number;
+  totalBookings: number;
+};
+
+export type RevenueReportByTypeItem = {
+  bookingType: string;
+  revenue: number;
+  commission: number;
+  ownerEarnings: number;
+  bookings: number;
+};
+
+export type RevenueReportMonthlyItem = {
+  month: string;
+  revenue: number;
+  commission: number;
+  ownerEarnings: number;
+};
+
+export type RevenueReportRowsItem = {
+  date: string;
+  paymentRef: string;
+  bookingType: string;
+  gross: number;
+  commission: number;
+  net: number;
+  ownerName: string;
+  status: string;
+};
+
+export interface RevenueReport {
+  generatedAt: string;
+  period: RevenueReportPeriod;
+  summary: RevenueReportSummary;
+  byType: RevenueReportByTypeItem[];
+  monthly: RevenueReportMonthlyItem[];
+  rows: RevenueReportRowsItem[];
+}
+
 export type ListUsersParams = {
 role?: string;
 status?: string;
@@ -2011,5 +2256,88 @@ status?: string;
 export type GetAdminRefunds200 = {
   refunds: RefundDetail[];
   total: number;
+};
+
+export type GetEarningsOwnerParams = {
+page?: number;
+limit?: number;
+status?: string;
+from?: string;
+to?: string;
+};
+
+export type GetEarningsOwner200 = {
+  summary: OwnerEarningsSummary;
+  earnings: OwnerEarningDetail[];
+  total: number;
+  page: number;
+  limit: number;
+};
+
+export type GetEarningsAdminParams = {
+page?: number;
+limit?: number;
+ownerId?: number;
+bookingType?: string;
+status?: string;
+from?: string;
+to?: string;
+};
+
+export type GetEarningsAdmin200 = {
+  earnings: OwnerEarningDetail[];
+  total: number;
+  page: number;
+  limit: number;
+};
+
+export type GetEarningsAnalyticsParams = {
+from?: string;
+to?: string;
+};
+
+export type GetPayoutsMyParams = {
+page?: number;
+limit?: number;
+status?: string;
+};
+
+export type GetPayoutsMy200 = {
+  payouts: Payout[];
+  total: number;
+  page: number;
+  limit: number;
+};
+
+export type GetPayoutsAdminParams = {
+page?: number;
+limit?: number;
+status?: string;
+ownerId?: number;
+};
+
+export type GetPayoutsAdmin200 = {
+  payouts: PayoutDetail[];
+  total: number;
+  page: number;
+  limit: number;
+};
+
+export type GetReportsRevenueParams = {
+from?: string;
+to?: string;
+bookingType?: string;
+};
+
+export type GetReportsCommissionParams = {
+from?: string;
+to?: string;
+bookingType?: string;
+};
+
+export type GetReportsEarningsParams = {
+from?: string;
+to?: string;
+ownerId?: number;
 };
 

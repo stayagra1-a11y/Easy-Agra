@@ -4866,3 +4866,446 @@ export const ProcessRefundResponse = zod.object({
 })
 
 
+/**
+ * @summary Get commission configurations
+ */
+export const GetCommissionsConfigResponseItem = zod.object({
+  "id": zod.number(),
+  "bookingType": zod.enum(['hotel', 'restaurant', 'spa']),
+  "rate": zod.number(),
+  "isActive": zod.boolean(),
+  "description": zod.string().nullish(),
+  "updatedBy": zod.number().nullish(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+export const GetCommissionsConfigResponse = zod.array(GetCommissionsConfigResponseItem)
+
+
+/**
+ * @summary Update commission configurations (admin)
+ */
+export const PutCommissionsConfigBody = zod.object({
+  "configs": zod.array(zod.object({
+  "bookingType": zod.enum(['hotel', 'restaurant', 'spa']),
+  "rate": zod.number(),
+  "isActive": zod.boolean().optional(),
+  "description": zod.string().nullish()
+}))
+})
+
+export const PutCommissionsConfigResponseItem = zod.object({
+  "id": zod.number(),
+  "bookingType": zod.enum(['hotel', 'restaurant', 'spa']),
+  "rate": zod.number(),
+  "isActive": zod.boolean(),
+  "description": zod.string().nullish(),
+  "updatedBy": zod.number().nullish(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+export const PutCommissionsConfigResponse = zod.array(PutCommissionsConfigResponseItem)
+
+
+/**
+ * @summary Owner's own earnings summary + list
+ */
+export const getEarningsOwnerQueryPageDefault = 1;
+export const getEarningsOwnerQueryLimitDefault = 20;
+
+export const GetEarningsOwnerQueryParams = zod.object({
+  "page": zod.coerce.number().default(getEarningsOwnerQueryPageDefault),
+  "limit": zod.coerce.number().default(getEarningsOwnerQueryLimitDefault),
+  "status": zod.coerce.string().optional(),
+  "from": zod.coerce.string().optional(),
+  "to": zod.coerce.string().optional()
+})
+
+export const GetEarningsOwnerResponse = zod.object({
+  "summary": zod.object({
+  "totalEarnings": zod.number(),
+  "pendingEarnings": zod.number(),
+  "creditedEarnings": zod.number(),
+  "withdrawnEarnings": zod.number(),
+  "totalCommission": zod.number(),
+  "totalGross": zod.number(),
+  "monthlyRevenue": zod.array(zod.object({
+  "month": zod.string(),
+  "gross": zod.number(),
+  "commission": zod.number(),
+  "net": zod.number()
+})),
+  "byBookingType": zod.array(zod.object({
+  "bookingType": zod.string(),
+  "gross": zod.number(),
+  "commission": zod.number(),
+  "net": zod.number(),
+  "count": zod.number()
+}))
+}),
+  "earnings": zod.array(zod.object({
+  "id": zod.number(),
+  "earningRef": zod.string(),
+  "paymentId": zod.number(),
+  "ownerId": zod.number(),
+  "bookingType": zod.enum(['hotel', 'restaurant', 'spa']),
+  "grossAmount": zod.number(),
+  "commissionRate": zod.number(),
+  "commissionAmount": zod.number(),
+  "netAmount": zod.number(),
+  "status": zod.enum(['pending', 'credited', 'withdrawn']),
+  "creditedAt": zod.string().nullish(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+}).and(zod.object({
+  "paymentRef": zod.string().optional(),
+  "ownerName": zod.string().nullish()
+}))),
+  "total": zod.number(),
+  "page": zod.number(),
+  "limit": zod.number()
+})
+
+
+/**
+ * @summary Admin view all owner earnings
+ */
+export const getEarningsAdminQueryPageDefault = 1;
+export const getEarningsAdminQueryLimitDefault = 20;
+
+export const GetEarningsAdminQueryParams = zod.object({
+  "page": zod.coerce.number().default(getEarningsAdminQueryPageDefault),
+  "limit": zod.coerce.number().default(getEarningsAdminQueryLimitDefault),
+  "ownerId": zod.coerce.number().optional(),
+  "bookingType": zod.coerce.string().optional(),
+  "status": zod.coerce.string().optional(),
+  "from": zod.coerce.string().optional(),
+  "to": zod.coerce.string().optional()
+})
+
+export const GetEarningsAdminResponse = zod.object({
+  "earnings": zod.array(zod.object({
+  "id": zod.number(),
+  "earningRef": zod.string(),
+  "paymentId": zod.number(),
+  "ownerId": zod.number(),
+  "bookingType": zod.enum(['hotel', 'restaurant', 'spa']),
+  "grossAmount": zod.number(),
+  "commissionRate": zod.number(),
+  "commissionAmount": zod.number(),
+  "netAmount": zod.number(),
+  "status": zod.enum(['pending', 'credited', 'withdrawn']),
+  "creditedAt": zod.string().nullish(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+}).and(zod.object({
+  "paymentRef": zod.string().optional(),
+  "ownerName": zod.string().nullish()
+}))),
+  "total": zod.number(),
+  "page": zod.number(),
+  "limit": zod.number()
+})
+
+
+/**
+ * @summary Platform earnings analytics (admin)
+ */
+export const GetEarningsAnalyticsQueryParams = zod.object({
+  "from": zod.coerce.string().optional(),
+  "to": zod.coerce.string().optional()
+})
+
+export const GetEarningsAnalyticsResponse = zod.object({
+  "totalPlatformRevenue": zod.number(),
+  "totalCommissionEarned": zod.number(),
+  "totalOwnerPayouts": zod.number(),
+  "pendingPayouts": zod.number(),
+  "earningsByType": zod.array(zod.object({
+  "bookingType": zod.string(),
+  "gross": zod.number(),
+  "commission": zod.number(),
+  "net": zod.number(),
+  "count": zod.number()
+})),
+  "monthlyCommission": zod.array(zod.object({
+  "month": zod.string(),
+  "commission": zod.number(),
+  "gross": zod.number()
+})),
+  "topOwners": zod.array(zod.object({
+  "ownerId": zod.number(),
+  "ownerName": zod.string(),
+  "totalEarnings": zod.number(),
+  "bookingType": zod.string()
+}))
+})
+
+
+/**
+ * @summary Owner requests a payout withdrawal
+ */
+export const PostPayoutsBody = zod.object({
+  "amount": zod.number(),
+  "bankDetails": zod.object({
+  "accountName": zod.string(),
+  "accountNumber": zod.string(),
+  "ifscCode": zod.string(),
+  "bankName": zod.string(),
+  "upiId": zod.string().nullish()
+}),
+  "notes": zod.string().nullish()
+})
+
+
+/**
+ * @summary Owner's own payout history
+ */
+export const getPayoutsMyQueryPageDefault = 1;
+export const getPayoutsMyQueryLimitDefault = 20;
+
+export const GetPayoutsMyQueryParams = zod.object({
+  "page": zod.coerce.number().default(getPayoutsMyQueryPageDefault),
+  "limit": zod.coerce.number().default(getPayoutsMyQueryLimitDefault),
+  "status": zod.coerce.string().optional()
+})
+
+export const GetPayoutsMyResponse = zod.object({
+  "payouts": zod.array(zod.object({
+  "id": zod.number(),
+  "payoutRef": zod.string(),
+  "ownerId": zod.number(),
+  "amount": zod.number(),
+  "status": zod.enum(['pending', 'approved', 'rejected', 'paid']),
+  "bankDetails": zod.unknown().optional(),
+  "notes": zod.string().nullish(),
+  "rejectionReason": zod.string().nullish(),
+  "processedBy": zod.number().nullish(),
+  "processedAt": zod.string().nullish(),
+  "paidAt": zod.string().nullish(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})),
+  "total": zod.number(),
+  "page": zod.number(),
+  "limit": zod.number()
+})
+
+
+/**
+ * @summary Admin view all payout requests
+ */
+export const getPayoutsAdminQueryPageDefault = 1;
+export const getPayoutsAdminQueryLimitDefault = 20;
+
+export const GetPayoutsAdminQueryParams = zod.object({
+  "page": zod.coerce.number().default(getPayoutsAdminQueryPageDefault),
+  "limit": zod.coerce.number().default(getPayoutsAdminQueryLimitDefault),
+  "status": zod.coerce.string().optional(),
+  "ownerId": zod.coerce.number().optional()
+})
+
+export const GetPayoutsAdminResponse = zod.object({
+  "payouts": zod.array(zod.object({
+  "id": zod.number(),
+  "payoutRef": zod.string(),
+  "ownerId": zod.number(),
+  "amount": zod.number(),
+  "status": zod.enum(['pending', 'approved', 'rejected', 'paid']),
+  "bankDetails": zod.unknown().optional(),
+  "notes": zod.string().nullish(),
+  "rejectionReason": zod.string().nullish(),
+  "processedBy": zod.number().nullish(),
+  "processedAt": zod.string().nullish(),
+  "paidAt": zod.string().nullish(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+}).and(zod.object({
+  "ownerName": zod.string().nullish(),
+  "ownerEmail": zod.string().nullish(),
+  "processedByName": zod.string().nullish()
+}))),
+  "total": zod.number(),
+  "page": zod.number(),
+  "limit": zod.number()
+})
+
+
+/**
+ * @summary Admin approve/reject/mark-paid a payout
+ */
+export const PatchPayoutsRefParams = zod.object({
+  "ref": zod.coerce.string()
+})
+
+export const PatchPayoutsRefBody = zod.object({
+  "action": zod.enum(['approve', 'reject', 'mark_paid']),
+  "rejectionReason": zod.string().nullish(),
+  "notes": zod.string().nullish()
+})
+
+export const PatchPayoutsRefResponse = zod.object({
+  "id": zod.number(),
+  "payoutRef": zod.string(),
+  "ownerId": zod.number(),
+  "amount": zod.number(),
+  "status": zod.enum(['pending', 'approved', 'rejected', 'paid']),
+  "bankDetails": zod.unknown().optional(),
+  "notes": zod.string().nullish(),
+  "rejectionReason": zod.string().nullish(),
+  "processedBy": zod.number().nullish(),
+  "processedAt": zod.string().nullish(),
+  "paidAt": zod.string().nullish(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+}).and(zod.object({
+  "ownerName": zod.string().nullish(),
+  "ownerEmail": zod.string().nullish(),
+  "processedByName": zod.string().nullish()
+}))
+
+
+/**
+ * @summary Platform revenue report (admin)
+ */
+export const GetReportsRevenueQueryParams = zod.object({
+  "from": zod.coerce.string().optional(),
+  "to": zod.coerce.string().optional(),
+  "bookingType": zod.coerce.string().optional()
+})
+
+export const GetReportsRevenueResponse = zod.object({
+  "generatedAt": zod.string(),
+  "period": zod.object({
+  "from": zod.string(),
+  "to": zod.string()
+}),
+  "summary": zod.object({
+  "totalRevenue": zod.number(),
+  "totalCommission": zod.number(),
+  "totalOwnerEarnings": zod.number(),
+  "totalPayouts": zod.number(),
+  "totalBookings": zod.number()
+}),
+  "byType": zod.array(zod.object({
+  "bookingType": zod.string(),
+  "revenue": zod.number(),
+  "commission": zod.number(),
+  "ownerEarnings": zod.number(),
+  "bookings": zod.number()
+})),
+  "monthly": zod.array(zod.object({
+  "month": zod.string(),
+  "revenue": zod.number(),
+  "commission": zod.number(),
+  "ownerEarnings": zod.number()
+})),
+  "rows": zod.array(zod.object({
+  "date": zod.string(),
+  "paymentRef": zod.string(),
+  "bookingType": zod.string(),
+  "gross": zod.number(),
+  "commission": zod.number(),
+  "net": zod.number(),
+  "ownerName": zod.string(),
+  "status": zod.string()
+}))
+})
+
+
+/**
+ * @summary Commission report (admin)
+ */
+export const GetReportsCommissionQueryParams = zod.object({
+  "from": zod.coerce.string().optional(),
+  "to": zod.coerce.string().optional(),
+  "bookingType": zod.coerce.string().optional()
+})
+
+export const GetReportsCommissionResponse = zod.object({
+  "generatedAt": zod.string(),
+  "period": zod.object({
+  "from": zod.string(),
+  "to": zod.string()
+}),
+  "summary": zod.object({
+  "totalRevenue": zod.number(),
+  "totalCommission": zod.number(),
+  "totalOwnerEarnings": zod.number(),
+  "totalPayouts": zod.number(),
+  "totalBookings": zod.number()
+}),
+  "byType": zod.array(zod.object({
+  "bookingType": zod.string(),
+  "revenue": zod.number(),
+  "commission": zod.number(),
+  "ownerEarnings": zod.number(),
+  "bookings": zod.number()
+})),
+  "monthly": zod.array(zod.object({
+  "month": zod.string(),
+  "revenue": zod.number(),
+  "commission": zod.number(),
+  "ownerEarnings": zod.number()
+})),
+  "rows": zod.array(zod.object({
+  "date": zod.string(),
+  "paymentRef": zod.string(),
+  "bookingType": zod.string(),
+  "gross": zod.number(),
+  "commission": zod.number(),
+  "net": zod.number(),
+  "ownerName": zod.string(),
+  "status": zod.string()
+}))
+})
+
+
+/**
+ * @summary Owner earnings report (owner/admin)
+ */
+export const GetReportsEarningsQueryParams = zod.object({
+  "from": zod.coerce.string().optional(),
+  "to": zod.coerce.string().optional(),
+  "ownerId": zod.coerce.number().optional()
+})
+
+export const GetReportsEarningsResponse = zod.object({
+  "generatedAt": zod.string(),
+  "period": zod.object({
+  "from": zod.string(),
+  "to": zod.string()
+}),
+  "summary": zod.object({
+  "totalRevenue": zod.number(),
+  "totalCommission": zod.number(),
+  "totalOwnerEarnings": zod.number(),
+  "totalPayouts": zod.number(),
+  "totalBookings": zod.number()
+}),
+  "byType": zod.array(zod.object({
+  "bookingType": zod.string(),
+  "revenue": zod.number(),
+  "commission": zod.number(),
+  "ownerEarnings": zod.number(),
+  "bookings": zod.number()
+})),
+  "monthly": zod.array(zod.object({
+  "month": zod.string(),
+  "revenue": zod.number(),
+  "commission": zod.number(),
+  "ownerEarnings": zod.number()
+})),
+  "rows": zod.array(zod.object({
+  "date": zod.string(),
+  "paymentRef": zod.string(),
+  "bookingType": zod.string(),
+  "gross": zod.number(),
+  "commission": zod.number(),
+  "net": zod.number(),
+  "ownerName": zod.string(),
+  "status": zod.string()
+}))
+})
+
+

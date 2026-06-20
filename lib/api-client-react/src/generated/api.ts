@@ -32,6 +32,7 @@ import type {
   BookingStats,
   BookingsPage,
   ChangePasswordInput,
+  CommissionConfig,
   ConfirmPaymentInput,
   CreatePaymentInput,
   DashboardStats,
@@ -54,13 +55,25 @@ import type {
   GetAdminRefunds200,
   GetAdminRefundsParams,
   GetAllSpasParams,
+  GetEarningsAdmin200,
+  GetEarningsAdminParams,
+  GetEarningsAnalyticsParams,
+  GetEarningsOwner200,
+  GetEarningsOwnerParams,
   GetMyFavoritePlaces200,
   GetMyPaymentsParams,
   GetMyRefunds200,
   GetMySpaAppointmentsParams,
   GetOwnerPaymentsParams,
   GetOwnerSpaAppointmentsParams,
+  GetPayoutsAdmin200,
+  GetPayoutsAdminParams,
+  GetPayoutsMy200,
+  GetPayoutsMyParams,
   GetPlaceConnections200,
+  GetReportsCommissionParams,
+  GetReportsEarningsParams,
+  GetReportsRevenueParams,
   GetRoomStatsParams,
   GetTopRatedHotelsParams,
   GetTouristPlaceConnections200,
@@ -99,9 +112,13 @@ import type {
   PaymentAnalytics,
   PaymentDetail,
   PaymentListResponse,
+  Payout,
+  PayoutDetail,
   PhotoUploadInput,
+  PlatformEarningsAnalytics,
   PlatformSettings,
   PlatformSettingsUpdate,
+  ProcessPayoutInput,
   ProcessRefundInput,
   Refund,
   RefundRequestInput,
@@ -110,6 +127,7 @@ import type {
   ReorderImagesInput,
   ReorderTouristPlaceImages200,
   ReportReview200,
+  RequestPayoutInput,
   ReservationDetail,
   ReservationInput,
   ReservationsPage,
@@ -118,6 +136,7 @@ import type {
   RestaurantInput,
   RestaurantSummary,
   RestaurantsPage,
+  RevenueReport,
   Review,
   ReviewInput,
   ReviewReplyInput,
@@ -156,6 +175,7 @@ import type {
   TouristPlaceTipInput,
   TouristPlacesPage,
   UnreadCount,
+  UpdateCommissionConfigInput,
   User,
   UserRoleUpdate,
   UserStatusUpdate,
@@ -11945,4 +11965,967 @@ export const useProcessRefund = <TError = ErrorType<unknown>,
       > => {
       return useMutation(getProcessRefundMutationOptions(options));
     }
+
+export const getGetCommissionsConfigUrl = () => {
+
+
+
+
+  return `/api/commissions/config`
+}
+
+/**
+ * @summary Get commission configurations
+ */
+export const getCommissionsConfig = async ( options?: RequestInit): Promise<CommissionConfig[]> => {
+
+  return customFetch<CommissionConfig[]>(getGetCommissionsConfigUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetCommissionsConfigQueryKey = () => {
+    return [
+    `/api/commissions/config`
+    ] as const;
+    }
+
+
+export const getGetCommissionsConfigQueryOptions = <TData = Awaited<ReturnType<typeof getCommissionsConfig>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getCommissionsConfig>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetCommissionsConfigQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getCommissionsConfig>>> = ({ signal }) => getCommissionsConfig({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getCommissionsConfig>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetCommissionsConfigQueryResult = NonNullable<Awaited<ReturnType<typeof getCommissionsConfig>>>
+export type GetCommissionsConfigQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Get commission configurations
+ */
+
+export function useGetCommissionsConfig<TData = Awaited<ReturnType<typeof getCommissionsConfig>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getCommissionsConfig>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetCommissionsConfigQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getPutCommissionsConfigUrl = () => {
+
+
+
+
+  return `/api/commissions/config`
+}
+
+/**
+ * @summary Update commission configurations (admin)
+ */
+export const putCommissionsConfig = async (updateCommissionConfigInput: UpdateCommissionConfigInput, options?: RequestInit): Promise<CommissionConfig[]> => {
+
+  return customFetch<CommissionConfig[]>(getPutCommissionsConfigUrl(),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      updateCommissionConfigInput,)
+  }
+);}
+
+
+
+
+export const getPutCommissionsConfigMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof putCommissionsConfig>>, TError,{data: BodyType<UpdateCommissionConfigInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof putCommissionsConfig>>, TError,{data: BodyType<UpdateCommissionConfigInput>}, TContext> => {
+
+const mutationKey = ['putCommissionsConfig'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof putCommissionsConfig>>, {data: BodyType<UpdateCommissionConfigInput>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  putCommissionsConfig(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PutCommissionsConfigMutationResult = NonNullable<Awaited<ReturnType<typeof putCommissionsConfig>>>
+    export type PutCommissionsConfigMutationBody = BodyType<UpdateCommissionConfigInput>
+    export type PutCommissionsConfigMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Update commission configurations (admin)
+ */
+export const usePutCommissionsConfig = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof putCommissionsConfig>>, TError,{data: BodyType<UpdateCommissionConfigInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof putCommissionsConfig>>,
+        TError,
+        {data: BodyType<UpdateCommissionConfigInput>},
+        TContext
+      > => {
+      return useMutation(getPutCommissionsConfigMutationOptions(options));
+    }
+
+export const getGetEarningsOwnerUrl = (params?: GetEarningsOwnerParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/earnings/owner?${stringifiedParams}` : `/api/earnings/owner`
+}
+
+/**
+ * @summary Owner's own earnings summary + list
+ */
+export const getEarningsOwner = async (params?: GetEarningsOwnerParams, options?: RequestInit): Promise<GetEarningsOwner200> => {
+
+  return customFetch<GetEarningsOwner200>(getGetEarningsOwnerUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetEarningsOwnerQueryKey = (params?: GetEarningsOwnerParams,) => {
+    return [
+    `/api/earnings/owner`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getGetEarningsOwnerQueryOptions = <TData = Awaited<ReturnType<typeof getEarningsOwner>>, TError = ErrorType<unknown>>(params?: GetEarningsOwnerParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getEarningsOwner>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetEarningsOwnerQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getEarningsOwner>>> = ({ signal }) => getEarningsOwner(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getEarningsOwner>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetEarningsOwnerQueryResult = NonNullable<Awaited<ReturnType<typeof getEarningsOwner>>>
+export type GetEarningsOwnerQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Owner's own earnings summary + list
+ */
+
+export function useGetEarningsOwner<TData = Awaited<ReturnType<typeof getEarningsOwner>>, TError = ErrorType<unknown>>(
+ params?: GetEarningsOwnerParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getEarningsOwner>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetEarningsOwnerQueryOptions(params,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getGetEarningsAdminUrl = (params?: GetEarningsAdminParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/earnings/admin?${stringifiedParams}` : `/api/earnings/admin`
+}
+
+/**
+ * @summary Admin view all owner earnings
+ */
+export const getEarningsAdmin = async (params?: GetEarningsAdminParams, options?: RequestInit): Promise<GetEarningsAdmin200> => {
+
+  return customFetch<GetEarningsAdmin200>(getGetEarningsAdminUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetEarningsAdminQueryKey = (params?: GetEarningsAdminParams,) => {
+    return [
+    `/api/earnings/admin`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getGetEarningsAdminQueryOptions = <TData = Awaited<ReturnType<typeof getEarningsAdmin>>, TError = ErrorType<unknown>>(params?: GetEarningsAdminParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getEarningsAdmin>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetEarningsAdminQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getEarningsAdmin>>> = ({ signal }) => getEarningsAdmin(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getEarningsAdmin>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetEarningsAdminQueryResult = NonNullable<Awaited<ReturnType<typeof getEarningsAdmin>>>
+export type GetEarningsAdminQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Admin view all owner earnings
+ */
+
+export function useGetEarningsAdmin<TData = Awaited<ReturnType<typeof getEarningsAdmin>>, TError = ErrorType<unknown>>(
+ params?: GetEarningsAdminParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getEarningsAdmin>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetEarningsAdminQueryOptions(params,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getGetEarningsAnalyticsUrl = (params?: GetEarningsAnalyticsParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/earnings/analytics?${stringifiedParams}` : `/api/earnings/analytics`
+}
+
+/**
+ * @summary Platform earnings analytics (admin)
+ */
+export const getEarningsAnalytics = async (params?: GetEarningsAnalyticsParams, options?: RequestInit): Promise<PlatformEarningsAnalytics> => {
+
+  return customFetch<PlatformEarningsAnalytics>(getGetEarningsAnalyticsUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetEarningsAnalyticsQueryKey = (params?: GetEarningsAnalyticsParams,) => {
+    return [
+    `/api/earnings/analytics`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getGetEarningsAnalyticsQueryOptions = <TData = Awaited<ReturnType<typeof getEarningsAnalytics>>, TError = ErrorType<unknown>>(params?: GetEarningsAnalyticsParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getEarningsAnalytics>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetEarningsAnalyticsQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getEarningsAnalytics>>> = ({ signal }) => getEarningsAnalytics(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getEarningsAnalytics>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetEarningsAnalyticsQueryResult = NonNullable<Awaited<ReturnType<typeof getEarningsAnalytics>>>
+export type GetEarningsAnalyticsQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Platform earnings analytics (admin)
+ */
+
+export function useGetEarningsAnalytics<TData = Awaited<ReturnType<typeof getEarningsAnalytics>>, TError = ErrorType<unknown>>(
+ params?: GetEarningsAnalyticsParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getEarningsAnalytics>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetEarningsAnalyticsQueryOptions(params,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getPostPayoutsUrl = () => {
+
+
+
+
+  return `/api/payouts`
+}
+
+/**
+ * @summary Owner requests a payout withdrawal
+ */
+export const postPayouts = async (requestPayoutInput: RequestPayoutInput, options?: RequestInit): Promise<Payout> => {
+
+  return customFetch<Payout>(getPostPayoutsUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      requestPayoutInput,)
+  }
+);}
+
+
+
+
+export const getPostPayoutsMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postPayouts>>, TError,{data: BodyType<RequestPayoutInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof postPayouts>>, TError,{data: BodyType<RequestPayoutInput>}, TContext> => {
+
+const mutationKey = ['postPayouts'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof postPayouts>>, {data: BodyType<RequestPayoutInput>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  postPayouts(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PostPayoutsMutationResult = NonNullable<Awaited<ReturnType<typeof postPayouts>>>
+    export type PostPayoutsMutationBody = BodyType<RequestPayoutInput>
+    export type PostPayoutsMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Owner requests a payout withdrawal
+ */
+export const usePostPayouts = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postPayouts>>, TError,{data: BodyType<RequestPayoutInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof postPayouts>>,
+        TError,
+        {data: BodyType<RequestPayoutInput>},
+        TContext
+      > => {
+      return useMutation(getPostPayoutsMutationOptions(options));
+    }
+
+export const getGetPayoutsMyUrl = (params?: GetPayoutsMyParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/payouts/my?${stringifiedParams}` : `/api/payouts/my`
+}
+
+/**
+ * @summary Owner's own payout history
+ */
+export const getPayoutsMy = async (params?: GetPayoutsMyParams, options?: RequestInit): Promise<GetPayoutsMy200> => {
+
+  return customFetch<GetPayoutsMy200>(getGetPayoutsMyUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetPayoutsMyQueryKey = (params?: GetPayoutsMyParams,) => {
+    return [
+    `/api/payouts/my`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getGetPayoutsMyQueryOptions = <TData = Awaited<ReturnType<typeof getPayoutsMy>>, TError = ErrorType<unknown>>(params?: GetPayoutsMyParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getPayoutsMy>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetPayoutsMyQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getPayoutsMy>>> = ({ signal }) => getPayoutsMy(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getPayoutsMy>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetPayoutsMyQueryResult = NonNullable<Awaited<ReturnType<typeof getPayoutsMy>>>
+export type GetPayoutsMyQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Owner's own payout history
+ */
+
+export function useGetPayoutsMy<TData = Awaited<ReturnType<typeof getPayoutsMy>>, TError = ErrorType<unknown>>(
+ params?: GetPayoutsMyParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getPayoutsMy>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetPayoutsMyQueryOptions(params,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getGetPayoutsAdminUrl = (params?: GetPayoutsAdminParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/payouts/admin?${stringifiedParams}` : `/api/payouts/admin`
+}
+
+/**
+ * @summary Admin view all payout requests
+ */
+export const getPayoutsAdmin = async (params?: GetPayoutsAdminParams, options?: RequestInit): Promise<GetPayoutsAdmin200> => {
+
+  return customFetch<GetPayoutsAdmin200>(getGetPayoutsAdminUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetPayoutsAdminQueryKey = (params?: GetPayoutsAdminParams,) => {
+    return [
+    `/api/payouts/admin`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getGetPayoutsAdminQueryOptions = <TData = Awaited<ReturnType<typeof getPayoutsAdmin>>, TError = ErrorType<unknown>>(params?: GetPayoutsAdminParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getPayoutsAdmin>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetPayoutsAdminQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getPayoutsAdmin>>> = ({ signal }) => getPayoutsAdmin(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getPayoutsAdmin>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetPayoutsAdminQueryResult = NonNullable<Awaited<ReturnType<typeof getPayoutsAdmin>>>
+export type GetPayoutsAdminQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Admin view all payout requests
+ */
+
+export function useGetPayoutsAdmin<TData = Awaited<ReturnType<typeof getPayoutsAdmin>>, TError = ErrorType<unknown>>(
+ params?: GetPayoutsAdminParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getPayoutsAdmin>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetPayoutsAdminQueryOptions(params,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getPatchPayoutsRefUrl = (ref: string,) => {
+
+
+
+
+  return `/api/payouts/${ref}`
+}
+
+/**
+ * @summary Admin approve/reject/mark-paid a payout
+ */
+export const patchPayoutsRef = async (ref: string,
+    processPayoutInput: ProcessPayoutInput, options?: RequestInit): Promise<PayoutDetail> => {
+
+  return customFetch<PayoutDetail>(getPatchPayoutsRefUrl(ref),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      processPayoutInput,)
+  }
+);}
+
+
+
+
+export const getPatchPayoutsRefMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof patchPayoutsRef>>, TError,{ref: string;data: BodyType<ProcessPayoutInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof patchPayoutsRef>>, TError,{ref: string;data: BodyType<ProcessPayoutInput>}, TContext> => {
+
+const mutationKey = ['patchPayoutsRef'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof patchPayoutsRef>>, {ref: string;data: BodyType<ProcessPayoutInput>}> = (props) => {
+          const {ref,data} = props ?? {};
+
+          return  patchPayoutsRef(ref,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PatchPayoutsRefMutationResult = NonNullable<Awaited<ReturnType<typeof patchPayoutsRef>>>
+    export type PatchPayoutsRefMutationBody = BodyType<ProcessPayoutInput>
+    export type PatchPayoutsRefMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Admin approve/reject/mark-paid a payout
+ */
+export const usePatchPayoutsRef = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof patchPayoutsRef>>, TError,{ref: string;data: BodyType<ProcessPayoutInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof patchPayoutsRef>>,
+        TError,
+        {ref: string;data: BodyType<ProcessPayoutInput>},
+        TContext
+      > => {
+      return useMutation(getPatchPayoutsRefMutationOptions(options));
+    }
+
+export const getGetReportsRevenueUrl = (params?: GetReportsRevenueParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/reports/revenue?${stringifiedParams}` : `/api/reports/revenue`
+}
+
+/**
+ * @summary Platform revenue report (admin)
+ */
+export const getReportsRevenue = async (params?: GetReportsRevenueParams, options?: RequestInit): Promise<RevenueReport> => {
+
+  return customFetch<RevenueReport>(getGetReportsRevenueUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetReportsRevenueQueryKey = (params?: GetReportsRevenueParams,) => {
+    return [
+    `/api/reports/revenue`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getGetReportsRevenueQueryOptions = <TData = Awaited<ReturnType<typeof getReportsRevenue>>, TError = ErrorType<unknown>>(params?: GetReportsRevenueParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getReportsRevenue>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetReportsRevenueQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getReportsRevenue>>> = ({ signal }) => getReportsRevenue(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getReportsRevenue>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetReportsRevenueQueryResult = NonNullable<Awaited<ReturnType<typeof getReportsRevenue>>>
+export type GetReportsRevenueQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Platform revenue report (admin)
+ */
+
+export function useGetReportsRevenue<TData = Awaited<ReturnType<typeof getReportsRevenue>>, TError = ErrorType<unknown>>(
+ params?: GetReportsRevenueParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getReportsRevenue>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetReportsRevenueQueryOptions(params,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getGetReportsCommissionUrl = (params?: GetReportsCommissionParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/reports/commission?${stringifiedParams}` : `/api/reports/commission`
+}
+
+/**
+ * @summary Commission report (admin)
+ */
+export const getReportsCommission = async (params?: GetReportsCommissionParams, options?: RequestInit): Promise<RevenueReport> => {
+
+  return customFetch<RevenueReport>(getGetReportsCommissionUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetReportsCommissionQueryKey = (params?: GetReportsCommissionParams,) => {
+    return [
+    `/api/reports/commission`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getGetReportsCommissionQueryOptions = <TData = Awaited<ReturnType<typeof getReportsCommission>>, TError = ErrorType<unknown>>(params?: GetReportsCommissionParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getReportsCommission>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetReportsCommissionQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getReportsCommission>>> = ({ signal }) => getReportsCommission(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getReportsCommission>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetReportsCommissionQueryResult = NonNullable<Awaited<ReturnType<typeof getReportsCommission>>>
+export type GetReportsCommissionQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Commission report (admin)
+ */
+
+export function useGetReportsCommission<TData = Awaited<ReturnType<typeof getReportsCommission>>, TError = ErrorType<unknown>>(
+ params?: GetReportsCommissionParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getReportsCommission>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetReportsCommissionQueryOptions(params,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getGetReportsEarningsUrl = (params?: GetReportsEarningsParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/reports/earnings?${stringifiedParams}` : `/api/reports/earnings`
+}
+
+/**
+ * @summary Owner earnings report (owner/admin)
+ */
+export const getReportsEarnings = async (params?: GetReportsEarningsParams, options?: RequestInit): Promise<RevenueReport> => {
+
+  return customFetch<RevenueReport>(getGetReportsEarningsUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetReportsEarningsQueryKey = (params?: GetReportsEarningsParams,) => {
+    return [
+    `/api/reports/earnings`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getGetReportsEarningsQueryOptions = <TData = Awaited<ReturnType<typeof getReportsEarnings>>, TError = ErrorType<unknown>>(params?: GetReportsEarningsParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getReportsEarnings>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetReportsEarningsQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getReportsEarnings>>> = ({ signal }) => getReportsEarnings(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getReportsEarnings>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetReportsEarningsQueryResult = NonNullable<Awaited<ReturnType<typeof getReportsEarnings>>>
+export type GetReportsEarningsQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Owner earnings report (owner/admin)
+ */
+
+export function useGetReportsEarnings<TData = Awaited<ReturnType<typeof getReportsEarnings>>, TError = ErrorType<unknown>>(
+ params?: GetReportsEarningsParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getReportsEarnings>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetReportsEarningsQueryOptions(params,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
 

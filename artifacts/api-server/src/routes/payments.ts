@@ -11,6 +11,7 @@ import {
 import { eq, and, or, ilike, desc, sql, inArray } from "drizzle-orm";
 import { requireAuth, requireRole } from "../middlewares/requireAuth";
 import { logActivity } from "../lib/auth";
+import { createOwnerEarning } from "./earnings";
 
 const router = Router();
 
@@ -525,6 +526,18 @@ router.post(
         gatewayPaymentId: gatewayPaymentId ?? null,
       },
     });
+
+    // Auto-create owner earning record on successful payment
+    try {
+      await createOwnerEarning(
+        payment.id,
+        payment.ownerId,
+        confirmedAmount,
+        payment.bookingType,
+      );
+    } catch (err) {
+      req.log.error({ err }, "Failed to create owner earning");
+    }
 
     await logActivity(
       req,
