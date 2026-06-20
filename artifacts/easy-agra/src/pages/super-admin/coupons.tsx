@@ -26,10 +26,12 @@ async function fetchCoupons(search: string, type: string) {
   return res.json();
 }
 
+const APPLICABLE_ON_OPTIONS = ["all", "hotel", "restaurant", "spa"] as const;
+
 const EMPTY_FORM = {
   code: "", name: "", description: "", type: "global", discountType: "percentage",
   discountValue: "", minOrderValue: "", maxDiscount: "", startDate: "", endDate: "",
-  maxUses: "", isActive: true,
+  maxUses: "", isActive: true, applicableOn: ["all"] as string[],
 };
 
 export default function CouponsPage() {
@@ -111,6 +113,7 @@ export default function CouponsPage() {
       endDate: coupon.endDate ?? "",
       maxUses: coupon.maxUses ?? "",
       isActive: coupon.isActive ?? true,
+      applicableOn: Array.isArray(coupon.applicableOn) && coupon.applicableOn.length ? coupon.applicableOn : ["all"],
     });
     setDialogOpen(true);
   };
@@ -262,6 +265,32 @@ export default function CouponsPage() {
                   </SelectContent>
                 </Select>
               </div>
+            </div>
+            <div className="space-y-1.5">
+              <Label>Applicable On</Label>
+              <div className="flex gap-4 flex-wrap pt-1">
+                {APPLICABLE_ON_OPTIONS.map(opt => (
+                  <label key={opt} className="flex items-center gap-2 cursor-pointer select-none">
+                    <input
+                      type="checkbox"
+                      className="w-4 h-4 rounded accent-primary"
+                      checked={form.applicableOn.includes(opt)}
+                      onChange={() => {
+                        setForm(f => {
+                          if (opt === "all") return { ...f, applicableOn: ["all"] };
+                          const withoutAll = f.applicableOn.filter(x => x !== "all");
+                          const next = withoutAll.includes(opt)
+                            ? withoutAll.filter(x => x !== opt)
+                            : [...withoutAll, opt];
+                          return { ...f, applicableOn: next.length === 0 ? ["all"] : next };
+                        });
+                      }}
+                    />
+                    <span className="text-sm capitalize">{opt === "all" ? "All" : opt + "s"}</span>
+                  </label>
+                ))}
+              </div>
+              <p className="text-xs text-muted-foreground">Select which business types this coupon applies to</p>
             </div>
             <div className="grid grid-cols-3 gap-4">
               <div className="space-y-1.5">

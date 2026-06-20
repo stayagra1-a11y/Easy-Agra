@@ -1,11 +1,20 @@
 import { Link } from "wouter";
+import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/use-auth";
 import { useGetUnreadNotificationCount, useListNotifications, useGetMyOwnerRequest } from "@workspace/api-client-react";
 import { CustomerLayout } from "@/components/layout/customer-layout";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Building2, UtensilsCrossed, Sparkles, MapPin, Bell, ChevronRight, Clock, CheckCircle2, XCircle, AlertCircle } from "lucide-react";
+import { Building2, UtensilsCrossed, Sparkles, MapPin, Bell, ChevronRight, Clock, CheckCircle2, XCircle, AlertCircle, Star } from "lucide-react";
+
+const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
+
+async function fetchFeatured() {
+  const res = await fetch(`${BASE}/api/platform-settings/featured`, { credentials: "include" });
+  if (!res.ok) return null;
+  return res.json();
+}
 
 const statusColors: Record<string, string> = {
   active: "bg-green-100 text-green-700",
@@ -20,11 +29,46 @@ const requestStatusIcon: Record<string, any> = {
   rejected: <XCircle className="h-4 w-4 text-red-500" />,
 };
 
+function FeaturedCard({ name, image, href, type }: { name: string; image?: string | null; href: string; type: string }) {
+  const iconMap: Record<string, any> = {
+    hotel: Building2,
+    restaurant: UtensilsCrossed,
+    spa: Sparkles,
+    place: MapPin,
+  };
+  const Icon = iconMap[type] || MapPin;
+  return (
+    <Link href={href}>
+      <div className="relative flex-shrink-0 w-36 rounded-xl overflow-hidden border border-border bg-muted cursor-pointer hover:shadow-md transition-shadow">
+        {image ? (
+          <img src={image} alt={name} className="w-full h-24 object-cover" />
+        ) : (
+          <div className="w-full h-24 flex items-center justify-center bg-primary/10">
+            <Icon className="h-8 w-8 text-primary/50" />
+          </div>
+        )}
+        <div className="p-2">
+          <p className="text-xs font-semibold line-clamp-2 leading-tight">{name}</p>
+        </div>
+      </div>
+    </Link>
+  );
+}
+
 export default function CustomerHome() {
   const { user } = useAuth();
   const { data: unreadData } = useGetUnreadNotificationCount();
   const { data: notificationsData } = useListNotifications({ limit: 3, unreadOnly: true });
   const { data: ownerRequest } = useGetMyOwnerRequest({ query: { retry: false, queryKey: ["getMyOwnerRequest"] } });
+  const { data: featured } = useQuery({ queryKey: ["featured-public"], queryFn: fetchFeatured });
+
+  const hasFeatured =
+    featured && (
+      (featured.hotels?.length ?? 0) > 0 ||
+      (featured.restaurants?.length ?? 0) > 0 ||
+      (featured.spas?.length ?? 0) > 0 ||
+      (featured.places?.length ?? 0) > 0
+    );
 
   const features = [
     { icon: UtensilsCrossed, label: "Restaurants", color: "bg-orange-50 text-orange-600", href: "/restaurants" },
@@ -79,6 +123,30 @@ export default function CustomerHome() {
             })}
           </div>
         </div>
+
+        {/* Featured section */}
+        {hasFeatured && (
+          <div>
+            <div className="flex items-center gap-2 mb-3">
+              <Star className="h-4 w-4 text-amber-500 fill-amber-400" />
+              <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Featured in Agra</h2>
+            </div>
+            <div className="flex gap-3 overflow-x-auto pb-1 -mx-1 px-1">
+              {featured.hotels?.map((h: any) => (
+                <FeaturedCard key={`hotel-${h.id}`} name={h.name} image={h.coverImage} href="/hotels" type="hotel" />
+              ))}
+              {featured.restaurants?.map((r: any) => (
+                <FeaturedCard key={`rest-${r.id}`} name={r.name} image={r.coverPhoto} href="/restaurants" type="restaurant" />
+              ))}
+              {featured.spas?.map((s: any) => (
+                <FeaturedCard key={`spa-${s.id}`} name={s.name} image={s.coverPhoto} href="/spas" type="spa" />
+              ))}
+              {featured.places?.map((p: any) => (
+                <FeaturedCard key={`place-${p.id}`} name={p.name} image={null} href="/places" type="place" />
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Owner request status / CTA */}
         {ownerRequest ? (

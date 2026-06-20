@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { db, platformSettingsTable, hotelsTable, restaurantsTable, spasTable, touristPlacesTable } from "@workspace/db";
-import { eq, inArray } from "drizzle-orm";
+import { and, eq, inArray } from "drizzle-orm";
 import { requireAuth, requireRole } from "../middlewares/requireAuth";
 import { logActivity } from "../lib/auth";
 
@@ -103,16 +103,16 @@ router.get("/platform-settings/featured", requireAuth, async (req, res): Promise
 
   const [hotels, restaurants, spas, places] = await Promise.all([
     featuredHotelIds.length
-      ? db.select({ id: hotelsTable.id, name: hotelsTable.name, category: hotelsTable.category, status: hotelsTable.status })
-          .from(hotelsTable).where(inArray(hotelsTable.id, featuredHotelIds))
+      ? db.select({ id: hotelsTable.id, name: hotelsTable.name, category: hotelsTable.category, coverImage: hotelsTable.coverImage })
+          .from(hotelsTable).where(and(inArray(hotelsTable.id, featuredHotelIds), eq(hotelsTable.status, "approved")))
       : Promise.resolve([]),
     featuredRestaurantIds.length
-      ? db.select({ id: restaurantsTable.id, name: restaurantsTable.name, status: restaurantsTable.status })
-          .from(restaurantsTable).where(inArray(restaurantsTable.id, featuredRestaurantIds))
+      ? db.select({ id: restaurantsTable.id, name: restaurantsTable.name, coverPhoto: restaurantsTable.coverPhoto })
+          .from(restaurantsTable).where(and(inArray(restaurantsTable.id, featuredRestaurantIds), eq(restaurantsTable.status, "active")))
       : Promise.resolve([]),
     featuredSpaIds.length
-      ? db.select({ id: spasTable.id, name: spasTable.name, status: spasTable.status })
-          .from(spasTable).where(inArray(spasTable.id, featuredSpaIds))
+      ? db.select({ id: spasTable.id, name: spasTable.name, coverPhoto: spasTable.coverPhoto })
+          .from(spasTable).where(and(inArray(spasTable.id, featuredSpaIds), eq(spasTable.status, "approved")))
       : Promise.resolve([]),
     featuredPlaceIds.length
       ? db.select({ id: touristPlacesTable.id, name: touristPlacesTable.name })

@@ -142,4 +142,79 @@ router.patch(
   },
 );
 
+router.patch(
+  "/admin/businesses/:type/:id/suspend",
+  requireRole("admin", "super_admin"),
+  async (req, res): Promise<void> => {
+    const raw = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+    const id = parseInt(raw, 10);
+    const type = Array.isArray(req.params.type) ? req.params.type[0] : req.params.type;
+    const currentUser = (req as any).currentUser;
+    const { reason } = req.body;
+
+    if (type === "hotel") {
+      const [entity] = await db.select().from(hotelsTable).where(eq(hotelsTable.id, id));
+      if (!entity) { res.status(404).json({ error: "Hotel not found" }); return; }
+      const [updated] = await db.update(hotelsTable).set({ status: "suspended" }).where(eq(hotelsTable.id, id)).returning();
+      await logActivity(req, "hotel_suspended", `Hotel ${entity.name} suspended${reason ? `: ${reason}` : ""}`, currentUser.id, currentUser.role);
+      if (entity.ownerId) await createNotification(entity.ownerId, "Hotel Suspended", reason || `Your hotel "${entity.name}" has been suspended.`, "general");
+      res.json(updated); return;
+    }
+    if (type === "restaurant") {
+      const [entity] = await db.select().from(restaurantsTable).where(eq(restaurantsTable.id, id));
+      if (!entity) { res.status(404).json({ error: "Restaurant not found" }); return; }
+      const [updated] = await db.update(restaurantsTable).set({ status: "suspended" as any }).where(eq(restaurantsTable.id, id)).returning();
+      await logActivity(req, "restaurant_suspended", `Restaurant ${entity.name} suspended`, currentUser.id, currentUser.role);
+      if (entity.ownerId) await createNotification(entity.ownerId, "Restaurant Suspended", reason || `Your restaurant "${entity.name}" has been suspended.`, "general");
+      res.json(updated); return;
+    }
+    if (type === "spa") {
+      const [entity] = await db.select().from(spasTable).where(eq(spasTable.id, id));
+      if (!entity) { res.status(404).json({ error: "Spa not found" }); return; }
+      const [updated] = await db.update(spasTable).set({ status: "suspended" }).where(eq(spasTable.id, id)).returning();
+      await logActivity(req, "spa_suspended", `Spa ${entity.name} suspended`, currentUser.id, currentUser.role);
+      if (entity.ownerId) await createNotification(entity.ownerId, "Spa Suspended", reason || `Your spa "${entity.name}" has been suspended.`, "general");
+      res.json(updated); return;
+    }
+    res.status(400).json({ error: "Invalid business type. Use hotel, restaurant, or spa." });
+  },
+);
+
+router.patch(
+  "/admin/businesses/:type/:id/restore",
+  requireRole("admin", "super_admin"),
+  async (req, res): Promise<void> => {
+    const raw = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
+    const id = parseInt(raw, 10);
+    const type = Array.isArray(req.params.type) ? req.params.type[0] : req.params.type;
+    const currentUser = (req as any).currentUser;
+
+    if (type === "hotel") {
+      const [entity] = await db.select().from(hotelsTable).where(eq(hotelsTable.id, id));
+      if (!entity) { res.status(404).json({ error: "Hotel not found" }); return; }
+      const [updated] = await db.update(hotelsTable).set({ status: "approved" }).where(eq(hotelsTable.id, id)).returning();
+      await logActivity(req, "hotel_restored", `Hotel ${entity.name} restored`, currentUser.id, currentUser.role);
+      if (entity.ownerId) await createNotification(entity.ownerId, "Hotel Restored", `Your hotel "${entity.name}" has been restored.`, "general");
+      res.json(updated); return;
+    }
+    if (type === "restaurant") {
+      const [entity] = await db.select().from(restaurantsTable).where(eq(restaurantsTable.id, id));
+      if (!entity) { res.status(404).json({ error: "Restaurant not found" }); return; }
+      const [updated] = await db.update(restaurantsTable).set({ status: "active" as any }).where(eq(restaurantsTable.id, id)).returning();
+      await logActivity(req, "restaurant_restored", `Restaurant ${entity.name} restored`, currentUser.id, currentUser.role);
+      if (entity.ownerId) await createNotification(entity.ownerId, "Restaurant Restored", `Your restaurant "${entity.name}" has been restored.`, "general");
+      res.json(updated); return;
+    }
+    if (type === "spa") {
+      const [entity] = await db.select().from(spasTable).where(eq(spasTable.id, id));
+      if (!entity) { res.status(404).json({ error: "Spa not found" }); return; }
+      const [updated] = await db.update(spasTable).set({ status: "approved" }).where(eq(spasTable.id, id)).returning();
+      await logActivity(req, "spa_restored", `Spa ${entity.name} restored`, currentUser.id, currentUser.role);
+      if (entity.ownerId) await createNotification(entity.ownerId, "Spa Restored", `Your spa "${entity.name}" has been restored.`, "general");
+      res.json(updated); return;
+    }
+    res.status(400).json({ error: "Invalid business type. Use hotel, restaurant, or spa." });
+  },
+);
+
 export default router;
