@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useLocation } from "wouter";
+import { useLocation, useParams } from "wouter";
 import { CustomerLayout } from "@/components/layout/customer-layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -71,9 +71,8 @@ function interestIcon(v: string) {
   return INTERESTS.find((i) => i.value === v)?.icon ?? "🔖";
 }
 
-interface Props { params: { ref: string } }
-
-export default function TripDetail({ params }: Props) {
+export default function TripDetail() {
+  const params = useParams<{ ref: string }>();
   const { toast } = useToast();
   const [, navigate] = useLocation();
   const qc = useQueryClient();
