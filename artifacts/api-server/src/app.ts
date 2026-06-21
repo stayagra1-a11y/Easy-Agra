@@ -10,6 +10,9 @@ import { pool } from "@workspace/db";
 const app: Express = express();
 const PgSession = connectPgSimple(session);
 
+// Trust Replit's reverse proxy so secure cookies work in production
+app.set("trust proxy", 1);
+
 app.use(
   pinoHttp({
     logger,
