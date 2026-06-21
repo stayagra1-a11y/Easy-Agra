@@ -18,69 +18,64 @@ function getAppUrl(req: any): string {
 // ── Register ────────────────────────────────────────────────────────────────
 router.post("/auth/register", async (req, res): Promise<void> => {
   const { fullName, email, mobile, password, city, state } = req.body;
-  if (!fullName || !email || !mobile || !password) {
-    res.status(400).json({ error: "Missing required fields" });
+  if (!fullName || !mobile || !password) {
+    res.status(400).json({ error: "Naam, mobile number aur password zaroori hain" });
     return;
   }
 
-  const existingEmail = await db.select().from(usersTable).where(eq(usersTable.email, email.toLowerCase()));
-  if (existingEmail.length > 0) {
-    res.status(409).json({ error: "This email is already registered. Please sign in or use a different email." });
-    return;
+  if (email) {
+    const existingEmail = await db.select().from(usersTable).where(eq(usersTable.email, email.toLowerCase()));
+    if (existingEmail.length > 0) {
+      res.status(409).json({ error: "Ye email pehle se registered hai. Login karein ya doosra email use karein." });
+      return;
+    }
   }
 
   const existingMobile = await db.select().from(usersTable).where(eq(usersTable.mobile, mobile.trim()));
   if (existingMobile.length > 0) {
-    res.status(409).json({ error: "This mobile number is already registered. Please sign in or use a different number." });
+    res.status(409).json({ error: "Ye mobile number pehle se registered hai. Login karein." });
     return;
   }
 
   const passwordHash = await bcrypt.hash(password, 12);
-  const verificationToken = crypto.randomBytes(32).toString("hex");
-  const verificationExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
 
-  const emailServiceEnabled = !!(process.env.GMAIL_USER && process.env.GMAIL_APP_PASSWORD);
+  // Use provided email or generate a placeholder from mobile (DB requires non-null)
+  const resolvedEmail = email ? email.toLowerCase() : `${mobile.trim()}@easyagra.local`;
 
   const [user] = await db
     .insert(usersTable)
     .values({
       fullName,
-      email: email.toLowerCase(),
+      email: resolvedEmail,
       mobile,
       passwordHash,
       city: city || null,
       state: state || null,
       role: "customer",
       status: "active",
-      emailVerified: !emailServiceEnabled, // auto-verified if no email service
-      emailVerificationToken: emailServiceEnabled ? verificationToken : null,
-      emailVerificationExpiry: emailServiceEnabled ? verificationExpiry : null,
+      emailVerified: true, // auto-verified — no email verification step required
     })
     .returning();
 
-  if (emailServiceEnabled) {
-    try {
-      await sendVerificationEmail(user.email, user.fullName, verificationToken, getAppUrl(req));
-    } catch (err) {
-      req.log.error({ err }, "Failed to send verification email");
-    }
+  // Send welcome email in background (non-blocking)
+  const emailServiceEnabled = !!(process.env.GMAIL_USER && process.env.GMAIL_APP_PASSWORD);
+  if (emailServiceEnabled && user.email) {
+    sendWelcomeEmail(user.email, user.fullName).catch((err) => {
+      req.log.error({ err }, "Failed to send welcome email");
+    });
   }
 
   await createNotification(
     user.id,
-    "Welcome to Easy Agra!",
-    `Hi ${user.fullName}, welcome to Easy Agra! Explore hotels, restaurants, spas, and iconic tourist places in Agra.`,
+    "Easy Agra mein aapka swagat hai! 🎉",
+    `Namaste ${user.fullName}! Easy Agra par aapka account ban gaya. Hotels, Restaurants, Spas book karein aur Agra ke tourist places explore karein.`,
     "welcome",
   );
 
-  await logActivity(req, "user_registered", `New user registered: ${user.email}`, user.id, user.role);
+  await logActivity(req, "user_registered", `New user registered: ${user.mobile}`, user.id, user.role);
 
-  if (emailServiceEnabled) {
-    res.status(201).json({ requiresVerification: true, message: "Registration successful. Please check your email to verify your account." });
-  } else {
-    req.session.userId = user.id;
-    res.status(201).json({ user: safeUser(user), message: "Registration successful" });
-  }
+  req.session.userId = user.id;
+  res.status(201).json({ user: safeUser(user), message: "Registration successful" });
 });
 
 // ── Verify Email ─────────────────────────────────────────────────────────────
@@ -177,11 +172,6 @@ router.post("/auth/login", async (req, res): Promise<void> => {
   }
   if (user.status === "rejected") {
     res.status(403).json({ error: "Your account has been rejected." });
-    return;
-  }
-
-  if (!user.emailVerified) {
-    res.status(403).json({ error: "Please verify your email before logging in.", requiresVerification: true, email: user.email });
     return;
   }
 

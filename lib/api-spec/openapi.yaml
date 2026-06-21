@@ -4566,7 +4566,6 @@ components:
           type: string
       required:
         - fullName
-        - email
         - mobile
         - password
 

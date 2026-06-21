@@ -8,7 +8,7 @@
 
 export interface RegisterInput {
   fullName: string;
-  email: string;
+  email?: string;
   mobile: string;
   password: string;
   city?: string;
