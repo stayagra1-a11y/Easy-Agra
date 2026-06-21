@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useLocation, useParams } from "wouter";
 import {
   useCreateSpa,
@@ -16,8 +16,9 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
-import { Loader2, ArrowLeft, Sparkles, ImagePlus, Trash2 } from "lucide-react";
+import { Loader2, ArrowLeft, Sparkles, ImagePlus, Trash2, Upload } from "lucide-react";
 import { UpiSettingsCard } from "@/components/upi-settings-card";
+import { uploadToCloudinary } from "@/lib/cloudinary";
 
 const FACILITIES = [
   "Steam Bath",
@@ -71,6 +72,35 @@ export default function SpaForm() {
   const [form, setForm] = useState<SpaFormState>(EMPTY);
   const [galleryInput, setGalleryInput] = useState("");
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const coverFileRef = useRef<HTMLInputElement>(null);
+  const galleryFileRef = useRef<HTMLInputElement>(null);
+
+  const handleCoverUpload = async (file: File) => {
+    setUploading(true);
+    try {
+      const url = await uploadToCloudinary(file);
+      set("coverPhoto", url);
+      toast({ title: "Cover photo uploaded!" });
+    } catch {
+      toast({ title: "Upload failed", description: "Could not upload photo. Try again.", variant: "destructive" });
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleGalleryUpload = async (files: FileList) => {
+    setUploading(true);
+    try {
+      const urls = await Promise.all(Array.from(files).map(uploadToCloudinary));
+      set("galleryPhotos", [...form.galleryPhotos, ...urls]);
+      toast({ title: `${urls.length} photo${urls.length > 1 ? "s" : ""} added!` });
+    } catch {
+      toast({ title: "Upload failed", description: "Could not upload photo. Try again.", variant: "destructive" });
+    } finally {
+      setUploading(false);
+    }
+  };
 
   const { data: existingSpa, isLoading: loadingSpa } = useGetSpaById(
     editId ?? 0,
@@ -383,14 +413,24 @@ export default function SpaForm() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
+            {/* Hidden file inputs */}
+            <input ref={coverFileRef} type="file" accept="image/*" className="hidden"
+              onChange={(e) => { const f = e.target.files?.[0]; if (f) handleCoverUpload(f); e.target.value = ""; }} />
+            <input ref={galleryFileRef} type="file" accept="image/*" multiple className="hidden"
+              onChange={(e) => { if (e.target.files?.length) handleGalleryUpload(e.target.files); e.target.value = ""; }} />
+
             <div>
-              <Label htmlFor="coverPhoto">Cover Photo URL</Label>
-              <Input
-                id="coverPhoto"
-                value={form.coverPhoto}
-                onChange={(e) => set("coverPhoto", e.target.value)}
-                placeholder="https://example.com/spa-cover.jpg"
-              />
+              <Label htmlFor="coverPhoto">Cover Photo</Label>
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full h-11 gap-2 mt-1 border-dashed border-2 border-primary/40 text-primary hover:bg-primary/5"
+                onClick={() => coverFileRef.current?.click()}
+                disabled={uploading}
+              >
+                {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <ImagePlus className="h-4 w-4" />}
+                {uploading ? "Uploading..." : "Phone se cover photo upload karo"}
+              </Button>
               {form.coverPhoto && (
                 <img
                   src={form.coverPhoto}
@@ -399,15 +439,37 @@ export default function SpaForm() {
                   onError={(e) => (e.currentTarget.style.display = "none")}
                 />
               )}
+              <div className="relative my-2">
+                <div className="absolute inset-0 flex items-center"><span className="w-full border-t" /></div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-background px-2 text-muted-foreground">ya URL daalo</span>
+                </div>
+              </div>
+              <Input
+                id="coverPhoto"
+                value={form.coverPhoto}
+                onChange={(e) => set("coverPhoto", e.target.value)}
+                placeholder="https://example.com/spa-cover.jpg"
+              />
             </div>
 
             <div>
               <Label>Gallery Photos</Label>
-              <div className="flex gap-2 mt-1">
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full h-11 gap-2 mt-1 border-dashed border-2 border-primary/40 text-primary hover:bg-primary/5"
+                onClick={() => galleryFileRef.current?.click()}
+                disabled={uploading}
+              >
+                {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+                {uploading ? "Uploading..." : "Gallery photos upload karo (multiple)"}
+              </Button>
+              <div className="flex gap-2 mt-2">
                 <Input
                   value={galleryInput}
                   onChange={(e) => setGalleryInput(e.target.value)}
-                  placeholder="Paste image URL..."
+                  placeholder="Ya URL paste karo..."
                   onKeyDown={(e) => {
                     if (e.key === "Enter") {
                       e.preventDefault();

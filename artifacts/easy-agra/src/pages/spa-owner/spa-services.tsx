@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useParams } from "wouter";
 import {
   useGetSpaServices,
@@ -21,8 +21,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
+import { uploadToCloudinary } from "@/lib/cloudinary";
 import {
-  Plus, Edit2, Trash2, Loader2, Sparkles, ArrowLeft,
+  Plus, Edit2, Trash2, Loader2, Sparkles, ArrowLeft, ImagePlus,
   Clock, BadgeIndianRupee, CheckCircle2, XCircle
 } from "lucide-react";
 import { Link } from "wouter";
@@ -78,6 +79,21 @@ export default function SpaServices() {
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<number | null>(null);
   const [form, setForm] = useState<ServiceForm>(blank);
+  const [uploading, setUploading] = useState(false);
+  const imgFileRef = useRef<HTMLInputElement>(null);
+
+  const handleImgUpload = async (file: File) => {
+    setUploading(true);
+    try {
+      const url = await uploadToCloudinary(file);
+      setForm((prev) => ({ ...prev, serviceImage: url }));
+      toast({ title: "Photo uploaded!" });
+    } catch {
+      toast({ title: "Upload failed", description: "Could not upload photo.", variant: "destructive" });
+    } finally {
+      setUploading(false);
+    }
+  };
 
   function invalidate() {
     qc.invalidateQueries({ queryKey: getGetSpaServicesQueryKey(spaId) });
@@ -340,7 +356,30 @@ export default function SpaServices() {
               </div>
 
               <div className="space-y-1">
-                <Label htmlFor="svc-img">Service Image URL</Label>
+                <Label htmlFor="svc-img">Service Image</Label>
+                <input ref={imgFileRef} type="file" accept="image/*" className="hidden"
+                  onChange={(e) => { const f = e.target.files?.[0]; if (f) handleImgUpload(f); e.target.value = ""; }} />
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full h-11 gap-2 border-dashed border-2 border-primary/40 text-primary hover:bg-primary/5"
+                  onClick={() => imgFileRef.current?.click()}
+                  disabled={uploading}
+                >
+                  {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <ImagePlus className="h-4 w-4" />}
+                  {uploading ? "Uploading..." : "Phone se photo upload karo"}
+                </Button>
+                {form.serviceImage && (
+                  <img src={form.serviceImage} alt="Preview"
+                    className="w-full h-28 object-cover rounded-md mt-1"
+                    onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
+                )}
+                <div className="relative my-1">
+                  <div className="absolute inset-0 flex items-center"><span className="w-full border-t" /></div>
+                  <div className="relative flex justify-center text-xs uppercase">
+                    <span className="bg-background px-2 text-muted-foreground">ya URL daalo</span>
+                  </div>
+                </div>
                 <Input
                   id="svc-img"
                   value={form.serviceImage}
