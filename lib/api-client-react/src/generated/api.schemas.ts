@@ -432,6 +432,12 @@ export interface Hotel {
   /** @nullable */
   description?: string | null;
   category: HotelCategory;
+  /**
+     * @minimum 1
+     * @maximum 5
+     * @nullable
+     */
+  starRating?: number | null;
   /** @nullable */
   address?: string | null;
   /** @nullable */
@@ -505,6 +511,11 @@ export interface HotelInput {
   name: string;
   description?: string;
   category: HotelInputCategory;
+  /**
+     * @minimum 1
+     * @maximum 5
+     */
+  starRating?: number;
   address?: string;
   city?: string;
   state?: string;

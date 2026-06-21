@@ -14,7 +14,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, Building2, MapPin, Phone, Info, Wifi, Image, Save, Send, Loader2, IndianRupee, Clock, Navigation, Plus, Pencil, Trash2, Check, X } from "lucide-react";
+import { ArrowLeft, Building2, MapPin, Phone, Info, Wifi, Image, Save, Send, Loader2, IndianRupee, Clock, Navigation, Plus, Pencil, Trash2, Check, X, Star } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { UpiSettingsCard } from "@/components/upi-settings-card";
 import { uploadToCloudinary } from "@/lib/cloudinary";
@@ -277,6 +277,7 @@ type FormData = {
   name: string;
   description: string;
   category: string;
+  starRating: number | null;
   address: string;
   city: string;
   state: string;
@@ -301,7 +302,7 @@ type FormData = {
 };
 
 const EMPTY_FORM: FormData = {
-  name: "", description: "", category: "standard",
+  name: "", description: "", category: "standard", starRating: null,
   address: "", city: "", state: "", pincode: "", googleMapLink: "", landmark: "",
   contactPerson: "", contactMobile: "", contactEmail: "", website: "",
   checkInTime: "14:00", checkOutTime: "11:00",
@@ -331,6 +332,7 @@ export default function HotelForm() {
         name: existingHotel.name || "",
         description: existingHotel.description || "",
         category: existingHotel.category || "standard",
+        starRating: (existingHotel as any).starRating ?? null,
         address: existingHotel.address || "",
         city: existingHotel.city || "",
         state: existingHotel.state || "",
@@ -364,6 +366,7 @@ export default function HotelForm() {
     name: form.name.trim(),
     description: form.description || undefined,
     category: form.category as any,
+    starRating: form.starRating ?? undefined,
     address: form.address || undefined,
     city: form.city || undefined,
     state: form.state || undefined,
@@ -504,6 +507,29 @@ export default function HotelForm() {
                       <SelectItem value="luxury">Luxury</SelectItem>
                     </SelectContent>
                   </Select>
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-xs">Star Rating</Label>
+                  <div className="flex items-center gap-2 pt-1">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <button
+                        key={star}
+                        type="button"
+                        onClick={() => setForm((f) => ({ ...f, starRating: f.starRating === star ? null : star }))}
+                        className="focus:outline-none transition-transform active:scale-90"
+                      >
+                        <Star
+                          className="h-7 w-7"
+                          fill={form.starRating != null && star <= form.starRating ? "#f59e0b" : "none"}
+                          stroke={form.starRating != null && star <= form.starRating ? "#f59e0b" : "#d1d5db"}
+                        />
+                      </button>
+                    ))}
+                    {form.starRating && (
+                      <span className="text-xs text-muted-foreground ml-1">{form.starRating} Star</span>
+                    )}
+                  </div>
+                  <p className="text-xs text-muted-foreground">Star pe click karein — dobara click se hatao</p>
                 </div>
               </CardContent>
             </Card>

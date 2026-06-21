@@ -432,9 +432,19 @@ export default function HotelDetail() {
           <div className="flex items-start justify-between gap-2">
             <div className="flex-1">
               <h1 className="text-xl font-bold leading-tight">{hotel.name}</h1>
-              {hotel.category && (
-                <Badge variant="secondary" className="mt-1 text-xs">{hotel.category}</Badge>
-              )}
+              <div className="flex items-center gap-2 mt-1 flex-wrap">
+                {hotel.category && (
+                  <Badge variant="secondary" className="text-xs">{hotel.category}</Badge>
+                )}
+                {(hotel as any).starRating && (
+                  <div className="flex items-center gap-0.5">
+                    {Array.from({ length: (hotel as any).starRating }).map((_: unknown, i: number) => (
+                      <Star key={i} className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
+                    ))}
+                    <span className="text-xs text-muted-foreground ml-1">{(hotel as any).starRating} Star</span>
+                  </div>
+                )}
+              </div>
             </div>
             {parseFloat(hotel.rating ?? "0") > 0 && (
               <div className="flex items-center gap-1 shrink-0 bg-amber-50 border border-amber-200 rounded-lg px-2 py-1">

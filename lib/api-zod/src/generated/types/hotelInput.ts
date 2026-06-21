@@ -11,6 +11,11 @@ export interface HotelInput {
   name: string;
   description?: string;
   category: HotelInputCategory;
+  /**
+     * @minimum 1
+     * @maximum 5
+     */
+  starRating?: number;
   address?: string;
   city?: string;
   state?: string;

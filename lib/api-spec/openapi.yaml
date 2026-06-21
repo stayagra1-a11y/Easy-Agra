@@ -5169,6 +5169,10 @@ components:
         category:
           type: string
           enum: [budget, standard, premium, luxury]
+        starRating:
+          type: ["integer", "null"]
+          minimum: 1
+          maximum: 5
         address:
           type: ["string", "null"]
         city:
@@ -5253,6 +5257,10 @@ components:
         category:
           type: string
           enum: [budget, standard, premium, luxury]
+        starRating:
+          type: integer
+          minimum: 1
+          maximum: 5
         address:
           type: string
         city:

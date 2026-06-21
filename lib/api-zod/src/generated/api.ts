@@ -884,6 +884,10 @@ export const ListHotelsQueryParams = zod.object({
   "limit": zod.coerce.number().optional()
 })
 
+export const listHotelsResponseHotelsItemStarRatingMax = 5;
+
+
+
 export const ListHotelsResponse = zod.object({
   "hotels": zod.array(zod.object({
   "id": zod.number(),
@@ -891,6 +895,7 @@ export const ListHotelsResponse = zod.object({
   "name": zod.string(),
   "description": zod.string().nullish(),
   "category": zod.enum(['budget', 'standard', 'premium', 'luxury']),
+  "starRating": zod.number().min(1).max(listHotelsResponseHotelsItemStarRatingMax).nullish(),
   "address": zod.string().nullish(),
   "city": zod.string().nullish(),
   "state": zod.string().nullish(),
@@ -931,10 +936,15 @@ export const ListHotelsResponse = zod.object({
 /**
  * @summary Create a hotel
  */
+export const createHotelBodyStarRatingMax = 5;
+
+
+
 export const CreateHotelBody = zod.object({
   "name": zod.string(),
   "description": zod.string().optional(),
   "category": zod.enum(['budget', 'standard', 'premium', 'luxury']),
+  "starRating": zod.number().min(1).max(createHotelBodyStarRatingMax).optional(),
   "address": zod.string().optional(),
   "city": zod.string().optional(),
   "state": zod.string().optional(),
@@ -966,12 +976,17 @@ export const GetHotelParams = zod.object({
   "id": zod.coerce.number()
 })
 
+export const getHotelResponseStarRatingMax = 5;
+
+
+
 export const GetHotelResponse = zod.object({
   "id": zod.number(),
   "ownerId": zod.number(),
   "name": zod.string(),
   "description": zod.string().nullish(),
   "category": zod.enum(['budget', 'standard', 'premium', 'luxury']),
+  "starRating": zod.number().min(1).max(getHotelResponseStarRatingMax).nullish(),
   "address": zod.string().nullish(),
   "city": zod.string().nullish(),
   "state": zod.string().nullish(),
@@ -1039,12 +1054,17 @@ export const UpdateHotelBody = zod.object({
   "earlyCheckInPrice": zod.number().optional()
 })
 
+export const updateHotelResponseStarRatingMax = 5;
+
+
+
 export const UpdateHotelResponse = zod.object({
   "id": zod.number(),
   "ownerId": zod.number(),
   "name": zod.string(),
   "description": zod.string().nullish(),
   "category": zod.enum(['budget', 'standard', 'premium', 'luxury']),
+  "starRating": zod.number().min(1).max(updateHotelResponseStarRatingMax).nullish(),
   "address": zod.string().nullish(),
   "city": zod.string().nullish(),
   "state": zod.string().nullish(),
@@ -1097,12 +1117,17 @@ export const SubmitHotelParams = zod.object({
   "id": zod.coerce.number()
 })
 
+export const submitHotelResponseStarRatingMax = 5;
+
+
+
 export const SubmitHotelResponse = zod.object({
   "id": zod.number(),
   "ownerId": zod.number(),
   "name": zod.string(),
   "description": zod.string().nullish(),
   "category": zod.enum(['budget', 'standard', 'premium', 'luxury']),
+  "starRating": zod.number().min(1).max(submitHotelResponseStarRatingMax).nullish(),
   "address": zod.string().nullish(),
   "city": zod.string().nullish(),
   "state": zod.string().nullish(),
@@ -1143,12 +1168,17 @@ export const ApproveHotelParams = zod.object({
   "id": zod.coerce.number()
 })
 
+export const approveHotelResponseStarRatingMax = 5;
+
+
+
 export const ApproveHotelResponse = zod.object({
   "id": zod.number(),
   "ownerId": zod.number(),
   "name": zod.string(),
   "description": zod.string().nullish(),
   "category": zod.enum(['budget', 'standard', 'premium', 'luxury']),
+  "starRating": zod.number().min(1).max(approveHotelResponseStarRatingMax).nullish(),
   "address": zod.string().nullish(),
   "city": zod.string().nullish(),
   "state": zod.string().nullish(),
@@ -1193,12 +1223,17 @@ export const RejectHotelBody = zod.object({
   "reason": zod.string()
 })
 
+export const rejectHotelResponseStarRatingMax = 5;
+
+
+
 export const RejectHotelResponse = zod.object({
   "id": zod.number(),
   "ownerId": zod.number(),
   "name": zod.string(),
   "description": zod.string().nullish(),
   "category": zod.enum(['budget', 'standard', 'premium', 'luxury']),
+  "starRating": zod.number().min(1).max(rejectHotelResponseStarRatingMax).nullish(),
   "address": zod.string().nullish(),
   "city": zod.string().nullish(),
   "state": zod.string().nullish(),
@@ -1239,12 +1274,17 @@ export const SuspendHotelParams = zod.object({
   "id": zod.coerce.number()
 })
 
+export const suspendHotelResponseStarRatingMax = 5;
+
+
+
 export const SuspendHotelResponse = zod.object({
   "id": zod.number(),
   "ownerId": zod.number(),
   "name": zod.string(),
   "description": zod.string().nullish(),
   "category": zod.enum(['budget', 'standard', 'premium', 'luxury']),
+  "starRating": zod.number().min(1).max(suspendHotelResponseStarRatingMax).nullish(),
   "address": zod.string().nullish(),
   "city": zod.string().nullish(),
   "state": zod.string().nullish(),
@@ -1285,12 +1325,17 @@ export const RestoreHotelParams = zod.object({
   "id": zod.coerce.number()
 })
 
+export const restoreHotelResponseStarRatingMax = 5;
+
+
+
 export const RestoreHotelResponse = zod.object({
   "id": zod.number(),
   "ownerId": zod.number(),
   "name": zod.string(),
   "description": zod.string().nullish(),
   "category": zod.enum(['budget', 'standard', 'premium', 'luxury']),
+  "starRating": zod.number().min(1).max(restoreHotelResponseStarRatingMax).nullish(),
   "address": zod.string().nullish(),
   "city": zod.string().nullish(),
   "state": zod.string().nullish(),

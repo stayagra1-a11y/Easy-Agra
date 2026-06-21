@@ -15,6 +15,12 @@ export interface Hotel {
   /** @nullable */
   description?: string | null;
   category: HotelCategory;
+  /**
+     * @minimum 1
+     * @maximum 5
+     * @nullable
+     */
+  starRating?: number | null;
   /** @nullable */
   address?: string | null;
   /** @nullable */

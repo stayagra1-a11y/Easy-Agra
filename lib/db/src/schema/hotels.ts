@@ -50,6 +50,8 @@ export const hotelsTable = pgTable("hotels", {
   contactEmail: text("contact_email"),
   website: text("website"),
 
+  starRating: integer("star_rating"),
+
   checkInTime: text("check_in_time"),
   checkOutTime: text("check_out_time"),
   totalRooms: integer("total_rooms"),

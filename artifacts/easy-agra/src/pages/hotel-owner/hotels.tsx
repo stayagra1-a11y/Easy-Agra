@@ -12,7 +12,7 @@ import {
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
-import { Building2, PlusCircle, Search, Pencil, Trash2, Send, Eye, MapPin, Phone, Clock, Wifi, CheckCircle2, XCircle } from "lucide-react";
+import { Building2, PlusCircle, Search, Pencil, Trash2, Send, Eye, MapPin, Phone, Clock, Wifi, CheckCircle2, XCircle, Star } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
@@ -311,11 +311,20 @@ export default function HotelOwnerHotels() {
                           <p className="font-semibold truncate">{hotel.name}</p>
                           <Badge variant={sc.variant} className="text-xs shrink-0">{sc.label}</Badge>
                         </div>
-                        <p className="text-xs text-muted-foreground mt-0.5">
-                          {CATEGORY_LABELS[hotel.category] ?? hotel.category}
-                          {hotel.city && ` · ${hotel.city}`}
-                          {hotel.totalRooms && ` · ${hotel.totalRooms} rooms`}
-                        </p>
+                        <div className="flex items-center gap-2 mt-0.5 flex-wrap">
+                          <p className="text-xs text-muted-foreground">
+                            {CATEGORY_LABELS[hotel.category] ?? hotel.category}
+                            {hotel.city && ` · ${hotel.city}`}
+                            {hotel.totalRooms && ` · ${hotel.totalRooms} rooms`}
+                          </p>
+                          {(hotel as any).starRating && (
+                            <div className="flex items-center gap-0.5">
+                              {Array.from({ length: (hotel as any).starRating }).map((_: unknown, i: number) => (
+                                <Star key={i} className="h-3 w-3 fill-amber-400 text-amber-400" />
+                              ))}
+                            </div>
+                          )}
+                        </div>
                         {hotel.status === "rejected" && hotel.rejectionReason && (
                           <p className="text-xs text-red-600 mt-1 line-clamp-1">⚠ {hotel.rejectionReason}</p>
                         )}
