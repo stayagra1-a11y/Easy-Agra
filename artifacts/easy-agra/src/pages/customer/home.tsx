@@ -71,10 +71,10 @@ export default function CustomerHome() {
     );
 
   const features = [
-    { icon: BedDouble, label: "Hotels", href: "/hotels", bg: "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=200&q=80", color: "text-blue-100" },
-    { icon: Landmark, label: "Famous Places", href: "/places", bg: "https://images.unsplash.com/photo-1548013146-72479768bada?w=200&q=80", color: "text-amber-100" },
-    { icon: UtensilsCrossed, label: "Best Restaurants", href: "/restaurants", bg: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=200&q=80", color: "text-orange-100" },
-    { icon: Leaf, label: "Spas", href: "/spas", bg: "https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=200&q=80", color: "text-green-100" },
+    { icon: BedDouble, label: "Hotels", sub: "Luxury stays", href: "/hotels", bg: "https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?w=800&q=90" },
+    { icon: Landmark, label: "Famous Places", sub: "Iconic monuments", href: "/places", bg: "https://images.unsplash.com/photo-1548013146-72479768bada?w=800&q=90" },
+    { icon: UtensilsCrossed, label: "Restaurants", sub: "Fine dining", href: "/restaurants", bg: "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800&q=90" },
+    { icon: Leaf, label: "Spas", sub: "Wellness & relax", href: "/spas", bg: "https://images.unsplash.com/photo-1600334089648-b0d9d3028eb2?w=800&q=90" },
   ];
 
   return (
@@ -109,13 +109,26 @@ export default function CustomerHome() {
         <div>
           <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">Explore Agra</h2>
           <div className="grid grid-cols-2 gap-3">
-            {features.map(({ icon: Icon, label, color, href, bg }: any) => {
+            {features.map(({ icon: Icon, label, sub, href, bg }: any) => {
               const tile = (
-                <div key={label} className="flex flex-col items-center gap-2 group cursor-pointer">
-                  <div className="w-full aspect-square rounded-2xl overflow-hidden shadow-md transition-transform group-active:scale-95">
-                    <img src={bg} alt={label} className="w-full h-full object-cover" />
+                <div key={label} className="relative w-full aspect-[4/3] rounded-2xl overflow-hidden shadow-lg group cursor-pointer active:scale-[0.97] transition-transform duration-150">
+                  {/* Background photo */}
+                  <img
+                    src={bg}
+                    alt={label}
+                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
+                  {/* Gradient overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent" />
+                  {/* Top-right icon badge */}
+                  <div className="absolute top-2.5 right-2.5 bg-white/20 backdrop-blur-sm rounded-full p-1.5">
+                    <Icon className="h-4 w-4 text-white" />
                   </div>
-                  <span className="text-sm font-semibold text-foreground text-center leading-tight">{label}</span>
+                  {/* Bottom text */}
+                  <div className="absolute bottom-0 left-0 right-0 px-3 py-3">
+                    <p className="text-white font-bold text-sm leading-tight drop-shadow">{label}</p>
+                    <p className="text-white/75 text-xs mt-0.5 leading-tight drop-shadow">{sub}</p>
+                  </div>
                 </div>
               );
               return href ? <Link key={label} href={href} className="block">{tile}</Link> : tile;
