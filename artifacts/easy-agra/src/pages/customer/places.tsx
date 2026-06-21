@@ -1,5 +1,6 @@
 import { useState, useCallback } from "react";
 import { Link, useLocation } from "wouter";
+import { useAuth } from "@/hooks/use-auth";
 import { CustomerLayout } from "@/components/layout/customer-layout";
 import { imgUrl } from "@/lib/cloudinary";
 import {
@@ -14,7 +15,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
-  MapPin, Clock, TicketIcon, Star, Search, ChevronRight, Heart, Bookmark,
+  MapPin, Clock, TicketIcon, Star, Search, ChevronRight, Heart, Bookmark, Images,
 } from "lucide-react";
 
 function useDebouncedValue(value: string, delay = 400) {
@@ -32,6 +33,8 @@ export default function CustomerPlaces() {
   const [search, setSearch] = useState("");
   const debouncedSearch = useDebouncedValue(search, 400);
   const queryClient = useQueryClient();
+  const { user } = useAuth();
+  const isAdmin = user?.role === "admin" || user?.role === "super_admin";
 
   const { data, isLoading } = useListTouristPlaces({
     search: debouncedSearch || undefined,
@@ -169,6 +172,19 @@ export default function CustomerPlaces() {
                       >
                         <Heart className={`h-4 w-4 ${isFav ? "fill-current" : ""}`} />
                       </button>
+
+                      {/* Admin Photos button */}
+                      {isAdmin && (
+                        <Link href={`/admin/tourist-places/${place.id}/photos`}>
+                          <button
+                            onClick={(e) => e.stopPropagation()}
+                            className="absolute bottom-3 right-3 flex items-center gap-1 bg-primary text-primary-foreground text-xs font-medium px-2 py-1 rounded-full shadow"
+                          >
+                            <Images className="h-3 w-3" />
+                            Photos
+                          </button>
+                        </Link>
+                      )}
                     </div>
 
                     {/* Content */}

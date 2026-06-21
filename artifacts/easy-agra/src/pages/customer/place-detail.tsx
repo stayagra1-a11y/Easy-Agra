@@ -20,8 +20,9 @@ import { Skeleton } from "@/components/ui/skeleton";
 import {
   MapPin, Clock, TicketIcon, Star, ChevronLeft, Train, Plane, Bus,
   Lightbulb, Info, History, Navigation, ExternalLink, Heart,
-  Compass, Hotel, Utensils, Sparkles, ArrowRight, Route,
+  Compass, Hotel, Utensils, Sparkles, ArrowRight, Route, Images,
 } from "lucide-react";
+import { useAuth } from "@/hooks/use-auth";
 
 // ── Haversine distance ──────────────────────────────────────────────────
 function haversineKm(lat1: number, lon1: number, lat2: number, lon2: number) {
@@ -78,6 +79,9 @@ export default function PlaceDetail() {
   const placeId = parseInt(params.id);
   const [isFavorited, setIsFavorited] = useState(false);
   const favInitialized = useRef(false);
+
+  const { user } = useAuth();
+  const isAdmin = user?.role === "admin" || user?.role === "super_admin";
 
   const { data: place, isLoading } = useGetTouristPlace(placeId);
   const { data: favData } = useGetMyFavoritePlaces();
@@ -199,6 +203,19 @@ export default function PlaceDetail() {
             />
           </button>
         </div>
+
+        {/* Admin manage photos banner */}
+        {isAdmin && (
+          <div className="mx-4 mb-3 flex items-center justify-between bg-primary/10 border border-primary/20 rounded-lg px-3 py-2">
+            <span className="text-xs text-primary font-medium">Admin: Manage this place's photos</span>
+            <Link href={`/admin/tourist-places/${placeId}/photos`}>
+              <Button size="sm" className="h-7 gap-1.5 text-xs">
+                <Images className="h-3.5 w-3.5" />
+                Photos Manager
+              </Button>
+            </Link>
+          </div>
+        )}
 
         {/* Photo gallery */}
         <PlaceGallery images={images} placeName={place.name} />
