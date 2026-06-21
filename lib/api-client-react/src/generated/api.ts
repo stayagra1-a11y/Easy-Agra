@@ -44,6 +44,7 @@ import type {
   CreateSupportTicketBody,
   CreateTripBody,
   DashboardStats,
+  DeleteHotelNearbyPlace200,
   DeleteMenuItem200,
   DeleteRestaurant200,
   DeleteReview200,
@@ -72,6 +73,7 @@ import type {
   GetEarningsAnalyticsParams,
   GetEarningsOwner200,
   GetEarningsOwnerParams,
+  GetHotelNearbyPlaces200,
   GetMyCancellations200,
   GetMyFavoritePlaces200,
   GetMyPaymentsParams,
@@ -95,6 +97,8 @@ import type {
   HealthStatus,
   Hotel,
   HotelInput,
+  HotelNearbyPlace,
+  HotelNearbyPlaceInput,
   HotelRejectInput,
   HotelStats,
   HotelUpdate,
@@ -3697,6 +3701,301 @@ export const useRestoreHotel = <TError = ErrorType<unknown>,
         TContext
       > => {
       return useMutation(getRestoreHotelMutationOptions(options));
+    }
+
+export const getGetHotelNearbyPlacesUrl = (id: number,) => {
+
+
+
+
+  return `/api/hotels/${id}/nearby`
+}
+
+/**
+ * @summary Get nearby places for a hotel
+ */
+export const getHotelNearbyPlaces = async (id: number, options?: RequestInit): Promise<GetHotelNearbyPlaces200> => {
+
+  return customFetch<GetHotelNearbyPlaces200>(getGetHotelNearbyPlacesUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetHotelNearbyPlacesQueryKey = (id: number,) => {
+    return [
+    `/api/hotels/${id}/nearby`
+    ] as const;
+    }
+
+
+export const getGetHotelNearbyPlacesQueryOptions = <TData = Awaited<ReturnType<typeof getHotelNearbyPlaces>>, TError = ErrorType<unknown>>(id: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getHotelNearbyPlaces>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetHotelNearbyPlacesQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getHotelNearbyPlaces>>> = ({ signal }) => getHotelNearbyPlaces(id, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: !!(id), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getHotelNearbyPlaces>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetHotelNearbyPlacesQueryResult = NonNullable<Awaited<ReturnType<typeof getHotelNearbyPlaces>>>
+export type GetHotelNearbyPlacesQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Get nearby places for a hotel
+ */
+
+export function useGetHotelNearbyPlaces<TData = Awaited<ReturnType<typeof getHotelNearbyPlaces>>, TError = ErrorType<unknown>>(
+ id: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getHotelNearbyPlaces>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetHotelNearbyPlacesQueryOptions(id,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getAddHotelNearbyPlaceUrl = (id: number,) => {
+
+
+
+
+  return `/api/hotels/${id}/nearby`
+}
+
+/**
+ * @summary Add a nearby place to a hotel
+ */
+export const addHotelNearbyPlace = async (id: number,
+    hotelNearbyPlaceInput: HotelNearbyPlaceInput, options?: RequestInit): Promise<HotelNearbyPlace> => {
+
+  return customFetch<HotelNearbyPlace>(getAddHotelNearbyPlaceUrl(id),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      hotelNearbyPlaceInput,)
+  }
+);}
+
+
+
+
+export const getAddHotelNearbyPlaceMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof addHotelNearbyPlace>>, TError,{id: number;data: BodyType<HotelNearbyPlaceInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof addHotelNearbyPlace>>, TError,{id: number;data: BodyType<HotelNearbyPlaceInput>}, TContext> => {
+
+const mutationKey = ['addHotelNearbyPlace'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof addHotelNearbyPlace>>, {id: number;data: BodyType<HotelNearbyPlaceInput>}> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  addHotelNearbyPlace(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type AddHotelNearbyPlaceMutationResult = NonNullable<Awaited<ReturnType<typeof addHotelNearbyPlace>>>
+    export type AddHotelNearbyPlaceMutationBody = BodyType<HotelNearbyPlaceInput>
+    export type AddHotelNearbyPlaceMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Add a nearby place to a hotel
+ */
+export const useAddHotelNearbyPlace = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof addHotelNearbyPlace>>, TError,{id: number;data: BodyType<HotelNearbyPlaceInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof addHotelNearbyPlace>>,
+        TError,
+        {id: number;data: BodyType<HotelNearbyPlaceInput>},
+        TContext
+      > => {
+      return useMutation(getAddHotelNearbyPlaceMutationOptions(options));
+    }
+
+export const getUpdateHotelNearbyPlaceUrl = (id: number,
+    nearbyId: number,) => {
+
+
+
+
+  return `/api/hotels/${id}/nearby/${nearbyId}`
+}
+
+/**
+ * @summary Update a nearby place entry
+ */
+export const updateHotelNearbyPlace = async (id: number,
+    nearbyId: number,
+    hotelNearbyPlaceInput: HotelNearbyPlaceInput, options?: RequestInit): Promise<HotelNearbyPlace> => {
+
+  return customFetch<HotelNearbyPlace>(getUpdateHotelNearbyPlaceUrl(id,nearbyId),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      hotelNearbyPlaceInput,)
+  }
+);}
+
+
+
+
+export const getUpdateHotelNearbyPlaceMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateHotelNearbyPlace>>, TError,{id: number;nearbyId: number;data: BodyType<HotelNearbyPlaceInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateHotelNearbyPlace>>, TError,{id: number;nearbyId: number;data: BodyType<HotelNearbyPlaceInput>}, TContext> => {
+
+const mutationKey = ['updateHotelNearbyPlace'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateHotelNearbyPlace>>, {id: number;nearbyId: number;data: BodyType<HotelNearbyPlaceInput>}> = (props) => {
+          const {id,nearbyId,data} = props ?? {};
+
+          return  updateHotelNearbyPlace(id,nearbyId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateHotelNearbyPlaceMutationResult = NonNullable<Awaited<ReturnType<typeof updateHotelNearbyPlace>>>
+    export type UpdateHotelNearbyPlaceMutationBody = BodyType<HotelNearbyPlaceInput>
+    export type UpdateHotelNearbyPlaceMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Update a nearby place entry
+ */
+export const useUpdateHotelNearbyPlace = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateHotelNearbyPlace>>, TError,{id: number;nearbyId: number;data: BodyType<HotelNearbyPlaceInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof updateHotelNearbyPlace>>,
+        TError,
+        {id: number;nearbyId: number;data: BodyType<HotelNearbyPlaceInput>},
+        TContext
+      > => {
+      return useMutation(getUpdateHotelNearbyPlaceMutationOptions(options));
+    }
+
+export const getDeleteHotelNearbyPlaceUrl = (id: number,
+    nearbyId: number,) => {
+
+
+
+
+  return `/api/hotels/${id}/nearby/${nearbyId}`
+}
+
+/**
+ * @summary Delete a nearby place entry
+ */
+export const deleteHotelNearbyPlace = async (id: number,
+    nearbyId: number, options?: RequestInit): Promise<DeleteHotelNearbyPlace200> => {
+
+  return customFetch<DeleteHotelNearbyPlace200>(getDeleteHotelNearbyPlaceUrl(id,nearbyId),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+export const getDeleteHotelNearbyPlaceMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteHotelNearbyPlace>>, TError,{id: number;nearbyId: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteHotelNearbyPlace>>, TError,{id: number;nearbyId: number}, TContext> => {
+
+const mutationKey = ['deleteHotelNearbyPlace'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteHotelNearbyPlace>>, {id: number;nearbyId: number}> = (props) => {
+          const {id,nearbyId} = props ?? {};
+
+          return  deleteHotelNearbyPlace(id,nearbyId,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteHotelNearbyPlaceMutationResult = NonNullable<Awaited<ReturnType<typeof deleteHotelNearbyPlace>>>
+
+    export type DeleteHotelNearbyPlaceMutationError = ErrorType<unknown>
+
+    /**
+ * @summary Delete a nearby place entry
+ */
+export const useDeleteHotelNearbyPlace = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteHotelNearbyPlace>>, TError,{id: number;nearbyId: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof deleteHotelNearbyPlace>>,
+        TError,
+        {id: number;nearbyId: number},
+        TContext
+      > => {
+      return useMutation(getDeleteHotelNearbyPlaceMutationOptions(options));
     }
 
 export const getGetRoomStatsUrl = (params?: GetRoomStatsParams,) => {

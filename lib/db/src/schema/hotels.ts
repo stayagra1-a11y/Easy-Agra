@@ -89,3 +89,38 @@ export const insertHotelSchema = createInsertSchema(hotelsTable).omit({
 });
 export type InsertHotel = z.infer<typeof insertHotelSchema>;
 export type Hotel = typeof hotelsTable.$inferSelect;
+
+// ── Hotel Nearby Places ─────────────────────────────────────────────────────
+export const hotelNearbyPlaceCategoryEnum = pgEnum("hotel_nearby_place_category", [
+  "tourist_place",
+  "railway_station",
+  "airport",
+  "bus_stand",
+  "hospital",
+  "market",
+  "other",
+]);
+
+export const hotelNearbyPlacesTable = pgTable("hotel_nearby_places", {
+  id: serial("id").primaryKey(),
+  hotelId: integer("hotel_id")
+    .notNull()
+    .references(() => hotelsTable.id, { onDelete: "cascade" }),
+  placeName: text("place_name").notNull(),
+  category: hotelNearbyPlaceCategoryEnum("category")
+    .notNull()
+    .default("tourist_place"),
+  distanceKm: numeric("distance_km", { precision: 6, scale: 2 }),
+  estimatedTimeMinutes: integer("estimated_time_minutes"),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .defaultNow()
+    .$onUpdate(() => new Date()),
+});
+
+export const insertHotelNearbyPlaceSchema = createInsertSchema(
+  hotelNearbyPlacesTable,
+).omit({ id: true, createdAt: true, updatedAt: true });
+export type InsertHotelNearbyPlace = z.infer<typeof insertHotelNearbyPlaceSchema>;
+export type HotelNearbyPlace = typeof hotelNearbyPlacesTable.$inferSelect;

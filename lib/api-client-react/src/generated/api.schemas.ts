@@ -356,6 +356,54 @@ export interface AnnouncementInput {
   message: string;
 }
 
+export type HotelNearbyPlaceCategory = typeof HotelNearbyPlaceCategory[keyof typeof HotelNearbyPlaceCategory];
+
+
+export const HotelNearbyPlaceCategory = {
+  tourist_place: 'tourist_place',
+  railway_station: 'railway_station',
+  airport: 'airport',
+  bus_stand: 'bus_stand',
+  hospital: 'hospital',
+  market: 'market',
+  other: 'other',
+} as const;
+
+export interface HotelNearbyPlace {
+  id: number;
+  hotelId: number;
+  placeName: string;
+  category: HotelNearbyPlaceCategory;
+  /** @nullable */
+  distanceKm?: number | null;
+  /** @nullable */
+  estimatedTimeMinutes?: number | null;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export type HotelNearbyPlaceInputCategory = typeof HotelNearbyPlaceInputCategory[keyof typeof HotelNearbyPlaceInputCategory];
+
+
+export const HotelNearbyPlaceInputCategory = {
+  tourist_place: 'tourist_place',
+  railway_station: 'railway_station',
+  airport: 'airport',
+  bus_stand: 'bus_stand',
+  hospital: 'hospital',
+  market: 'market',
+  other: 'other',
+} as const;
+
+export interface HotelNearbyPlaceInput {
+  placeName: string;
+  category?: HotelNearbyPlaceInputCategory;
+  /** @nullable */
+  distanceKm?: number | null;
+  /** @nullable */
+  estimatedTimeMinutes?: number | null;
+}
+
 export type HotelCategory = typeof HotelCategory[keyof typeof HotelCategory];
 
 
@@ -2535,6 +2583,14 @@ search?: string;
 city?: string;
 page?: number;
 limit?: number;
+};
+
+export type GetHotelNearbyPlaces200 = {
+  nearby: HotelNearbyPlace[];
+};
+
+export type DeleteHotelNearbyPlace200 = {
+  success?: boolean;
 };
 
 export type GetRoomStatsParams = {

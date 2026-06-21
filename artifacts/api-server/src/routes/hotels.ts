@@ -1,10 +1,19 @@
 import { Router } from "express";
-import { db, hotelsTable, usersTable } from "@workspace/db";
-import { eq, and, ilike, sql, isNull } from "drizzle-orm";
+import { db, hotelsTable, usersTable, hotelNearbyPlacesTable } from "@workspace/db";
+import { eq, and, ilike, sql, isNull, asc } from "drizzle-orm";
 import { logActivity, createNotification } from "../lib/auth";
 import { requireAuth, requireRole } from "../middlewares/requireAuth";
 
 const router = Router();
+
+function serializeNearby(r: typeof hotelNearbyPlacesTable.$inferSelect) {
+  return {
+    ...r,
+    distanceKm: r.distanceKm ? parseFloat(String(r.distanceKm)) : null,
+    createdAt: r.createdAt instanceof Date ? r.createdAt.toISOString() : r.createdAt,
+    updatedAt: r.updatedAt instanceof Date ? r.updatedAt.toISOString() : r.updatedAt,
+  };
+}
 
 function serializeHotel(h: typeof hotelsTable.$inferSelect) {
   return {
@@ -333,6 +342,74 @@ router.patch("/hotels/:id/upi", requireRole("hotel_owner"), async (req, res): Pr
 
   await logActivity(req, "hotel_updated", `Hotel "${updated.name}" UPI settings updated`, cu.id, cu.role);
   res.json(serializeHotel(updated));
+});
+
+// ── Nearby Places ──────────────────────────────────────────────────────────
+// GET /hotels/:id/nearby
+router.get("/hotels/:id/nearby", requireAuth, async (req, res): Promise<void> => {
+  const id = parseInt(req.params.id as string, 10);
+  const hotel = await findHotel(id);
+  if (!hotel) { res.status(404).json({ error: "Hotel not found" }); return; }
+  const nearby = await db
+    .select()
+    .from(hotelNearbyPlacesTable)
+    .where(eq(hotelNearbyPlacesTable.hotelId, id))
+    .orderBy(asc(hotelNearbyPlacesTable.distanceKm));
+  res.json({ nearby: nearby.map(serializeNearby) });
+});
+
+// POST /hotels/:id/nearby
+router.post("/hotels/:id/nearby", requireRole("hotel_owner", "admin", "super_admin"), async (req, res): Promise<void> => {
+  const cu = (req as any).currentUser;
+  const id = parseInt(req.params.id as string, 10);
+  const hotel = await findHotel(id);
+  if (!hotel) { res.status(404).json({ error: "Hotel not found" }); return; }
+  if (!ownerGuard(hotel, cu.id, cu.role)) { res.status(403).json({ error: "Access denied" }); return; }
+  const { placeName, category, distanceKm, estimatedTimeMinutes } = req.body;
+  if (!placeName?.trim()) { res.status(400).json({ error: "Place name is required" }); return; }
+  const [row] = await db.insert(hotelNearbyPlacesTable).values({
+    hotelId: id,
+    placeName: placeName.trim(),
+    category: category || "tourist_place",
+    distanceKm: distanceKm != null ? String(distanceKm) : null,
+    estimatedTimeMinutes: estimatedTimeMinutes != null ? parseInt(estimatedTimeMinutes, 10) : null,
+  }).returning();
+  res.status(201).json(serializeNearby(row));
+});
+
+// PUT /hotels/:id/nearby/:nearbyId
+router.put("/hotels/:id/nearby/:nearbyId", requireRole("hotel_owner", "admin", "super_admin"), async (req, res): Promise<void> => {
+  const cu = (req as any).currentUser;
+  const id = parseInt(req.params.id as string, 10);
+  const nearbyId = parseInt(req.params.nearbyId as string, 10);
+  const hotel = await findHotel(id);
+  if (!hotel) { res.status(404).json({ error: "Hotel not found" }); return; }
+  if (!ownerGuard(hotel, cu.id, cu.role)) { res.status(403).json({ error: "Access denied" }); return; }
+  const { placeName, category, distanceKm, estimatedTimeMinutes } = req.body;
+  const [row] = await db.update(hotelNearbyPlacesTable)
+    .set({
+      placeName: placeName?.trim(),
+      category: category || undefined,
+      distanceKm: distanceKm != null ? String(distanceKm) : null,
+      estimatedTimeMinutes: estimatedTimeMinutes != null ? parseInt(estimatedTimeMinutes, 10) : null,
+    })
+    .where(and(eq(hotelNearbyPlacesTable.id, nearbyId), eq(hotelNearbyPlacesTable.hotelId, id)))
+    .returning();
+  if (!row) { res.status(404).json({ error: "Nearby place not found" }); return; }
+  res.json(serializeNearby(row));
+});
+
+// DELETE /hotels/:id/nearby/:nearbyId
+router.delete("/hotels/:id/nearby/:nearbyId", requireRole("hotel_owner", "admin", "super_admin"), async (req, res): Promise<void> => {
+  const cu = (req as any).currentUser;
+  const id = parseInt(req.params.id as string, 10);
+  const nearbyId = parseInt(req.params.nearbyId as string, 10);
+  const hotel = await findHotel(id);
+  if (!hotel) { res.status(404).json({ error: "Hotel not found" }); return; }
+  if (!ownerGuard(hotel, cu.id, cu.role)) { res.status(403).json({ error: "Access denied" }); return; }
+  await db.delete(hotelNearbyPlacesTable)
+    .where(and(eq(hotelNearbyPlacesTable.id, nearbyId), eq(hotelNearbyPlacesTable.hotelId, id)));
+  res.json({ success: true });
 });
 
 router.post("/hotels/:id/restore", requireRole("super_admin"), async (req, res): Promise<void> => {

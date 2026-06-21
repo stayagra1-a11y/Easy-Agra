@@ -1325,6 +1325,82 @@ export const RestoreHotelResponse = zod.object({
 
 
 /**
+ * @summary Get nearby places for a hotel
+ */
+export const GetHotelNearbyPlacesParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const GetHotelNearbyPlacesResponse = zod.object({
+  "nearby": zod.array(zod.object({
+  "id": zod.number(),
+  "hotelId": zod.number(),
+  "placeName": zod.string(),
+  "category": zod.enum(['tourist_place', 'railway_station', 'airport', 'bus_stand', 'hospital', 'market', 'other']),
+  "distanceKm": zod.number().nullish(),
+  "estimatedTimeMinutes": zod.number().nullish(),
+  "createdAt": zod.string().optional(),
+  "updatedAt": zod.string().optional()
+}))
+})
+
+
+/**
+ * @summary Add a nearby place to a hotel
+ */
+export const AddHotelNearbyPlaceParams = zod.object({
+  "id": zod.coerce.number()
+})
+
+export const AddHotelNearbyPlaceBody = zod.object({
+  "placeName": zod.string(),
+  "category": zod.enum(['tourist_place', 'railway_station', 'airport', 'bus_stand', 'hospital', 'market', 'other']).optional(),
+  "distanceKm": zod.number().nullish(),
+  "estimatedTimeMinutes": zod.number().nullish()
+})
+
+
+/**
+ * @summary Update a nearby place entry
+ */
+export const UpdateHotelNearbyPlaceParams = zod.object({
+  "id": zod.coerce.number(),
+  "nearbyId": zod.coerce.number()
+})
+
+export const UpdateHotelNearbyPlaceBody = zod.object({
+  "placeName": zod.string(),
+  "category": zod.enum(['tourist_place', 'railway_station', 'airport', 'bus_stand', 'hospital', 'market', 'other']).optional(),
+  "distanceKm": zod.number().nullish(),
+  "estimatedTimeMinutes": zod.number().nullish()
+})
+
+export const UpdateHotelNearbyPlaceResponse = zod.object({
+  "id": zod.number(),
+  "hotelId": zod.number(),
+  "placeName": zod.string(),
+  "category": zod.enum(['tourist_place', 'railway_station', 'airport', 'bus_stand', 'hospital', 'market', 'other']),
+  "distanceKm": zod.number().nullish(),
+  "estimatedTimeMinutes": zod.number().nullish(),
+  "createdAt": zod.string().optional(),
+  "updatedAt": zod.string().optional()
+})
+
+
+/**
+ * @summary Delete a nearby place entry
+ */
+export const DeleteHotelNearbyPlaceParams = zod.object({
+  "id": zod.coerce.number(),
+  "nearbyId": zod.coerce.number()
+})
+
+export const DeleteHotelNearbyPlaceResponse = zod.object({
+  "success": zod.boolean().optional()
+})
+
+
+/**
  * @summary Room statistics
  */
 export const GetRoomStatsQueryParams = zod.object({

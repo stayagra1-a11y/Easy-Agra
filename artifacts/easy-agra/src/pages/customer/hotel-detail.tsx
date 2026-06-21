@@ -15,8 +15,9 @@ import {
   Loader2, MapPin, Star, ArrowLeft, BedDouble, Users, IndianRupee,
   Clock, Phone, Globe, Wifi, Car, Coffee, Utensils, Dumbbell,
   Wind, Waves, Shield, CheckCircle2, ChevronLeft, ChevronRight,
-  CalendarDays, X,
+  CalendarDays, X, Navigation, Train, Plane, Bus, Hospital, ShoppingBag,
 } from "lucide-react";
+import { useGetHotelNearbyPlaces } from "@workspace/api-client-react";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 interface Hotel {
@@ -71,6 +72,69 @@ const ROOM_TYPE_LABELS: Record<string, string> = {
   standard: "Standard", deluxe: "Deluxe", suite: "Suite",
   family: "Family", single: "Single", double: "Double", twin: "Twin",
 };
+
+const NEARBY_CATEGORY_ICONS: Record<string, any> = {
+  tourist_place: Navigation,
+  railway_station: Train,
+  airport: Plane,
+  bus_stand: Bus,
+  hospital: Hospital,
+  market: ShoppingBag,
+  other: MapPin,
+};
+
+const NEARBY_CATEGORY_LABELS: Record<string, string> = {
+  tourist_place: "Tourist Place",
+  railway_station: "Railway Station",
+  airport: "Airport",
+  bus_stand: "Bus Stand",
+  hospital: "Hospital",
+  market: "Market",
+  other: "Other",
+};
+
+function NearbyDistances({ hotelId }: { hotelId: number }) {
+  const { data, isLoading } = useGetHotelNearbyPlaces(hotelId);
+  const nearby = data?.nearby ?? [];
+  if (isLoading || nearby.length === 0) return null;
+  return (
+    <Card>
+      <CardHeader className="pb-2 pt-4 px-4">
+        <CardTitle className="text-sm flex items-center gap-2">
+          <Navigation className="h-4 w-4 text-primary" /> Nearby Distances
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="px-4 pb-4">
+        <div className="space-y-2.5">
+          {nearby.map((item) => {
+            const Icon = NEARBY_CATEGORY_ICONS[item.category] ?? MapPin;
+            return (
+              <div key={item.id} className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                  <Icon className="h-4 w-4 text-primary" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium line-clamp-1">{item.placeName}</p>
+                  <p className="text-xs text-muted-foreground">{NEARBY_CATEGORY_LABELS[item.category] ?? item.category}</p>
+                </div>
+                <div className="text-right shrink-0">
+                  {item.distanceKm != null && (
+                    <p className="text-sm font-semibold text-primary">{item.distanceKm} km</p>
+                  )}
+                  {item.estimatedTimeMinutes != null && (
+                    <p className="text-xs text-muted-foreground flex items-center gap-0.5 justify-end">
+                      <Clock className="h-3 w-3" /> {item.estimatedTimeMinutes} min
+                    </p>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
 
 // ── Gallery ───────────────────────────────────────────────────────────────────
 function Gallery({ images, name }: { images: string[]; name: string }) {
@@ -413,6 +477,9 @@ export default function HotelDetail() {
           {hotel.description && (
             <p className="text-sm text-muted-foreground leading-relaxed">{hotel.description}</p>
           )}
+
+          {/* Nearby Places */}
+          <NearbyDistances hotelId={hotel.id} />
 
           {/* Amenities */}
           {hotel.amenities?.length > 0 && (

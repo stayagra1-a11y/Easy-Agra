@@ -1,6 +1,10 @@
 import { useState, useRef, useEffect } from "react";
-import { useCreateHotel, useUpdateHotel, useGetHotel, getGetHotelQueryKey, getListHotelsQueryKey } from "@workspace/api-client-react";
-import type { HotelInput, HotelUpdate } from "@workspace/api-client-react";
+import {
+  useCreateHotel, useUpdateHotel, useGetHotel, getGetHotelQueryKey, getListHotelsQueryKey,
+  useGetHotelNearbyPlaces, useAddHotelNearbyPlace, useUpdateHotelNearbyPlace, useDeleteHotelNearbyPlace,
+  getGetHotelNearbyPlacesQueryKey,
+} from "@workspace/api-client-react";
+import type { HotelInput, HotelUpdate, HotelNearbyPlace } from "@workspace/api-client-react";
 import { OwnerLayout } from "@/components/layout/owner-layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -10,7 +14,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, Building2, MapPin, Phone, Info, Wifi, Image, Save, Send, Loader2, IndianRupee, Clock } from "lucide-react";
+import { ArrowLeft, Building2, MapPin, Phone, Info, Wifi, Image, Save, Send, Loader2, IndianRupee, Clock, Navigation, Plus, Pencil, Trash2, Check, X } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { UpiSettingsCard } from "@/components/upi-settings-card";
 import { uploadToCloudinary } from "@/lib/cloudinary";
@@ -112,6 +116,160 @@ function ImageUpload({
       )}
       <input ref={inputRef} type="file" accept="image/*" className="hidden" onChange={(e) => handleFiles(e.target.files)} />
     </div>
+  );
+}
+
+const CATEGORY_LABELS: Record<string, string> = {
+  tourist_place: "Tourist Place",
+  railway_station: "Railway Station",
+  airport: "Airport",
+  bus_stand: "Bus Stand",
+  hospital: "Hospital",
+  market: "Market",
+  other: "Other",
+};
+
+function NearbyPlacesManager({ hotelId }: { hotelId: number }) {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+  const { data, isLoading } = useGetHotelNearbyPlaces(hotelId);
+  const addMutation = useAddHotelNearbyPlace();
+  const updateMutation = useUpdateHotelNearbyPlace();
+  const deleteMutation = useDeleteHotelNearbyPlace();
+
+  const [showForm, setShowForm] = useState(false);
+  const [editingId, setEditingId] = useState<number | null>(null);
+  const [form, setForm] = useState({ placeName: "", category: "tourist_place", distanceKm: "", estimatedTimeMinutes: "" });
+
+  const nearby = data?.nearby ?? [];
+
+  const resetForm = () => {
+    setForm({ placeName: "", category: "tourist_place", distanceKm: "", estimatedTimeMinutes: "" });
+    setShowForm(false);
+    setEditingId(null);
+  };
+
+  const startEdit = (item: HotelNearbyPlace) => {
+    setForm({
+      placeName: item.placeName,
+      category: item.category,
+      distanceKm: item.distanceKm != null ? String(item.distanceKm) : "",
+      estimatedTimeMinutes: item.estimatedTimeMinutes != null ? String(item.estimatedTimeMinutes) : "",
+    });
+    setEditingId(item.id);
+    setShowForm(true);
+  };
+
+  const handleSave = () => {
+    if (!form.placeName.trim()) { toast({ title: "Jagah ka naam zaroori hai", variant: "destructive" }); return; }
+    const payload = {
+      placeName: form.placeName.trim(),
+      category: form.category as any,
+      distanceKm: form.distanceKm ? parseFloat(form.distanceKm) : undefined,
+      estimatedTimeMinutes: form.estimatedTimeMinutes ? parseInt(form.estimatedTimeMinutes, 10) : undefined,
+    };
+    if (editingId) {
+      updateMutation.mutate({ id: hotelId, nearbyId: editingId, data: payload }, {
+        onSuccess: () => { queryClient.invalidateQueries({ queryKey: getGetHotelNearbyPlacesQueryKey(hotelId) }); resetForm(); toast({ title: "Updated!" }); },
+        onError: () => toast({ title: "Error", variant: "destructive" }),
+      });
+    } else {
+      addMutation.mutate({ id: hotelId, data: payload }, {
+        onSuccess: () => { queryClient.invalidateQueries({ queryKey: getGetHotelNearbyPlacesQueryKey(hotelId) }); resetForm(); toast({ title: "Added!" }); },
+        onError: () => toast({ title: "Error", variant: "destructive" }),
+      });
+    }
+  };
+
+  const handleDelete = (nearbyId: number) => {
+    deleteMutation.mutate({ id: hotelId, nearbyId }, {
+      onSuccess: () => { queryClient.invalidateQueries({ queryKey: getGetHotelNearbyPlacesQueryKey(hotelId) }); toast({ title: "Deleted" }); },
+    });
+  };
+
+  return (
+    <Card>
+      <CardHeader className="pb-2 pt-4 px-4">
+        <div className="flex items-center justify-between">
+          <CardTitle className="text-sm font-semibold flex items-center gap-2">
+            <Navigation className="h-4 w-4 text-primary" /> Nearby Distances
+          </CardTitle>
+          {!showForm && (
+            <Button size="sm" variant="outline" className="h-7 text-xs gap-1" onClick={() => setShowForm(true)}>
+              <Plus className="h-3.5 w-3.5" /> Add
+            </Button>
+          )}
+        </div>
+      </CardHeader>
+      <CardContent className="px-4 pb-4 space-y-3">
+        {/* Add/Edit form */}
+        {showForm && (
+          <div className="border border-border rounded-xl p-3 space-y-3 bg-muted/30">
+            <div>
+              <Label className="text-xs">Jagah ka naam *</Label>
+              <Input className="mt-1 h-8 text-sm" placeholder="Jaise: Taj Mahal" value={form.placeName} onChange={(e) => setForm((f) => ({ ...f, placeName: e.target.value }))} />
+            </div>
+            <div>
+              <Label className="text-xs">Category</Label>
+              <select
+                className="w-full mt-1 h-8 text-sm rounded-md border border-input bg-background px-2"
+                value={form.category}
+                onChange={(e) => setForm((f) => ({ ...f, category: e.target.value }))}
+              >
+                {Object.entries(CATEGORY_LABELS).map(([v, l]) => (
+                  <option key={v} value={v}>{l}</option>
+                ))}
+              </select>
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              <div>
+                <Label className="text-xs">Distance (km)</Label>
+                <Input className="mt-1 h-8 text-sm" type="number" step="0.1" placeholder="2.5" value={form.distanceKm} onChange={(e) => setForm((f) => ({ ...f, distanceKm: e.target.value }))} />
+              </div>
+              <div>
+                <Label className="text-xs">Time (minutes)</Label>
+                <Input className="mt-1 h-8 text-sm" type="number" placeholder="10" value={form.estimatedTimeMinutes} onChange={(e) => setForm((f) => ({ ...f, estimatedTimeMinutes: e.target.value }))} />
+              </div>
+            </div>
+            <div className="flex gap-2">
+              <Button size="sm" className="flex-1 h-8 text-xs gap-1" onClick={handleSave} disabled={addMutation.isPending || updateMutation.isPending}>
+                <Check className="h-3.5 w-3.5" /> {editingId ? "Update" : "Save"}
+              </Button>
+              <Button size="sm" variant="outline" className="h-8 text-xs gap-1" onClick={resetForm}>
+                <X className="h-3.5 w-3.5" /> Cancel
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {/* List */}
+        {isLoading && <p className="text-xs text-muted-foreground">Loading...</p>}
+        {!isLoading && nearby.length === 0 && !showForm && (
+          <p className="text-xs text-muted-foreground text-center py-4">Abhi tak koi distance add nahi ki. "Add" button dabayein.</p>
+        )}
+        {nearby.map((item) => (
+          <div key={item.id} className="flex items-center gap-3 py-2 border-b border-border last:border-0">
+            <Navigation className="h-4 w-4 text-primary shrink-0" />
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium line-clamp-1">{item.placeName}</p>
+              <p className="text-xs text-muted-foreground">{CATEGORY_LABELS[item.category] ?? item.category}</p>
+            </div>
+            <div className="text-right shrink-0">
+              {item.distanceKm != null && <p className="text-xs font-medium">{item.distanceKm} km</p>}
+              {item.estimatedTimeMinutes != null && <p className="text-xs text-muted-foreground">{item.estimatedTimeMinutes} min</p>}
+            </div>
+            <div className="flex gap-1 shrink-0">
+              <button onClick={() => startEdit(item)} className="p-1 rounded hover:bg-muted transition-colors">
+                <Pencil className="h-3.5 w-3.5 text-muted-foreground" />
+              </button>
+              <button onClick={() => handleDelete(item.id)} className="p-1 rounded hover:bg-red-50 transition-colors">
+                <Trash2 className="h-3.5 w-3.5 text-red-400" />
+              </button>
+            </div>
+          </div>
+        ))}
+      </CardContent>
+    </Card>
   );
 }
 
@@ -306,6 +464,11 @@ export default function HotelForm() {
             <TabsTrigger value="media" className="flex-col h-12 text-xs gap-0.5 px-2 shrink-0">
               <Image className="h-3.5 w-3.5" /> Media
             </TabsTrigger>
+            {isEdit && (
+              <TabsTrigger value="nearby" className="flex-col h-12 text-xs gap-0.5 px-2 shrink-0">
+                <Navigation className="h-3.5 w-3.5" /> Nearby
+              </TabsTrigger>
+            )}
             {isEdit && (
               <TabsTrigger value="payment" className="flex-col h-12 text-xs gap-0.5 px-2 shrink-0">
                 <IndianRupee className="h-3.5 w-3.5" /> UPI
@@ -533,6 +696,13 @@ export default function HotelForm() {
               </CardContent>
             </Card>
           </TabsContent>
+
+          {/* Nearby Places */}
+          {isEdit && (
+            <TabsContent value="nearby" className="mt-3">
+              <NearbyPlacesManager hotelId={parseInt(params.id as string, 10)} />
+            </TabsContent>
+          )}
 
           {/* UPI Payment Settings */}
           {isEdit && (

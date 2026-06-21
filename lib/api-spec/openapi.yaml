@@ -1102,6 +1102,117 @@ paths:
               schema:
                 $ref: "#/components/schemas/Hotel"
 
+  /hotels/{id}/nearby:
+    get:
+      operationId: getHotelNearbyPlaces
+      tags: [hotels]
+      summary: Get nearby places for a hotel
+      security:
+        - cookieAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Nearby places list
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [nearby]
+                properties:
+                  nearby:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/HotelNearbyPlace"
+    post:
+      operationId: addHotelNearbyPlace
+      tags: [hotels]
+      summary: Add a nearby place to a hotel
+      security:
+        - cookieAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/HotelNearbyPlaceInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HotelNearbyPlace"
+
+  /hotels/{id}/nearby/{nearbyId}:
+    put:
+      operationId: updateHotelNearbyPlace
+      tags: [hotels]
+      summary: Update a nearby place entry
+      security:
+        - cookieAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+        - in: path
+          name: nearbyId
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/HotelNearbyPlaceInput"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HotelNearbyPlace"
+    delete:
+      operationId: deleteHotelNearbyPlace
+      tags: [hotels]
+      summary: Delete a nearby place entry
+      security:
+        - cookieAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+        - in: path
+          name: nearbyId
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+
   /rooms/stats:
     get:
       operationId: getRoomStats
@@ -5007,6 +5118,42 @@ components:
       required:
         - title
         - message
+
+    HotelNearbyPlace:
+      type: object
+      required: [id, hotelId, placeName, category]
+      properties:
+        id:
+          type: integer
+        hotelId:
+          type: integer
+        placeName:
+          type: string
+        category:
+          type: string
+          enum: [tourist_place, railway_station, airport, bus_stand, hospital, market, other]
+        distanceKm:
+          type: ["number", "null"]
+        estimatedTimeMinutes:
+          type: ["integer", "null"]
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+
+    HotelNearbyPlaceInput:
+      type: object
+      required: [placeName]
+      properties:
+        placeName:
+          type: string
+        category:
+          type: string
+          enum: [tourist_place, railway_station, airport, bus_stand, hospital, market, other]
+        distanceKm:
+          type: ["number", "null"]
+        estimatedTimeMinutes:
+          type: ["integer", "null"]
 
     Hotel:
       type: object
