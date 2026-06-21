@@ -6,3 +6,9 @@ id = "WxXwr8aEeEUCXGtCaFAv-"
 uri = "file://artifacts/easy-agra/public/favicon.svg"
 type = "image"
 title = "Easy Agra — App Icon (current)"
+
+[[outputs]]
+id = "R1vPn5pzMxJRSpMbMoYSo"
+uri = "file://easy-agra-qr.png"
+type = "image"
+title = "Easy Agra — App QR Code"
