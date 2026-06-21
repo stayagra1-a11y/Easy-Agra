@@ -140,6 +140,9 @@ import AdminTouristPlaces from "@/pages/admin/tourist-places";
 import TouristPlaceForm from "@/pages/admin/tourist-place-form";
 import TouristPlacePhotos from "@/pages/admin/tourist-place-photos";
 
+// Customer - search
+import SearchPage from "@/pages/customer/search";
+
 // Customer - restaurants & reservations
 import CustomerRestaurants from "@/pages/customer/restaurants";
 import RestaurantDetail from "@/pages/customer/restaurant-detail";
@@ -276,6 +279,7 @@ function Router() {
       <Route path="/spas" component={() => <ProtectedRoute component={CustomerSpas} allowedRoles={["customer"]} />} />
       <Route path="/my-spa-appointments" component={() => <ProtectedRoute component={MySpaAppointments} allowedRoles={["customer"]} />} />
 
+      <Route path="/search" component={() => <ProtectedRoute component={SearchPage} allowedRoles={["customer"]} />} />
       <Route path="/my-places" component={() => <ProtectedRoute component={MyPlaces} allowedRoles={["customer"]} />} />
       <Route path="/places/:id" component={() => <ProtectedRoute component={PlaceDetail} allowedRoles={["customer"]} />} />
       <Route path="/places" component={() => <ProtectedRoute component={CustomerPlaces} allowedRoles={["customer"]} />} />

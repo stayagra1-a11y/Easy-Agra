@@ -1,4 +1,4 @@
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/use-auth";
 import { useGetUnreadNotificationCount, useListNotifications, useGetMyOwnerRequest } from "@workspace/api-client-react";
@@ -6,7 +6,7 @@ import { CustomerLayout } from "@/components/layout/customer-layout";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { BedDouble, UtensilsCrossed, Leaf, Landmark, Bell, ChevronRight, Clock, CheckCircle2, XCircle, AlertCircle, Star, Building2, Sparkles, MapPin } from "lucide-react";
+import { BedDouble, UtensilsCrossed, Leaf, Landmark, Bell, ChevronRight, Clock, CheckCircle2, XCircle, AlertCircle, Star, Building2, Sparkles, MapPin, Search } from "lucide-react";
 
 const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
 
@@ -57,6 +57,7 @@ function FeaturedCard({ name, image, href, type }: { name: string; image?: strin
 
 export default function CustomerHome() {
   const { user } = useAuth();
+  const [, navigate] = useLocation();
   const { data: unreadData } = useGetUnreadNotificationCount();
   const { data: notificationsData } = useListNotifications({ limit: 3, unreadOnly: true });
   const { data: ownerRequest } = useGetMyOwnerRequest({ query: { retry: false, queryKey: ["getMyOwnerRequest"] } });
@@ -82,15 +83,22 @@ export default function CustomerHome() {
       <div className="px-4 py-5 space-y-5">
         {/* Welcome header */}
         <div className="bg-gradient-to-r from-primary to-primary/80 rounded-2xl p-5 text-white">
-          <p className="text-white/70 text-sm">Good to see you,</p>
-          <h1 className="text-xl font-bold mt-0.5">{user?.fullName}</h1>
-          <div className="flex items-center gap-2 mt-3">
-            <Badge className={`text-xs px-2 py-0.5 border-0 ${statusColors[user?.status || "active"]}`}>
-              {user?.status}
-            </Badge>
-            <span className="text-white/60 text-xs capitalize">{user?.role?.replace(/_/g, " ")}</span>
-          </div>
+          <p className="text-white/70 text-sm">Namaste,</p>
+          <h1 className="text-xl font-bold mt-0.5">{user?.fullName?.split(" ")[0]} ji! 🙏</h1>
+          <p className="text-white/60 text-xs mt-1">Agra mein aapka swagat hai</p>
         </div>
+
+        {/* Search bar */}
+        <button
+          onClick={() => navigate("/search")}
+          className="w-full flex items-center gap-3 px-4 py-3 bg-white border border-border rounded-2xl shadow-sm hover:shadow-md transition-shadow text-left"
+        >
+          <Search className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+          <span className="text-sm text-muted-foreground flex-1">Hotel, jagah, restaurant dhundho...</span>
+          <div className="bg-primary/10 rounded-full p-1">
+            <ChevronRight className="h-3.5 w-3.5 text-primary" />
+          </div>
+        </button>
 
         {/* Notifications preview */}
         {unreadData && unreadData.count > 0 && (
