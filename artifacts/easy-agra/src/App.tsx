@@ -40,6 +40,7 @@ import AdminNotifications from "@/pages/admin/notifications";
 import AdminBookings from "@/pages/admin/bookings";
 import BookingAnalytics from "@/pages/admin/booking-analytics";
 import AdminReviews from "@/pages/admin/reviews";
+import AdminHotels from "@/pages/admin/admin-hotels";
 
 // Super Admin
 import SuperAdminDashboard from "@/pages/super-admin/dashboard";
@@ -310,6 +311,7 @@ function Router() {
       <Route path="/admin/bookings" component={() => <ProtectedRoute component={AdminBookings} allowedRoles={["admin", "super_admin"]} />} />
       <Route path="/admin/booking-analytics" component={() => <ProtectedRoute component={BookingAnalytics} allowedRoles={["admin", "super_admin"]} />} />
       <Route path="/admin/reviews" component={() => <ProtectedRoute component={AdminReviews} allowedRoles={["admin", "super_admin"]} />} />
+      <Route path="/admin/hotels" component={() => <ProtectedRoute component={AdminHotels} allowedRoles={["admin", "super_admin"]} />} />
       <Route path="/admin/restaurants" component={() => <ProtectedRoute component={AdminRestaurants} allowedRoles={["admin", "super_admin"]} />} />
       <Route path="/admin/spas" component={() => <ProtectedRoute component={AdminSpas} allowedRoles={["admin", "super_admin"]} />} />
       <Route path="/admin/payments" component={() => <ProtectedRoute component={AdminPayments} allowedRoles={["admin", "super_admin"]} />} />
