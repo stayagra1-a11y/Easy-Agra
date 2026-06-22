@@ -19,6 +19,7 @@ import {
   Drumstick,
   Star,
   CalendarCheck,
+  Share2,
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 
@@ -90,10 +91,20 @@ export default function RestaurantDetail() {
   return (
     <CustomerLayout>
       <div className="max-w-lg mx-auto pb-28">
-        {/* Back */}
-        <div className="p-4 pb-0">
-          <button onClick={() => navigate("/restaurants")} className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-2">
+        {/* Back + Share */}
+        <div className="p-4 pb-0 flex items-center justify-between">
+          <button onClick={() => navigate("/restaurants")} className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
             <ChevronLeft className="w-4 h-4" /> Back to Restaurants
+          </button>
+          <button
+            onClick={() => {
+              const text = encodeURIComponent(`Yeh restaurant dekho: ${r.name} — ${window.location.href}`);
+              window.open(`https://wa.me/?text=${text}`, "_blank");
+            }}
+            className="flex items-center gap-1.5 text-xs font-medium text-[#25D366] border border-[#25D366]/40 bg-[#25D366]/5 hover:bg-[#25D366]/15 rounded-full px-3 py-1.5 transition-colors"
+          >
+            <Share2 className="h-3.5 w-3.5" />
+            WhatsApp pe share karo
           </button>
         </div>
 

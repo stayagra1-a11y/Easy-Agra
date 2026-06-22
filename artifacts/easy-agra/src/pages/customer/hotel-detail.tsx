@@ -15,7 +15,7 @@ import {
   Loader2, MapPin, Star, ArrowLeft, BedDouble, Users, IndianRupee,
   Clock, Phone, Globe, Wifi, Car, Coffee, Utensils, Dumbbell,
   Wind, Waves, Shield, CheckCircle2, ChevronLeft, ChevronRight,
-  CalendarDays, X, Navigation, Train, Plane, Bus, Hospital, ShoppingBag,
+  CalendarDays, X, Navigation, Train, Plane, Bus, Hospital, ShoppingBag, Share2,
 } from "lucide-react";
 import { useGetHotelNearbyPlaces } from "@workspace/api-client-react";
 
@@ -414,10 +414,20 @@ export default function HotelDetail() {
   return (
     <CustomerLayout>
       <div className="pb-20">
-        {/* Back button */}
-        <div className="px-4 pt-4 pb-2">
+        {/* Back button + Share */}
+        <div className="px-4 pt-4 pb-2 flex items-center justify-between">
           <button onClick={() => navigate("/hotels")} className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
             <ArrowLeft className="h-4 w-4" /> Back to Hotels
+          </button>
+          <button
+            onClick={() => {
+              const text = encodeURIComponent(`Yeh hotel dekho: ${hotel.name} — ${window.location.href}`);
+              window.open(`https://wa.me/?text=${text}`, "_blank");
+            }}
+            className="flex items-center gap-1.5 text-xs font-medium text-[#25D366] border border-[#25D366]/40 bg-[#25D366]/5 hover:bg-[#25D366]/15 rounded-full px-3 py-1.5 transition-colors"
+          >
+            <Share2 className="h-3.5 w-3.5" />
+            WhatsApp pe share karo
           </button>
         </div>
 
