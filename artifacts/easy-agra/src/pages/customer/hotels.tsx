@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { apiRequest } from "@/lib/api-request";
 import { useQuery } from "@tanstack/react-query";
-import { Loader2, BedDouble, MapPin, Search, Star, IndianRupee } from "lucide-react";
+import { Loader2, BedDouble, MapPin, Search, Star, IndianRupee, Navigation } from "lucide-react";
 
 interface Hotel {
   id: number;
@@ -163,7 +163,19 @@ export default function CustomerHotels() {
                           <span className="text-xs font-normal text-muted-foreground">/night</span>
                         </div>
                       )}
-                      <Button size="sm" className="h-7 text-xs ml-auto">Book Now</Button>
+                      <div className="flex items-center gap-2 ml-auto">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            const q = encodeURIComponent([hotel.name, hotel.address, hotel.city, "Agra"].filter(Boolean).join(", "));
+                            window.open(`https://www.google.com/maps/search/?api=1&query=${q}`, "_blank");
+                          }}
+                          className="flex items-center gap-1 text-xs text-[#4285F4] font-medium border border-[#4285F4]/30 rounded-full px-2.5 py-1 hover:bg-[#4285F4]/5 transition-colors"
+                        >
+                          <Navigation className="h-3 w-3" /> Map
+                        </button>
+                        <Button size="sm" className="h-7 text-xs">Book Now</Button>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>

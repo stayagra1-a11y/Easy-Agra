@@ -17,6 +17,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Star,
+  Navigation,
 } from "lucide-react";
 
 const CUISINE_TYPES = [
@@ -161,6 +162,16 @@ export default function CustomerRestaurants() {
                           </span>
                         )}
                       </div>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          const q = encodeURIComponent([r.name, r.address, r.city, "Agra"].filter(Boolean).join(", "));
+                          window.open(`https://www.google.com/maps/search/?api=1&query=${q}`, "_blank");
+                        }}
+                        className="flex items-center gap-1 text-xs text-[#4285F4] font-medium border border-[#4285F4]/30 rounded-full px-2.5 py-1 hover:bg-[#4285F4]/5 transition-colors mt-2"
+                      >
+                        <Navigation className="h-3 w-3" /> Map pe dekho
+                      </button>
 
                       <div className="mt-3 flex items-center justify-between">
                         <Button size="sm" className="h-8 text-xs bg-primary">

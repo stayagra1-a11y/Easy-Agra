@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { apiRequest } from "@/lib/api-request";
-import { Loader2, Sparkles, MapPin, Search, Clock, Star } from "lucide-react";
+import { Loader2, Sparkles, MapPin, Search, Clock, Star, Navigation } from "lucide-react";
 
 interface Spa {
   id: number;
@@ -155,9 +155,21 @@ export default function CustomerSpas() {
                           </Badge>
                         )}
                       </div>
-                      <Button size="sm" className="h-7 text-xs">
-                        Book Now
-                      </Button>
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            const q = encodeURIComponent([spa.name, spa.address, spa.city, "Agra"].filter(Boolean).join(", "));
+                            window.open(`https://www.google.com/maps/search/?api=1&query=${q}`, "_blank");
+                          }}
+                          className="flex items-center gap-1 text-xs text-[#4285F4] font-medium border border-[#4285F4]/30 rounded-full px-2.5 py-1 hover:bg-[#4285F4]/5 transition-colors"
+                        >
+                          <Navigation className="h-3 w-3" /> Map
+                        </button>
+                        <Button size="sm" className="h-7 text-xs">
+                          Book Now
+                        </Button>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
