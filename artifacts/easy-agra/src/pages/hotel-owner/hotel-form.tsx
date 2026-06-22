@@ -318,9 +318,65 @@ export default function HotelForm() {
 
   const [form, setForm] = useState<FormData>(EMPTY_FORM);
   const [activeTab, setActiveTab] = useState("basic");
+  const [draftSaved, setDraftSaved] = useState(false);
+  const [hasDraft, setHasDraft] = useState(false);
   const [, navigate] = useLocation();
   const queryClient = useQueryClient();
   const { toast } = useToast();
+  const draftKey = `hotel_draft_${hotelId ?? "new"}`;
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Restore draft on load
+  useEffect(() => {
+    const raw = localStorage.getItem(draftKey);
+    if (raw) {
+      try {
+        const parsed = JSON.parse(raw);
+        if (parsed && Object.keys(parsed).length > 0) {
+          setHasDraft(true);
+        }
+      } catch { /* ignore */ }
+    }
+  }, [draftKey]);
+
+  // Auto-save draft every 2s after last change
+  useEffect(() => {
+    if (timerRef.current) clearTimeout(timerRef.current);
+    timerRef.current = setTimeout(() => {
+      const minimal = JSON.stringify(form);
+      if (minimal.length > 2 && minimal !== "{}") {
+        localStorage.setItem(draftKey, minimal);
+        setDraftSaved(true);
+        setHasDraft(false);
+        setTimeout(() => setDraftSaved(false), 2000);
+      }
+    }, 2000);
+    return () => { if (timerRef.current) clearTimeout(timerRef.current); };
+  }, [form, draftKey]);
+
+  function restoreDraft() {
+    const raw = localStorage.getItem(draftKey);
+    if (raw) {
+      try {
+        const parsed = JSON.parse(raw);
+        setForm((prev) => ({ ...EMPTY_FORM, ...parsed }));
+        toast({ title: "Draft restored!", description: "Saved data recovered successfully." });
+        setHasDraft(false);
+      } catch { toast({ title: "Could not restore draft", variant: "destructive" }); }
+    }
+  }
+
+  function clearDraft() {
+    localStorage.removeItem(draftKey);
+    setHasDraft(false);
+    setDraftSaved(false);
+  }
+
+  function progressPercent() {
+    const req = [form.name, form.address, form.city, form.state, form.contactMobile, form.coverImage];
+    const filled = req.filter(Boolean).length;
+    return Math.round((filled / req.length) * 100);
+  }
 
   const { data: existingHotel } = useGetHotel(hotelId!, {
     query: { enabled: isEdit && !!hotelId, queryKey: getGetHotelQueryKey(hotelId!) },
@@ -394,6 +450,7 @@ export default function HotelForm() {
     mutation: {
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: getListHotelsQueryKey() });
+        clearDraft();
         toast({ title: "Hotel created!", description: "Saved as draft. Submit for approval when ready." });
         navigate("/hotel-owner/hotels");
       },
@@ -444,11 +501,41 @@ export default function HotelForm() {
               <ArrowLeft className="h-4 w-4" />
             </Button>
           </Link>
-          <div>
+          <div className="flex-1">
             <h1 className="text-lg font-bold">{isEdit ? "Edit Hotel" : "Add New Hotel"}</h1>
             <p className="text-xs text-muted-foreground">{isEdit ? "Update hotel information" : "Fill in details and save as draft"}</p>
           </div>
+          {draftSaved && (
+            <span className="text-[10px] text-green-600 bg-green-50 px-2 py-1 rounded-full font-medium">Saved</span>
+          )}
         </div>
+
+        {/* Draft restore banner */}
+        {hasDraft && !isEdit && (
+          <div className="flex items-center gap-3 bg-blue-50 border border-blue-200 rounded-xl px-3 py-2.5">
+            <div className="flex-1">
+              <p className="text-xs font-medium text-blue-800">Aapka draft save hua tha</p>
+              <p className="text-[10px] text-blue-600">Pehle se bharaya hua data restore karein</p>
+            </div>
+            <div className="flex gap-1.5">
+              <Button size="sm" variant="outline" className="h-7 text-xs border-blue-200 text-blue-700" onClick={restoreDraft}>Restore</Button>
+              <Button size="sm" variant="ghost" className="h-7 text-xs text-muted-foreground" onClick={clearDraft}>Clear</Button>
+            </div>
+          </div>
+        )}
+
+        {/* Progress bar */}
+        {!isEdit && (
+          <div className="space-y-1">
+            <div className="flex justify-between items-center">
+              <span className="text-xs text-muted-foreground">Profile complete</span>
+              <span className="text-xs font-medium text-primary">{progressPercent()}%</span>
+            </div>
+            <div className="w-full h-1.5 bg-muted rounded-full overflow-hidden">
+              <div className="h-full bg-primary rounded-full transition-all duration-500" style={{ width: `${progressPercent()}%` }} />
+            </div>
+          </div>
+        )}
 
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="flex h-auto p-1 gap-1 overflow-x-auto">

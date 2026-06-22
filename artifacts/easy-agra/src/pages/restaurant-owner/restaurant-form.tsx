@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ChevronLeft, Camera, X, Utensils } from "lucide-react";
+import { ChevronLeft, Camera, X, Utensils, Save } from "lucide-react";
 import { UpiSettingsCard } from "@/components/upi-settings-card";
 import { useToast } from "@/hooks/use-toast";
 
@@ -65,6 +65,55 @@ export default function RestaurantForm() {
   const galleryRef = useRef<HTMLInputElement>(null);
 
   const [form, setForm] = useState<FormState>(INITIAL);
+  const [draftSaved, setDraftSaved] = useState(false);
+  const [hasDraft, setHasDraft] = useState(false);
+  const draftKey = `restaurant_draft_${restaurantId ?? "new"}`;
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Restore draft
+  useEffect(() => {
+    const raw = localStorage.getItem(draftKey);
+    if (raw) {
+      try { if (Object.keys(JSON.parse(raw)).length > 0) setHasDraft(true); } catch { /* ignore */ }
+    }
+  }, [draftKey]);
+
+  // Auto-save draft every 2s
+  useEffect(() => {
+    if (timerRef.current) clearTimeout(timerRef.current);
+    timerRef.current = setTimeout(() => {
+      const minimal = JSON.stringify(form);
+      if (minimal.length > 2 && minimal !== "{}") {
+        localStorage.setItem(draftKey, minimal);
+        setDraftSaved(true);
+        setHasDraft(false);
+        setTimeout(() => setDraftSaved(false), 2000);
+      }
+    }, 2000);
+    return () => { if (timerRef.current) clearTimeout(timerRef.current); };
+  }, [form, draftKey]);
+
+  function restoreDraft() {
+    const raw = localStorage.getItem(draftKey);
+    if (raw) {
+      try {
+        setForm((prev) => ({ ...INITIAL, ...JSON.parse(raw) }));
+        toast({ title: "Draft restored!", description: "Saved data recovered." });
+        setHasDraft(false);
+      } catch { toast({ title: "Could not restore draft", variant: "destructive" }); }
+    }
+  }
+
+  function clearDraft() {
+    localStorage.removeItem(draftKey);
+    setHasDraft(false);
+    setDraftSaved(false);
+  }
+
+  function progressPercent() {
+    const req = [form.name, form.address, form.city, form.state, form.contactNumber, form.coverPhoto];
+    return Math.round((req.filter(Boolean).length / req.length) * 100);
+  }
 
   const getQuery = useGetRestaurant(restaurantId!, {
     query: { enabled: isEdit && !!restaurantId } as any,
@@ -167,6 +216,7 @@ export default function RestaurantForm() {
         { data: payload },
         {
           onSuccess: () => {
+            clearDraft();
             toast({ title: "Restaurant added ✓" });
             queryClient.invalidateQueries({ queryKey: ["getMyRestaurants"] });
             navigate("/restaurant-owner/restaurants");
@@ -199,8 +249,40 @@ export default function RestaurantForm() {
           <button onClick={() => navigate("/restaurant-owner/restaurants")} className="text-muted-foreground hover:text-foreground">
             <ChevronLeft className="w-5 h-5" />
           </button>
-          <h1 className="text-lg font-bold">{isEdit ? "Edit Restaurant" : "Add Restaurant"}</h1>
+          <div className="flex-1">
+            <h1 className="text-lg font-bold">{isEdit ? "Edit Restaurant" : "Add Restaurant"}</h1>
+          </div>
+          {draftSaved && (
+            <span className="text-[10px] text-green-600 bg-green-50 px-2 py-1 rounded-full font-medium">Saved</span>
+          )}
         </div>
+
+        {/* Draft restore */}
+        {hasDraft && !isEdit && (
+          <div className="flex items-center gap-3 bg-blue-50 border border-blue-200 rounded-xl px-3 py-2.5">
+            <div className="flex-1">
+              <p className="text-xs font-medium text-blue-800">Aapka draft save hua tha</p>
+              <p className="text-[10px] text-blue-600">Pehle se bharaya hua data restore karein</p>
+            </div>
+            <div className="flex gap-1.5">
+              <Button size="sm" variant="outline" className="h-7 text-xs border-blue-200 text-blue-700" onClick={restoreDraft}>Restore</Button>
+              <Button size="sm" variant="ghost" className="h-7 text-xs text-muted-foreground" onClick={clearDraft}>Clear</Button>
+            </div>
+          </div>
+        )}
+
+        {/* Progress bar */}
+        {!isEdit && (
+          <div className="space-y-1">
+            <div className="flex justify-between items-center">
+              <span className="text-xs text-muted-foreground">Profile complete</span>
+              <span className="text-xs font-medium text-primary">{progressPercent()}%</span>
+            </div>
+            <div className="w-full h-1.5 bg-muted rounded-full overflow-hidden">
+              <div className="h-full bg-primary rounded-full transition-all duration-500" style={{ width: `${progressPercent()}%` }} />
+            </div>
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Basic Info */}

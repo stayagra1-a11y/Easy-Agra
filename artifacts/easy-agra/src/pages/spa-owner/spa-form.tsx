@@ -16,7 +16,7 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
-import { Loader2, ArrowLeft, Sparkles, ImagePlus, Trash2, Upload } from "lucide-react";
+import { Loader2, ArrowLeft, Sparkles, ImagePlus, Trash2, Upload, Save } from "lucide-react";
 import { UpiSettingsCard } from "@/components/upi-settings-card";
 import { uploadToCloudinary } from "@/lib/cloudinary";
 
@@ -73,8 +73,57 @@ export default function SpaForm() {
   const [galleryInput, setGalleryInput] = useState("");
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [draftSaved, setDraftSaved] = useState(false);
+  const [hasDraft, setHasDraft] = useState(false);
+  const draftKey = `spa_draft_${editId ?? "new"}`;
+  const draftTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const coverFileRef = useRef<HTMLInputElement>(null);
   const galleryFileRef = useRef<HTMLInputElement>(null);
+
+  // Restore draft
+  useEffect(() => {
+    const raw = localStorage.getItem(draftKey);
+    if (raw) {
+      try { if (Object.keys(JSON.parse(raw)).length > 0) setHasDraft(true); } catch { /* ignore */ }
+    }
+  }, [draftKey]);
+
+  // Auto-save draft every 2s
+  useEffect(() => {
+    if (draftTimer.current) clearTimeout(draftTimer.current);
+    draftTimer.current = setTimeout(() => {
+      const minimal = JSON.stringify(form);
+      if (minimal.length > 2 && minimal !== "{}") {
+        localStorage.setItem(draftKey, minimal);
+        setDraftSaved(true);
+        setHasDraft(false);
+        setTimeout(() => setDraftSaved(false), 2000);
+      }
+    }, 2000);
+    return () => { if (draftTimer.current) clearTimeout(draftTimer.current); };
+  }, [form, draftKey]);
+
+  function restoreDraft() {
+    const raw = localStorage.getItem(draftKey);
+    if (raw) {
+      try {
+        setForm((prev) => ({ ...EMPTY, ...JSON.parse(raw) }));
+        toast({ title: "Draft restored!", description: "Saved data recovered." });
+        setHasDraft(false);
+      } catch { toast({ title: "Could not restore draft", variant: "destructive" }); }
+    }
+  }
+
+  function clearDraft() {
+    localStorage.removeItem(draftKey);
+    setHasDraft(false);
+    setDraftSaved(false);
+  }
+
+  function progressPercent() {
+    const req = [form.name, form.address, form.city, form.state, form.contactNumber, form.coverPhoto];
+    return Math.round((req.filter(Boolean).length / req.length) * 100);
+  }
 
   const handleCoverUpload = async (file: File) => {
     setUploading(true);
@@ -208,6 +257,7 @@ export default function SpaForm() {
         { data: payload },
         {
           onSuccess: () => {
+            clearDraft();
             invalidate();
             toast({ title: "Spa created! Submit it for approval when ready." });
             navigate("/spa-owner/spas");
@@ -244,7 +294,7 @@ export default function SpaForm() {
           >
             <ArrowLeft className="h-4 w-4" />
           </Button>
-          <div>
+          <div className="flex-1">
             <h1 className="text-lg font-bold">
               {isEdit ? "Edit Spa" : "Add New Spa"}
             </h1>
@@ -254,7 +304,37 @@ export default function SpaForm() {
                 : "Fill in the details and submit for approval"}
             </p>
           </div>
+          {draftSaved && (
+            <span className="text-[10px] text-green-600 bg-green-50 px-2 py-1 rounded-full font-medium">Saved</span>
+          )}
         </div>
+
+        {/* Draft restore */}
+        {hasDraft && !isEdit && (
+          <div className="flex items-center gap-3 bg-blue-50 border border-blue-200 rounded-xl px-3 py-2.5">
+            <div className="flex-1">
+              <p className="text-xs font-medium text-blue-800">Aapka draft save hua tha</p>
+              <p className="text-[10px] text-blue-600">Pehle se bharaya hua data restore karein</p>
+            </div>
+            <div className="flex gap-1.5">
+              <Button size="sm" variant="outline" className="h-7 text-xs border-blue-200 text-blue-700" onClick={restoreDraft}>Restore</Button>
+              <Button size="sm" variant="ghost" className="h-7 text-xs text-muted-foreground" onClick={clearDraft}>Clear</Button>
+            </div>
+          </div>
+        )}
+
+        {/* Progress bar */}
+        {!isEdit && (
+          <div className="space-y-1">
+            <div className="flex justify-between items-center">
+              <span className="text-xs text-muted-foreground">Profile complete</span>
+              <span className="text-xs font-medium text-primary">{progressPercent()}%</span>
+            </div>
+            <div className="w-full h-1.5 bg-muted rounded-full overflow-hidden">
+              <div className="h-full bg-primary rounded-full transition-all duration-500" style={{ width: `${progressPercent()}%` }} />
+            </div>
+          </div>
+        )}
 
         {/* Basic Info */}
         <Card>
