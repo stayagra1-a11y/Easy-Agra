@@ -7,9 +7,11 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { useState } from "react";
+import { useI18n } from "@/lib/i18n";
 
 export function CustomerLayout({ children }: { children: React.ReactNode }) {
   const { user } = useAuth();
+  const { t } = useI18n();
   const [location] = useLocation();
   const queryClient = useQueryClient();
   const { data: unreadData } = useGetUnreadNotificationCount();
@@ -24,34 +26,34 @@ export function CustomerLayout({ children }: { children: React.ReactNode }) {
   };
 
   const navItems = [
-    { href: "/", icon: Home, label: "Home" },
-    { href: "/customer/bookings", icon: CalendarDays, label: "Bookings" },
-    { href: "/restaurants", icon: Utensils, label: "Dine" },
-    { href: "/spas", icon: Sparkles, label: "Spas" },
-    { href: "/places", icon: Landmark, label: "Places" },
-    { href: "/trips", icon: Map, label: "Trips" },
-    { href: "/support/tickets", icon: LifeBuoy, label: "Support" },
-    { href: "/refunds", icon: ReceiptText, label: "Refunds" },
-    { href: "/my-payments", icon: IndianRupee, label: "Payments" },
-    { href: "/notifications", icon: Bell, label: "Alerts", badge: unreadData?.count },
-    { href: "/profile", icon: User, label: "Profile" },
+    { href: "/", icon: Home, label: t("home") },
+    { href: "/customer/bookings", icon: CalendarDays, label: t("bookings") },
+    { href: "/restaurants", icon: Utensils, label: t("restaurants") },
+    { href: "/spas", icon: Sparkles, label: t("spas") },
+    { href: "/places", icon: Landmark, label: t("places") },
+    { href: "/trips", icon: Map, label: t("trips") ?? "Trips" },
+    { href: "/support/tickets", icon: LifeBuoy, label: t("help_support") },
+    { href: "/refunds", icon: ReceiptText, label: t("refunds") ?? "Refunds" },
+    { href: "/my-payments", icon: IndianRupee, label: t("my_payments") },
+    { href: "/notifications", icon: Bell, label: t("notifications"), badge: unreadData?.count },
+    { href: "/profile", icon: User, label: t("profile") },
   ];
 
   const menuLinks = [
-    { href: "/profile", icon: User, label: "My Profile" },
-    { href: "/customer/bookings", icon: CalendarDays, label: "My Bookings" },
-    { href: "/my-payments", icon: IndianRupee, label: "Payments" },
-    { href: "/my-reservations", icon: Star, label: "My Reservations" },
-    { href: "/refunds", icon: ReceiptText, label: "Refunds" },
-    { href: "/support/tickets", icon: LifeBuoy, label: "Help & Support" },
-    { href: "/settings", icon: Settings, label: "Settings" },
-    { href: "/become-owner", icon: Building2, label: "List Your Business", highlight: true },
+    { href: "/profile", icon: User, label: t("profile") },
+    { href: "/customer/bookings", icon: CalendarDays, label: t("my_bookings") },
+    { href: "/my-payments", icon: IndianRupee, label: t("my_payments") },
+    { href: "/my-reservations", icon: Star, label: t("my_reservations") },
+    { href: "/refunds", icon: ReceiptText, label: t("refunds") ?? "Refunds" },
+    { href: "/support/tickets", icon: LifeBuoy, label: t("help_support") },
+    { href: "/settings", icon: Settings, label: t("settings") },
+    { href: "/become-owner", icon: Building2, label: t("list_your_business"), highlight: true },
   ];
 
   const infoLinks = [
-    { href: "/support/tickets", icon: Phone, label: "Contact Us" },
-    { href: "/privacy", icon: ShieldCheck, label: "Privacy Policy" },
-    { href: "/terms", icon: FileText, label: "Terms of Use" },
+    { href: "/support/tickets", icon: Phone, label: t("contact_us") },
+    { href: "/privacy", icon: ShieldCheck, label: t("privacy_policy") },
+    { href: "/terms", icon: FileText, label: t("terms_of_use") },
   ];
 
   return (

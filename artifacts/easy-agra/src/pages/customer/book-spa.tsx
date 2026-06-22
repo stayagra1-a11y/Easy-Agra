@@ -12,6 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft, CalendarCheck, Loader2, Sparkles, BadgeIndianRupee } from "lucide-react";
+import { useI18n } from "@/lib/i18n";
 
 interface BookForm {
   customerName: string;
@@ -26,6 +27,7 @@ interface BookForm {
 }
 
 export default function BookSpa() {
+  const { t } = useI18n();
   const { id } = useParams<{ id: string }>();
   const search = useSearch();
   const [, navigate] = useLocation();
@@ -158,7 +160,7 @@ export default function BookSpa() {
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <div>
-            <h1 className="text-lg font-bold">Book Appointment</h1>
+            <h1 className="text-lg font-bold">{t("book_appointment")}</h1>
             {spa && (
               <p className="text-xs text-muted-foreground flex items-center gap-1">
                 <Sparkles className="h-3 w-3" />

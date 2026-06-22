@@ -14,6 +14,7 @@ import {
 import { useEffect, useRef, useState } from "react";
 import { apiRequest } from "@/lib/api-request";
 import { imgUrl } from "@/lib/cloudinary";
+import { useI18n } from "@/lib/i18n";
 
 const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
 
@@ -234,6 +235,7 @@ function FeaturedCard({ name, image, href, type }: { name: string; image?: strin
 }
 
 export default function CustomerHome() {
+  const { t } = useI18n();
   const { user } = useAuth();
   const [, navigate] = useLocation();
   const { data: unreadData } = useGetUnreadNotificationCount();
@@ -287,7 +289,7 @@ export default function CustomerHome() {
           className="w-full flex items-center gap-3 px-4 py-3 bg-white border border-border rounded-2xl shadow-sm hover:shadow-md transition-shadow text-left"
         >
           <Search className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-          <span className="text-sm text-muted-foreground flex-1">Hotel, jagah, restaurant dhundho...</span>
+          <span className="text-sm text-muted-foreground flex-1">{t("search_placeholder")}</span>
           <div className="bg-primary/10 rounded-full p-1">
             <ChevronRight className="h-3.5 w-3.5 text-primary" />
           </div>
@@ -298,10 +300,10 @@ export default function CustomerHome() {
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-1.5">
               <Star className="h-4 w-4 text-amber-500 fill-amber-400" />
-              <h2 className="text-sm font-semibold">Top Hotels in Agra</h2>
+              <h2 className="text-sm font-semibold">{t("top_hotels")}</h2>
             </div>
             <Link href="/hotels" className="text-xs text-primary font-medium flex items-center gap-0.5">
-              Sab dekho <ChevronRight className="h-3 w-3" />
+              {t("see_all")} <ChevronRight className="h-3 w-3" />
             </Link>
           </div>
           {hotelsLoading ? (
@@ -312,7 +314,7 @@ export default function CustomerHome() {
             </div>
           ) : (
             <div className="text-center py-6 text-muted-foreground text-sm bg-muted/30 rounded-xl">
-              Abhi koi hotel approved nahi hai
+              {t("no_hotels_yet")}
             </div>
           )}
         </div>
@@ -322,10 +324,10 @@ export default function CustomerHome() {
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-1.5">
               <UtensilsCrossed className="h-4 w-4 text-orange-500" />
-              <h2 className="text-sm font-semibold">Popular Restaurants</h2>
+              <h2 className="text-sm font-semibold">{t("popular_restaurants")}</h2>
             </div>
             <Link href="/restaurants" className="text-xs text-primary font-medium flex items-center gap-0.5">
-              Sab dekho <ChevronRight className="h-3 w-3" />
+              {t("see_all")} <ChevronRight className="h-3 w-3" />
             </Link>
           </div>
           {restaurantsLoading ? (
@@ -336,7 +338,7 @@ export default function CustomerHome() {
             </div>
           ) : (
             <div className="text-center py-6 text-muted-foreground text-sm bg-muted/30 rounded-xl">
-              Abhi koi restaurant available nahi hai
+              {t("no_restaurants_yet")}
             </div>
           )}
         </div>

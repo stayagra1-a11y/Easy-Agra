@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { apiRequest } from "@/lib/api-request";
 import { Loader2, Sparkles, MapPin, Search, Clock, Star, Navigation } from "lucide-react";
+import { useI18n } from "@/lib/i18n";
 
 interface Spa {
   id: number;
@@ -33,6 +34,7 @@ interface SpaBrowseResult {
 }
 
 export default function CustomerSpas() {
+  const { t } = useI18n();
   const [, navigate] = useLocation();
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
@@ -167,7 +169,7 @@ export default function CustomerSpas() {
                           <Navigation className="h-3 w-3" /> Map
                         </button>
                         <Button size="sm" className="h-7 text-xs">
-                          Book Now
+                          {t("book_now")}
                         </Button>
                       </div>
                     </div>

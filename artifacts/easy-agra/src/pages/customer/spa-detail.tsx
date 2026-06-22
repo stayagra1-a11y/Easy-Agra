@@ -11,6 +11,7 @@ import {
   BadgeIndianRupee, ArrowLeft, CalendarCheck, CheckCircle2
 } from "lucide-react";
 import { Link } from "wouter";
+import { useI18n } from "@/lib/i18n";
 
 const CATEGORY_LABELS: Record<string, string> = {
   full_body_massage: "Full Body Massage",
@@ -24,6 +25,7 @@ const CATEGORY_LABELS: Record<string, string> = {
 };
 
 export default function SpaDetail() {
+  const { t } = useI18n();
   const { id } = useParams<{ id: string }>();
   const [, navigate] = useLocation();
   const spaId = parseInt(id, 10);
@@ -228,7 +230,7 @@ export default function SpaDetail() {
           <Link href={`/spas/${spaId}/book`}>
             <Button className="w-full gap-2" size="lg">
               <CalendarCheck className="h-5 w-5" />
-              Book an Appointment
+              {t("book_appointment")}
             </Button>
           </Link>
         </div>

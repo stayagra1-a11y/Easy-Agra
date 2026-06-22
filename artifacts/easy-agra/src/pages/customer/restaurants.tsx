@@ -19,6 +19,7 @@ import {
   Star,
   Navigation,
 } from "lucide-react";
+import { useI18n } from "@/lib/i18n";
 
 const CUISINE_TYPES = [
   "All", "North Indian", "South Indian", "Chinese", "Continental",
@@ -26,6 +27,7 @@ const CUISINE_TYPES = [
 ];
 
 export default function CustomerRestaurants() {
+  const { t } = useI18n();
   const [search, setSearch] = useState("");
   const [cuisine, setCuisine] = useState("All");
   const [page, setPage] = useState(1);
@@ -170,12 +172,12 @@ export default function CustomerRestaurants() {
                         }}
                         className="flex items-center gap-1 text-xs text-[#4285F4] font-medium border border-[#4285F4]/30 rounded-full px-2.5 py-1 hover:bg-[#4285F4]/5 transition-colors mt-2"
                       >
-                        <Navigation className="h-3 w-3" /> Map pe dekho
+                        <Navigation className="h-3 w-3" /> {t("map")}
                       </button>
 
                       <div className="mt-3 flex items-center justify-between">
                         <Button size="sm" className="h-8 text-xs bg-primary">
-                          View Menu & Reserve
+                          {t("view_menu_reserve")}
                         </Button>
                         <span className="text-xs text-emerald-600 font-medium">Open Now</span>
                       </div>

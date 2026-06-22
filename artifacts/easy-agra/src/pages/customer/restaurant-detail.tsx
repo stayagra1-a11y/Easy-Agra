@@ -21,6 +21,7 @@ import {
   CalendarCheck,
   Share2,
 } from "lucide-react";
+import { useI18n } from "@/lib/i18n";
 import { useAuth } from "@/hooks/use-auth";
 
 const CATEGORIES = [
@@ -41,6 +42,7 @@ const CATEGORY_COLORS: Record<string, string> = {
 };
 
 export default function RestaurantDetail() {
+  const { t } = useI18n();
   const params = useParams<{ id: string }>();
   const id = parseInt(params.id, 10);
   const [, navigate] = useLocation();
@@ -283,7 +285,7 @@ export default function RestaurantDetail() {
               <Link href={`/reservations/new?restaurantId=${r.id}`} className="flex-1">
                 <Button className="w-full h-12 bg-primary text-base font-semibold">
                   <CalendarCheck className="w-5 h-5 mr-2" />
-                  Reserve a Table
+                  {t("reserve_table")}
                 </Button>
               </Link>
             )}

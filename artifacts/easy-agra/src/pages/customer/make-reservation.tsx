@@ -16,6 +16,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { ChevronLeft, CalendarDays, Clock, Users, Phone, Mail, MapPin } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/use-auth";
+import { useI18n } from "@/lib/i18n";
 
 function getSearchParam(key: string): string {
   const url = new URL(window.location.href);
@@ -39,6 +40,7 @@ function todayStr() {
 }
 
 export default function MakeReservation() {
+  const { t } = useI18n();
   const [, navigate] = useLocation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -116,7 +118,7 @@ export default function MakeReservation() {
           <button onClick={() => navigate(-1 as any)} className="text-muted-foreground hover:text-foreground">
             <ChevronLeft className="w-5 h-5" />
           </button>
-          <h1 className="text-lg font-bold">Reserve a Table</h1>
+          <h1 className="text-lg font-bold">{t("reserve_table")}</h1>
         </div>
 
         {/* Restaurant info */}

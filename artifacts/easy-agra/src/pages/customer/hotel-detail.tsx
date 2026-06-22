@@ -17,6 +17,7 @@ import {
   Wind, Waves, Shield, CheckCircle2, ChevronLeft, ChevronRight,
   CalendarDays, X, Navigation, Train, Plane, Bus, Hospital, ShoppingBag, Share2,
 } from "lucide-react";
+import { useI18n } from "@/lib/i18n";
 import { useGetHotelNearbyPlaces } from "@workspace/api-client-react";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -183,6 +184,7 @@ function BookingModal({
   room: Room; hotelId: number; hotelName: string;
   hotel: any; onClose: () => void; onSuccess: (ref: string) => void;
 }) {
+  const { t } = useI18n();
   const { toast } = useToast();
   const today = new Date().toISOString().split("T")[0];
   const tomorrow = new Date(Date.now() + 86400000).toISOString().split("T")[0];
@@ -337,7 +339,7 @@ function BookingModal({
             onClick={() => mutation.mutate()}
           >
             {mutation.isPending ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
-            Confirm Booking
+            {t("confirm_booking")}
           </Button>
         </div>
       </div>
@@ -347,6 +349,7 @@ function BookingModal({
 
 // ── Main Page ─────────────────────────────────────────────────────────────────
 export default function HotelDetail() {
+  const { t } = useI18n();
   const { id } = useParams<{ id: string }>();
   const [, navigate] = useLocation();
   const { toast } = useToast();
@@ -395,17 +398,17 @@ export default function HotelDetail() {
     <CustomerLayout>
       <div className="px-4 py-12 flex flex-col items-center text-center space-y-4">
         <CheckCircle2 className="h-16 w-16 text-green-500" />
-        <h2 className="text-xl font-bold">Booking Confirmed!</h2>
+        <h2 className="text-xl font-bold">{t("booking_confirmed")}</h2>
         <p className="text-muted-foreground text-sm">Your booking reference is</p>
         <div className="bg-primary/10 text-primary font-mono font-bold text-lg px-4 py-2 rounded-xl">
           {bookingSuccess}
         </div>
         <p className="text-xs text-muted-foreground max-w-xs">
-          The hotel will confirm your booking shortly. You can track it in My Bookings.
+          The hotel will confirm your booking shortly. You can track it in {t("my_bookings")}.
         </p>
         <div className="flex gap-3 pt-2">
           <Button variant="outline" onClick={() => navigate("/hotels")}>Browse More Hotels</Button>
-          <Button onClick={() => navigate("/customer/bookings")}>My Bookings</Button>
+          <Button onClick={() => navigate("/customer/bookings")}>{t("my_bookings")}</Button>
         </div>
       </div>
     </CustomerLayout>
@@ -626,7 +629,7 @@ export default function HotelDetail() {
                           disabled={room.availableRooms === 0}
                         >
                           <CalendarDays className="h-4 w-4 mr-2" />
-                          {room.availableRooms === 0 ? "Fully Booked" : "Book This Room"}
+                          {room.availableRooms === 0 ? t("fully_booked") : t("book_room")}
                         </Button>
                       </CardContent>
                     </Card>

@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { apiRequest } from "@/lib/api-request";
 import { useQuery } from "@tanstack/react-query";
 import { Loader2, BedDouble, MapPin, Search, Star, IndianRupee, Navigation } from "lucide-react";
+import { useI18n } from "@/lib/i18n";
 
 interface Hotel {
   id: number;
@@ -33,6 +34,7 @@ interface HotelListResult {
 }
 
 export default function CustomerHotels() {
+  const { t } = useI18n();
   const [, navigate] = useLocation();
   const [searchInput, setSearchInput] = useState("");
   const [search, setSearch] = useState("");
@@ -174,7 +176,7 @@ export default function CustomerHotels() {
                         >
                           <Navigation className="h-3 w-3" /> Map
                         </button>
-                        <Button size="sm" className="h-7 text-xs">Book Now</Button>
+                        <Button size="sm" className="h-7 text-xs">{t("book_now")}</Button>
                       </div>
                     </div>
                   </CardContent>

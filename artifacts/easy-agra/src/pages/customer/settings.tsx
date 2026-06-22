@@ -9,11 +9,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { Loader2, Eye, EyeOff, Lock, Bell, Trash2 } from "lucide-react";
+import { Loader2, Eye, EyeOff, Lock, Bell, Trash2, Globe } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useI18n } from "@/lib/i18n";
 
 export default function Settings() {
   const { user } = useAuth();
+  const { lang, setLang, t } = useI18n();
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const changePwdMutation = useChangePassword();
@@ -54,7 +56,34 @@ export default function Settings() {
   return (
     <CustomerLayout>
       <div className="px-4 py-5 space-y-4">
-        <h1 className="text-xl font-bold">Settings</h1>
+        <h1 className="text-xl font-bold">{t("settings")}</h1>
+
+        {/* Language switcher */}
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base flex items-center gap-2"><Globe className="h-4 w-4" />{t("language")}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setLang("hi")}
+                className={`flex-1 py-2 rounded-lg text-sm font-medium transition-colors border ${
+                  lang === "hi" ? "bg-primary text-white border-primary" : "bg-muted border-border text-muted-foreground"
+                }`}
+              >
+                {t("hindi")}
+              </button>
+              <button
+                onClick={() => setLang("en")}
+                className={`flex-1 py-2 rounded-lg text-sm font-medium transition-colors border ${
+                  lang === "en" ? "bg-primary text-white border-primary" : "bg-muted border-border text-muted-foreground"
+                }`}
+              >
+                {t("english")}
+              </button>
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Change password */}
         <Card>

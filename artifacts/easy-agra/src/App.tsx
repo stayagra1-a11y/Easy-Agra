@@ -4,6 +4,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/providers/auth-provider";
 import { useAuth } from "@/hooks/use-auth";
+import { I18nProvider } from "@/lib/i18n";
 import NotFound from "@/pages/not-found";
 import { Loader2 } from "lucide-react";
 import { OfflineBanner } from "@/components/offline-banner";
@@ -348,14 +349,16 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <OfflineBanner />
-        <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
-          <AuthProvider>
-            <Router />
-            <PwaInstallBanner />
-          </AuthProvider>
-        </WouterRouter>
-        <Toaster />
+        <I18nProvider>
+          <OfflineBanner />
+          <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
+            <AuthProvider>
+              <Router />
+              <PwaInstallBanner />
+            </AuthProvider>
+          </WouterRouter>
+          <Toaster />
+        </I18nProvider>
       </TooltipProvider>
     </QueryClientProvider>
   );
