@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { db, hotelsTable, usersTable, hotelNearbyPlacesTable } from "@workspace/db";
-import { eq, and, ilike, sql, isNull, asc } from "drizzle-orm";
+import { eq, and, ilike, sql, isNull, asc, desc } from "drizzle-orm";
 import { logActivity, createNotification } from "../lib/auth";
 import { requireAuth, requireRole } from "../middlewares/requireAuth";
 
@@ -74,7 +74,7 @@ router.get("/hotels/stats", requireAuth, async (req, res): Promise<void> => {
 // ──────────────────────────────────────────────────
 router.get("/hotels", requireAuth, async (req, res): Promise<void> => {
   const cu = (req as any).currentUser;
-  const { status, search, city, page = "1", limit = "20" } = req.query as Record<string, string>;
+  const { status, search, city, page = "1", limit = "20", sort } = req.query as Record<string, string>;
   const pageNum = Math.max(1, parseInt(page, 10));
   const limitNum = Math.min(100, Math.max(1, parseInt(limit, 10)));
   const offset = (pageNum - 1) * limitNum;
@@ -96,7 +96,11 @@ router.get("/hotels", requireAuth, async (req, res): Promise<void> => {
 
   const [hotels, countResult] = await Promise.all([
     db.select().from(hotelsTable).where(where)
-      .orderBy(hotelsTable.createdAt).limit(limitNum).offset(offset),
+      .orderBy(
+        ...(sort === "top"
+          ? [sql`${hotelsTable.starRating} DESC NULLS LAST`, desc(hotelsTable.createdAt)]
+          : [hotelsTable.createdAt])
+      ).limit(limitNum).offset(offset),
     db.select({ count: sql<number>`count(*)::int` }).from(hotelsTable).where(where),
   ]);
 

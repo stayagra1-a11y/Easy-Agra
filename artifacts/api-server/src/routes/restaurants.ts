@@ -101,7 +101,7 @@ router.get(
 // GET /restaurants  — public browse
 // ────────────────────────────────────────────────────────────────────────
 router.get("/restaurants", async (req, res): Promise<void> => {
-  const { search, city, cuisine, page = "1", limit = "12" } = req.query as any;
+  const { search, city, cuisine, page = "1", limit = "12", sort } = req.query as any;
   const pageNum = Math.max(1, parseInt(page, 10));
   const limitNum = Math.min(50, parseInt(limit, 10));
   const offset = (pageNum - 1) * limitNum;
@@ -120,7 +120,9 @@ router.get("/restaurants", async (req, res): Promise<void> => {
     .select()
     .from(restaurantsTable)
     .where(and(...conditions))
-    .orderBy(desc(restaurantsTable.createdAt))
+    .orderBy(sort === "top"
+      ? sql`${restaurantsTable.createdAt} DESC`
+      : desc(restaurantsTable.createdAt))
     .limit(limitNum)
     .offset(offset);
 

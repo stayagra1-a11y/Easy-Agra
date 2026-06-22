@@ -5,8 +5,15 @@ import { useGetUnreadNotificationCount, useListNotifications, useGetMyOwnerReque
 import { CustomerLayout } from "@/components/layout/customer-layout";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { BedDouble, UtensilsCrossed, Leaf, Landmark, Bell, ChevronRight, Clock, CheckCircle2, XCircle, AlertCircle, Star, Building2, Sparkles, MapPin, Search } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
+import {
+  BedDouble, UtensilsCrossed, Leaf, Landmark, Bell, ChevronRight,
+  Clock, CheckCircle2, XCircle, AlertCircle, Star, Building2,
+  Sparkles, MapPin, Search,
+} from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { apiRequest } from "@/lib/api-request";
+import { imgUrl } from "@/lib/cloudinary";
 
 const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
 
@@ -16,25 +23,196 @@ async function fetchFeatured() {
   return res.json();
 }
 
-const statusColors: Record<string, string> = {
-  active: "bg-green-100 text-green-700",
-  pending: "bg-yellow-100 text-yellow-700",
-  suspended: "bg-red-100 text-red-700",
-  rejected: "bg-gray-100 text-gray-600",
-};
-
 const requestStatusIcon: Record<string, any> = {
   pending: <Clock className="h-4 w-4 text-yellow-500" />,
   approved: <CheckCircle2 className="h-4 w-4 text-green-500" />,
   rejected: <XCircle className="h-4 w-4 text-red-500" />,
 };
 
+const HERO_SLIDES = [
+  {
+    img: "https://images.unsplash.com/photo-1564507592333-c60657eea523?w=900&q=85",
+    title: "Taj Mahal",
+    sub: "Duniya ka sabse khoobsurat monument",
+  },
+  {
+    img: "https://images.unsplash.com/photo-1524492412937-b28074a5d7da?w=900&q=85",
+    title: "Agra Fort",
+    sub: "Mughal samrajya ki shaan",
+  },
+  {
+    img: "https://images.unsplash.com/photo-1477587458883-47145ed94245?w=900&q=85",
+    title: "Fatehpur Sikri",
+    sub: "Patthar mein ukeri hui kahani",
+  },
+  {
+    img: "https://images.unsplash.com/photo-1587474260584-136574528ed5?w=900&q=85",
+    title: "Mehtab Bagh",
+    sub: "Taj ka najara, chandni raat mein",
+  },
+];
+
+function HeroCarousel({ userName }: { userName: string }) {
+  const [current, setCurrent] = useState(0);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  function startTimer() {
+    timerRef.current = setInterval(() => {
+      setCurrent((c) => (c + 1) % HERO_SLIDES.length);
+    }, 4000);
+  }
+
+  useEffect(() => {
+    startTimer();
+    return () => { if (timerRef.current) clearInterval(timerRef.current); };
+  }, []);
+
+  function goTo(idx: number) {
+    setCurrent(idx);
+    if (timerRef.current) clearInterval(timerRef.current);
+    startTimer();
+  }
+
+  const slide = HERO_SLIDES[current];
+
+  return (
+    <div className="relative w-full rounded-2xl overflow-hidden shadow-lg" style={{ height: 220 }}>
+      {HERO_SLIDES.map((s, i) => (
+        <img
+          key={i}
+          src={s.img}
+          alt={s.title}
+          className="absolute inset-0 w-full h-full object-cover transition-opacity duration-700"
+          style={{ opacity: i === current ? 1 : 0, zIndex: i === current ? 1 : 0 }}
+        />
+      ))}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" style={{ zIndex: 2 }} />
+
+      <div className="absolute bottom-0 left-0 right-0 px-4 pb-4" style={{ zIndex: 3 }}>
+        <p className="text-white/80 text-xs mb-0.5">Namaste, <span className="font-semibold">{userName} ji!</span> 🙏</p>
+        <h1 className="text-white text-xl font-bold leading-tight drop-shadow">{slide.title}</h1>
+        <p className="text-white/75 text-xs mt-0.5 drop-shadow">{slide.sub}</p>
+
+        <div className="flex gap-1.5 mt-3">
+          {HERO_SLIDES.map((_, i) => (
+            <button
+              key={i}
+              onClick={() => goTo(i)}
+              className="transition-all duration-300 rounded-full"
+              style={{
+                height: 6,
+                width: i === current ? 20 : 6,
+                background: i === current ? "white" : "rgba(255,255,255,0.45)",
+              }}
+              aria-label={`Slide ${i + 1}`}
+            />
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+interface Hotel {
+  id: number;
+  name: string;
+  category: string | null;
+  coverImage: string | null;
+  starRating: number | null;
+  city: string | null;
+}
+
+interface Restaurant {
+  id: number;
+  name: string;
+  cuisineType: string | null;
+  coverPhoto: string | null;
+  city: string | null;
+}
+
+function HotelCard({ hotel }: { hotel: Hotel }) {
+  const [, navigate] = useLocation();
+  const cover = hotel.coverImage ? imgUrl(hotel.coverImage, 320) : null;
+  return (
+    <button
+      onClick={() => navigate(`/hotels/${hotel.id}`)}
+      className="flex-shrink-0 w-40 rounded-2xl overflow-hidden border border-border bg-white shadow-sm hover:shadow-md active:scale-[0.97] transition-all duration-150 text-left"
+    >
+      <div className="relative w-full" style={{ height: 100 }}>
+        {cover ? (
+          <img src={cover} alt={hotel.name} className="w-full h-full object-cover" />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center bg-primary/10">
+            <BedDouble className="h-8 w-8 text-primary/40" />
+          </div>
+        )}
+        {hotel.starRating && (
+          <div className="absolute top-2 right-2 flex items-center gap-0.5 bg-black/60 backdrop-blur-sm rounded-full px-1.5 py-0.5">
+            <Star className="h-2.5 w-2.5 text-amber-400 fill-amber-400" />
+            <span className="text-white text-[10px] font-bold">{hotel.starRating}</span>
+          </div>
+        )}
+      </div>
+      <div className="px-2.5 py-2">
+        <p className="font-semibold text-xs leading-tight line-clamp-2">{hotel.name}</p>
+        {hotel.category && (
+          <span className="inline-block mt-1 text-[10px] text-muted-foreground bg-muted px-1.5 py-0.5 rounded-full capitalize">
+            {hotel.category}
+          </span>
+        )}
+      </div>
+    </button>
+  );
+}
+
+function RestaurantCard({ restaurant }: { restaurant: Restaurant }) {
+  const [, navigate] = useLocation();
+  const cover = restaurant.coverPhoto ? imgUrl(restaurant.coverPhoto, 320) : null;
+  return (
+    <button
+      onClick={() => navigate(`/restaurants/${restaurant.id}`)}
+      className="flex-shrink-0 w-40 rounded-2xl overflow-hidden border border-border bg-white shadow-sm hover:shadow-md active:scale-[0.97] transition-all duration-150 text-left"
+    >
+      <div className="relative w-full" style={{ height: 100 }}>
+        {cover ? (
+          <img src={cover} alt={restaurant.name} className="w-full h-full object-cover" />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center bg-orange-50">
+            <UtensilsCrossed className="h-8 w-8 text-orange-300" />
+          </div>
+        )}
+      </div>
+      <div className="px-2.5 py-2">
+        <p className="font-semibold text-xs leading-tight line-clamp-2">{restaurant.name}</p>
+        {restaurant.cuisineType && (
+          <span className="inline-block mt-1 text-[10px] text-muted-foreground bg-muted px-1.5 py-0.5 rounded-full capitalize">
+            {restaurant.cuisineType}
+          </span>
+        )}
+      </div>
+    </button>
+  );
+}
+
+function HorizontalSkeletonRow() {
+  return (
+    <div className="flex gap-3 overflow-hidden">
+      {[1, 2, 3, 4].map((i) => (
+        <div key={i} className="flex-shrink-0 w-40 rounded-2xl overflow-hidden border border-border">
+          <Skeleton className="w-full h-24" />
+          <div className="px-2.5 py-2 space-y-1.5">
+            <Skeleton className="h-3 w-full" />
+            <Skeleton className="h-3 w-2/3" />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 function FeaturedCard({ name, image, href, type }: { name: string; image?: string | null; href: string; type: string }) {
   const iconMap: Record<string, any> = {
-    hotel: Building2,
-    restaurant: UtensilsCrossed,
-    spa: Sparkles,
-    place: MapPin,
+    hotel: Building2, restaurant: UtensilsCrossed, spa: Sparkles, place: MapPin,
   };
   const Icon = iconMap[type] || MapPin;
   return (
@@ -63,13 +241,31 @@ export default function CustomerHome() {
   const { data: ownerRequest } = useGetMyOwnerRequest({ query: { retry: false, queryKey: ["getMyOwnerRequest"] } });
   const { data: featured } = useQuery({ queryKey: ["featured-public"], queryFn: fetchFeatured });
 
+  const { data: topHotelsData, isLoading: hotelsLoading } = useQuery({
+    queryKey: ["top-hotels-home"],
+    queryFn: (): Promise<{ hotels: Hotel[] }> =>
+      apiRequest(`${BASE}/api/hotels?status=approved&sort=top&limit=8`),
+    staleTime: 60_000,
+  });
+
+  const { data: topRestaurantsData, isLoading: restaurantsLoading } = useQuery({
+    queryKey: ["top-restaurants-home"],
+    queryFn: (): Promise<{ restaurants: Restaurant[] }> =>
+      apiRequest(`${BASE}/api/restaurants?sort=top&limit=8`),
+    staleTime: 60_000,
+  });
+
+  const topHotels = topHotelsData?.hotels ?? [];
+  const topRestaurants = topRestaurantsData?.restaurants ?? [];
+
   const hasFeatured =
-    featured && (
-      (featured.hotels?.length ?? 0) > 0 ||
+    featured &&
+    ((featured.hotels?.length ?? 0) > 0 ||
       (featured.restaurants?.length ?? 0) > 0 ||
       (featured.spas?.length ?? 0) > 0 ||
-      (featured.places?.length ?? 0) > 0
-    );
+      (featured.places?.length ?? 0) > 0);
+
+  const firstName = user?.fullName?.split(" ")[0] ?? "Aap";
 
   const features = [
     { icon: BedDouble, label: "Hotels", sub: "Luxury stays", href: "/hotels", bg: "https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?w=800&q=90" },
@@ -81,12 +277,9 @@ export default function CustomerHome() {
   return (
     <CustomerLayout>
       <div className="px-4 py-5 space-y-5">
-        {/* Welcome header */}
-        <div className="bg-gradient-to-r from-primary to-primary/80 rounded-2xl p-5 text-white">
-          <p className="text-white/70 text-sm">Namaste,</p>
-          <h1 className="text-xl font-bold mt-0.5">{user?.fullName?.split(" ")[0]} ji! 🙏</h1>
-          <p className="text-white/60 text-xs mt-1">Agra mein aapka swagat hai</p>
-        </div>
+
+        {/* Hero Carousel */}
+        <HeroCarousel userName={firstName} />
 
         {/* Search bar */}
         <button
@@ -99,6 +292,54 @@ export default function CustomerHome() {
             <ChevronRight className="h-3.5 w-3.5 text-primary" />
           </div>
         </button>
+
+        {/* Top Rated Hotels */}
+        <div>
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-1.5">
+              <Star className="h-4 w-4 text-amber-500 fill-amber-400" />
+              <h2 className="text-sm font-semibold">Top Hotels in Agra</h2>
+            </div>
+            <Link href="/hotels" className="text-xs text-primary font-medium flex items-center gap-0.5">
+              Sab dekho <ChevronRight className="h-3 w-3" />
+            </Link>
+          </div>
+          {hotelsLoading ? (
+            <HorizontalSkeletonRow />
+          ) : topHotels.length > 0 ? (
+            <div className="flex gap-3 overflow-x-auto pb-1 -mx-1 px-1 scrollbar-hide">
+              {topHotels.map((h) => <HotelCard key={h.id} hotel={h} />)}
+            </div>
+          ) : (
+            <div className="text-center py-6 text-muted-foreground text-sm bg-muted/30 rounded-xl">
+              Abhi koi hotel approved nahi hai
+            </div>
+          )}
+        </div>
+
+        {/* Popular Restaurants */}
+        <div>
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-1.5">
+              <UtensilsCrossed className="h-4 w-4 text-orange-500" />
+              <h2 className="text-sm font-semibold">Popular Restaurants</h2>
+            </div>
+            <Link href="/restaurants" className="text-xs text-primary font-medium flex items-center gap-0.5">
+              Sab dekho <ChevronRight className="h-3 w-3" />
+            </Link>
+          </div>
+          {restaurantsLoading ? (
+            <HorizontalSkeletonRow />
+          ) : topRestaurants.length > 0 ? (
+            <div className="flex gap-3 overflow-x-auto pb-1 -mx-1 px-1 scrollbar-hide">
+              {topRestaurants.map((r) => <RestaurantCard key={r.id} restaurant={r} />)}
+            </div>
+          ) : (
+            <div className="text-center py-6 text-muted-foreground text-sm bg-muted/30 rounded-xl">
+              Abhi koi restaurant available nahi hai
+            </div>
+          )}
+        </div>
 
         {/* Notifications preview */}
         {unreadData && unreadData.count > 0 && (
@@ -113,26 +354,25 @@ export default function CustomerHome() {
           </Link>
         )}
 
-        {/* Quick links */}
+        {/* Explore Agra category grid */}
         <div>
           <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-3">Explore Agra</h2>
           <div className="grid grid-cols-2 gap-3">
-            {features.map(({ icon: Icon, label, sub, href, bg }: any) => {
+            {features.map(({ icon: Icon, label, sub, href, bg }) => {
               const tile = (
-                <div key={label} className="relative w-full aspect-[4/3] rounded-2xl overflow-hidden shadow-lg group cursor-pointer active:scale-[0.97] transition-transform duration-150">
-                  {/* Background photo */}
+                <div
+                  key={label}
+                  className="relative w-full aspect-[4/3] rounded-2xl overflow-hidden shadow-lg group cursor-pointer active:scale-[0.97] transition-transform duration-150"
+                >
                   <img
                     src={bg}
                     alt={label}
                     className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                   />
-                  {/* Gradient overlay */}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent" />
-                  {/* Top-right icon badge */}
                   <div className="absolute top-2.5 right-2.5 bg-white/20 backdrop-blur-sm rounded-full p-1.5">
                     <Icon className="h-4 w-4 text-white" />
                   </div>
-                  {/* Bottom text */}
                   <div className="absolute bottom-0 left-0 right-0 px-3 py-3">
                     <p className="text-white font-bold text-sm leading-tight drop-shadow">{label}</p>
                     <p className="text-white/75 text-xs mt-0.5 leading-tight drop-shadow">{sub}</p>
@@ -183,7 +423,10 @@ export default function CustomerHome() {
                     <p className="text-xs text-destructive mt-1">{ownerRequest.rejectionReason}</p>
                   )}
                 </div>
-                <Badge variant={ownerRequest.status === "approved" ? "default" : "secondary"} className="text-xs capitalize">
+                <Badge
+                  variant={ownerRequest.status === "approved" ? "default" : "secondary"}
+                  className="text-xs capitalize"
+                >
                   {ownerRequest.status}
                 </Badge>
               </div>
