@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useListHotels, useDeleteHotel, useSubmitHotel, getListHotelsQueryKey } from "@workspace/api-client-react";
 import type { Hotel } from "@workspace/api-client-react";
 import { OwnerLayout } from "@/components/layout/owner-layout";
@@ -7,16 +7,18 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
-import { Building2, PlusCircle, Search, Pencil, Trash2, Send, Eye, MapPin, Phone, Clock, Wifi, CheckCircle2, XCircle, Star } from "lucide-react";
+import { Building2, PlusCircle, Search, Pencil, Trash2, Send, Eye, MapPin, Phone, Clock, Wifi, CheckCircle2, XCircle, Star, FileCheck } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
+import { apiRequest } from "@/lib/api-request";
 
 const STATUS_CONFIG: Record<string, { label: string; variant: "default" | "secondary" | "destructive" | "outline"; color: string }> = {
   draft: { label: "Draft", variant: "secondary", color: "text-slate-600" },
@@ -179,6 +181,10 @@ export default function HotelOwnerHotels() {
   const [viewHotel, setViewHotel] = useState<Hotel | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<Hotel | null>(null);
   const [submitTarget, setSubmitTarget] = useState<Hotel | null>(null);
+  const [commissionTarget, setCommissionTarget] = useState<Hotel | null>(null);
+  const [agreementChecked, setAgreementChecked] = useState(false);
+  const [agreementData, setAgreementData] = useState<any>(null);
+  const [agreementLoading, setAgreementLoading] = useState(false);
 
   const queryClient = useQueryClient();
   const { toast } = useToast();
@@ -348,8 +354,8 @@ export default function HotelOwnerHotels() {
                       )}
                       {canSubmit && (
                         <Button size="sm" className="h-7 text-xs gap-1"
-                          onClick={() => setSubmitTarget(hotel)}>
-                          <Send className="h-3 w-3" /> Submit
+                          onClick={() => setCommissionTarget(hotel)}>
+                          <FileCheck className="h-3 w-3" /> Submit
                         </Button>
                       )}
                       {hotel.status === "approved" && (
@@ -375,22 +381,87 @@ export default function HotelOwnerHotels() {
       {/* Detail sheet */}
       <HotelDetailSheet hotel={viewHotel} open={!!viewHotel} onClose={() => setViewHotel(null)} />
 
-      {/* Submit confirmation */}
-      <AlertDialog open={!!submitTarget} onOpenChange={() => setSubmitTarget(null)}>
-        <AlertDialogContent>
+      {/* Commission Agreement Step */}
+      <AlertDialog
+        open={!!commissionTarget}
+        onOpenChange={(open) => {
+          if (!open) {
+            setCommissionTarget(null);
+            setAgreementChecked(false);
+            setAgreementData(null);
+          }
+        }}
+      >
+        <AlertDialogContent className="max-w-md">
           <AlertDialogHeader>
-            <AlertDialogTitle>Submit for Approval?</AlertDialogTitle>
-            <AlertDialogDescription>
-              "{submitTarget?.name}" will be submitted for admin review. You won't be able to edit it while it's under review.
+            <AlertDialogTitle className="flex items-center gap-2">
+              <FileCheck className="h-5 w-5 text-primary" /> Commission Agreement
+            </AlertDialogTitle>
+            <AlertDialogDescription className="space-y-3">
+              <p className="text-sm">
+                Before submitting <strong>"{commissionTarget?.name}"</strong>, please review and accept the commission agreement.
+              </p>
+              <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 text-sm">
+                <p className="font-medium text-amber-800 mb-1">Commission Terms</p>
+                <p className="text-amber-700">
+                  Easy Agra will charge a <strong>15% commission</strong> on every booking amount for this hotel listing. This commission will be deducted from each booking before the payout is processed to your account.
+                </p>
+              </div>
+              <div className="flex items-start gap-2 pt-1">
+                <Checkbox
+                  id="agree"
+                  checked={agreementChecked}
+                  onCheckedChange={(v) => setAgreementChecked(v === true)}
+                />
+                <label htmlFor="agree" className="text-sm text-muted-foreground leading-tight cursor-pointer">
+                  I agree to the 15% commission terms and authorize Easy Agra to deduct commission from all bookings.
+                </label>
+              </div>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={() => submitTarget && submitMutation.mutate({ id: submitTarget.id })}
-              disabled={submitMutation.isPending}
+            <AlertDialogCancel
+              onClick={() => {
+                setCommissionTarget(null);
+                setAgreementChecked(false);
+                setAgreementData(null);
+              }}
             >
-              {submitMutation.isPending ? "Submitting..." : "Submit"}
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={async () => {
+                if (!commissionTarget || !agreementChecked) return;
+                try {
+                  setAgreementLoading(true);
+                  // Try to get existing agreement
+                  const existing = await apiRequest(`/api/hotel-commission-agreements/${commissionTarget.id}`);
+                  if (existing && !existing.agreed) {
+                    await apiRequest(`/api/hotel-commission-agreements/${commissionTarget.id}/agree`, { method: "POST" });
+                  } else if (!existing) {
+                    await apiRequest("/api/hotel-commission-agreements", {
+                      method: "POST",
+                      body: { hotelId: commissionTarget.id, commissionRate: 15 },
+                    });
+                    await apiRequest(`/api/hotel-commission-agreements/${commissionTarget.id}/agree`, { method: "POST" });
+                  }
+                  // Now submit hotel
+                  submitMutation.mutate({ id: commissionTarget.id });
+                  setCommissionTarget(null);
+                  setAgreementChecked(false);
+                } catch (e: any) {
+                  toast({
+                    title: "Agreement Error",
+                    description: e?.message || "Failed to process agreement. Please try again.",
+                    variant: "destructive",
+                  });
+                } finally {
+                  setAgreementLoading(false);
+                }
+              }}
+              disabled={!agreementChecked || submitMutation.isPending || agreementLoading}
+            >
+              {agreementLoading || submitMutation.isPending ? "Processing..." : "Agree & Submit"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

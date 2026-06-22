@@ -12,6 +12,7 @@ export * from "./platform_settings";
 export * from "./tourist_places";
 export * from "./payments";
 export * from "./commissions";
+export * from "./hotel-commission-agreements";
 export * from "./trip_plans";
 export * from "./support_tickets";
 export * from "./cancellations";

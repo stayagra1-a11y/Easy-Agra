@@ -812,7 +812,8 @@ export const GetDashboardStatsResponse = zod.object({
   "suspendedUsers": zod.number(),
   "totalOwnerRequests": zod.number(),
   "pendingOwnerRequests": zod.number(),
-  "totalAdmins": zod.number()
+  "totalAdmins": zod.number(),
+  "pendingHotels": zod.number().optional()
 })
 
 
@@ -5168,6 +5169,56 @@ export const PutCommissionsConfigResponseItem = zod.object({
   "updatedAt": zod.string()
 })
 export const PutCommissionsConfigResponse = zod.array(PutCommissionsConfigResponseItem)
+
+
+/**
+ * @summary Create a commission agreement for a hotel
+ */
+export const CreateHotelCommissionAgreementBody = zod.object({
+  "hotelId": zod.number(),
+  "commissionRate": zod.number().optional(),
+  "agreementText": zod.string().nullish()
+})
+
+
+/**
+ * @summary Get commission agreement for a hotel
+ */
+export const GetHotelCommissionAgreementParams = zod.object({
+  "hotelId": zod.coerce.number()
+})
+
+export const GetHotelCommissionAgreementResponse = zod.object({
+  "id": zod.number(),
+  "hotelId": zod.number(),
+  "ownerId": zod.number(),
+  "commissionRate": zod.number(),
+  "agreed": zod.boolean(),
+  "agreedAt": zod.string().nullish(),
+  "agreementText": zod.string().nullish(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
+
+
+/**
+ * @summary Owner agrees to the commission agreement
+ */
+export const AgreeToCommissionParams = zod.object({
+  "hotelId": zod.coerce.number()
+})
+
+export const AgreeToCommissionResponse = zod.object({
+  "id": zod.number(),
+  "hotelId": zod.number(),
+  "ownerId": zod.number(),
+  "commissionRate": zod.number(),
+  "agreed": zod.boolean(),
+  "agreedAt": zod.string().nullish(),
+  "agreementText": zod.string().nullish(),
+  "createdAt": zod.string(),
+  "updatedAt": zod.string()
+})
 
 
 /**

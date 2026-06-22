@@ -14,4 +14,5 @@ export interface DashboardStats {
   totalOwnerRequests: number;
   pendingOwnerRequests: number;
   totalAdmins: number;
+  pendingHotels?: number;
 }

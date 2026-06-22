@@ -98,6 +98,8 @@ export * from './getTouristPlaceConnections200';
 export * from './healthStatus';
 export * from './hotel';
 export * from './hotelCategory';
+export * from './hotelCommissionAgreement';
+export * from './hotelCommissionAgreementInput';
 export * from './hotelInput';
 export * from './hotelInputCategory';
 export * from './hotelNearbyPlace';

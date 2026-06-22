@@ -344,6 +344,7 @@ export interface DashboardStats {
   totalOwnerRequests: number;
   pendingOwnerRequests: number;
   totalAdmins: number;
+  pendingHotels?: number;
 }
 
 export interface RoleCount {
@@ -1912,6 +1913,24 @@ export type RefundDetail = Refund & ({
   requestedByName?: string | null;
   processedByName?: string | null;
 });
+
+export interface HotelCommissionAgreement {
+  id: number;
+  hotelId: number;
+  ownerId: number;
+  commissionRate: number;
+  agreed: boolean;
+  agreedAt?: string | null;
+  agreementText?: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface HotelCommissionAgreementInput {
+  hotelId: number;
+  commissionRate?: number;
+  agreementText?: string | null;
+}
 
 export type CommissionConfigBookingType = typeof CommissionConfigBookingType[keyof typeof CommissionConfigBookingType];
 

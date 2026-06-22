@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { db, hotelsTable, usersTable, hotelNearbyPlacesTable } from "@workspace/db";
+import { db, hotelsTable, usersTable, hotelNearbyPlacesTable, hotelCommissionAgreementsTable } from "@workspace/db";
 import { eq, and, ilike, sql, isNull, asc, desc } from "drizzle-orm";
 import { logActivity, createNotification } from "../lib/auth";
 import { requireAuth, requireRole } from "../middlewares/requireAuth";
@@ -253,6 +253,17 @@ router.post("/hotels/:id/submit", requireRole("hotel_owner"), async (req, res): 
   if (hotel.ownerId !== cu.id) { res.status(403).json({ error: "Access denied" }); return; }
   if (!["draft", "rejected"].includes(hotel.status)) {
     res.status(400).json({ error: "Hotel can only be submitted from draft or rejected state" });
+    return;
+  }
+
+  // Check commission agreement
+  const [agreement] = await db
+    .select()
+    .from(hotelCommissionAgreementsTable)
+    .where(eq(hotelCommissionAgreementsTable.hotelId, id));
+
+  if (!agreement || !agreement.agreed) {
+    res.status(400).json({ error: "Commission agreement not accepted. Please agree to the 15% commission agreement before submitting." });
     return;
   }
 

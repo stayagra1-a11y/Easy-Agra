@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { db, usersTable, ownerRequestsTable, activityLogsTable } from "@workspace/db";
+import { db, usersTable, ownerRequestsTable, activityLogsTable, hotelsTable } from "@workspace/db";
 import { eq, sql } from "drizzle-orm";
 import { requireRole } from "../middlewares/requireAuth";
 
@@ -19,6 +19,10 @@ router.get("/dashboard/stats", requireRole("admin", "super_admin"), async (req, 
     pendingOwnerRequests: sql<number>`count(*) filter (where ${ownerRequestsTable.status} = 'pending')::int`,
   }).from(ownerRequestsTable);
 
+  const [hotelStats] = await db.select({
+    pendingHotels: sql<number>`count(*) filter (where ${hotelsTable.status} = 'pending')::int`,
+  }).from(hotelsTable);
+
   res.json({
     totalUsers: stats?.totalUsers ?? 0,
     activeUsers: stats?.activeUsers ?? 0,
@@ -27,6 +31,7 @@ router.get("/dashboard/stats", requireRole("admin", "super_admin"), async (req, 
     totalAdmins: stats?.totalAdmins ?? 0,
     totalOwnerRequests: requestStats?.totalOwnerRequests ?? 0,
     pendingOwnerRequests: requestStats?.pendingOwnerRequests ?? 0,
+    pendingHotels: hotelStats?.pendingHotels ?? 0,
   });
 });
 

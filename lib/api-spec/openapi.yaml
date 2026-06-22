@@ -46,6 +46,8 @@ tags:
     description: Refund management
   - name: commissions
     description: Platform commission configuration
+  - name: hotel-commission-agreements
+    description: Hotel commission agreements for owners
   - name: earnings
     description: Owner earnings and platform revenue
   - name: payouts
@@ -3750,6 +3752,80 @@ paths:
                 items:
                   $ref: "#/components/schemas/CommissionConfig"
 
+  # ─── Hotel Commission Agreement paths ─────────────────────────────────────
+  /hotel-commission-agreements:
+    post:
+      operationId: createHotelCommissionAgreement
+      tags: [hotel-commission-agreements]
+      summary: Create a commission agreement for a hotel
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/HotelCommissionAgreementInput"
+      responses:
+        "201":
+          description: Agreement created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HotelCommissionAgreement"
+        "400":
+          description: Agreement already exists
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /hotel-commission-agreements/{hotelId}:
+    get:
+      operationId: getHotelCommissionAgreement
+      tags: [hotel-commission-agreements]
+      summary: Get commission agreement for a hotel
+      parameters:
+        - name: hotelId
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: Agreement found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HotelCommissionAgreement"
+        "404":
+          description: Agreement not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /hotel-commission-agreements/{hotelId}/agree:
+    post:
+      operationId: agreeToCommission
+      tags: [hotel-commission-agreements]
+      summary: Owner agrees to the commission agreement
+      parameters:
+        - name: hotelId
+          in: path
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: Agreement accepted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HotelCommissionAgreement"
+        "404":
+          description: Agreement not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
   # ─── Earnings paths ────────────────────────────────────────────────────────
   /earnings/owner:
     get:
@@ -5087,6 +5163,8 @@ components:
         pendingOwnerRequests:
           type: integer
         totalAdmins:
+          type: integer
+        pendingHotels:
           type: integer
       required:
         - totalUsers
@@ -7768,6 +7846,29 @@ components:
               $ref: "#/components/schemas/Payment"
             requestedByName: { type: string, nullable: true }
             processedByName: { type: string, nullable: true }
+
+    # ─── Hotel Commission Agreement schemas ─────────────────────────────────
+    HotelCommissionAgreement:
+      type: object
+      properties:
+        id: { type: integer }
+        hotelId: { type: integer }
+        ownerId: { type: integer }
+        commissionRate: { type: number }
+        agreed: { type: boolean }
+        agreedAt: { type: string, nullable: true }
+        agreementText: { type: string, nullable: true }
+        createdAt: { type: string }
+        updatedAt: { type: string }
+      required: [id, hotelId, ownerId, commissionRate, agreed, createdAt, updatedAt]
+
+    HotelCommissionAgreementInput:
+      type: object
+      properties:
+        hotelId: { type: integer }
+        commissionRate: { type: number }
+        agreementText: { type: string, nullable: true }
+      required: [hotelId]
 
     # ─── Commission schemas ────────────────────────────────
     CommissionConfig:

@@ -96,6 +96,8 @@ import type {
   GetTouristPlaceConnections200,
   HealthStatus,
   Hotel,
+  HotelCommissionAgreement,
+  HotelCommissionAgreementInput,
   HotelInput,
   HotelNearbyPlace,
   HotelNearbyPlaceInput,
@@ -12516,6 +12518,224 @@ export const usePutCommissionsConfig = <TError = ErrorType<unknown>,
         TContext
       > => {
       return useMutation(getPutCommissionsConfigMutationOptions(options));
+    }
+
+export const getCreateHotelCommissionAgreementUrl = () => {
+
+
+
+
+  return `/api/hotel-commission-agreements`
+}
+
+/**
+ * @summary Create a commission agreement for a hotel
+ */
+export const createHotelCommissionAgreement = async (hotelCommissionAgreementInput: HotelCommissionAgreementInput, options?: RequestInit): Promise<HotelCommissionAgreement> => {
+
+  return customFetch<HotelCommissionAgreement>(getCreateHotelCommissionAgreementUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      hotelCommissionAgreementInput,)
+  }
+);}
+
+
+
+
+export const getCreateHotelCommissionAgreementMutationOptions = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createHotelCommissionAgreement>>, TError,{data: BodyType<HotelCommissionAgreementInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createHotelCommissionAgreement>>, TError,{data: BodyType<HotelCommissionAgreementInput>}, TContext> => {
+
+const mutationKey = ['createHotelCommissionAgreement'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createHotelCommissionAgreement>>, {data: BodyType<HotelCommissionAgreementInput>}> = (props) => {
+          const {data} = props ?? {};
+
+          return  createHotelCommissionAgreement(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateHotelCommissionAgreementMutationResult = NonNullable<Awaited<ReturnType<typeof createHotelCommissionAgreement>>>
+    export type CreateHotelCommissionAgreementMutationBody = BodyType<HotelCommissionAgreementInput>
+    export type CreateHotelCommissionAgreementMutationError = ErrorType<ErrorResponse>
+
+    /**
+ * @summary Create a commission agreement for a hotel
+ */
+export const useCreateHotelCommissionAgreement = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createHotelCommissionAgreement>>, TError,{data: BodyType<HotelCommissionAgreementInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof createHotelCommissionAgreement>>,
+        TError,
+        {data: BodyType<HotelCommissionAgreementInput>},
+        TContext
+      > => {
+      return useMutation(getCreateHotelCommissionAgreementMutationOptions(options));
+    }
+
+export const getGetHotelCommissionAgreementUrl = (hotelId: number,) => {
+
+
+
+
+  return `/api/hotel-commission-agreements/${hotelId}`
+}
+
+/**
+ * @summary Get commission agreement for a hotel
+ */
+export const getHotelCommissionAgreement = async (hotelId: number, options?: RequestInit): Promise<HotelCommissionAgreement> => {
+
+  return customFetch<HotelCommissionAgreement>(getGetHotelCommissionAgreementUrl(hotelId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetHotelCommissionAgreementQueryKey = (hotelId: number,) => {
+    return [
+    `/api/hotel-commission-agreements/${hotelId}`
+    ] as const;
+    }
+
+
+export const getGetHotelCommissionAgreementQueryOptions = <TData = Awaited<ReturnType<typeof getHotelCommissionAgreement>>, TError = ErrorType<ErrorResponse>>(hotelId: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getHotelCommissionAgreement>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetHotelCommissionAgreementQueryKey(hotelId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getHotelCommissionAgreement>>> = ({ signal }) => getHotelCommissionAgreement(hotelId, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: !!(hotelId), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getHotelCommissionAgreement>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetHotelCommissionAgreementQueryResult = NonNullable<Awaited<ReturnType<typeof getHotelCommissionAgreement>>>
+export type GetHotelCommissionAgreementQueryError = ErrorType<ErrorResponse>
+
+
+/**
+ * @summary Get commission agreement for a hotel
+ */
+
+export function useGetHotelCommissionAgreement<TData = Awaited<ReturnType<typeof getHotelCommissionAgreement>>, TError = ErrorType<ErrorResponse>>(
+ hotelId: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getHotelCommissionAgreement>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetHotelCommissionAgreementQueryOptions(hotelId,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getAgreeToCommissionUrl = (hotelId: number,) => {
+
+
+
+
+  return `/api/hotel-commission-agreements/${hotelId}/agree`
+}
+
+/**
+ * @summary Owner agrees to the commission agreement
+ */
+export const agreeToCommission = async (hotelId: number, options?: RequestInit): Promise<HotelCommissionAgreement> => {
+
+  return customFetch<HotelCommissionAgreement>(getAgreeToCommissionUrl(hotelId),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+export const getAgreeToCommissionMutationOptions = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof agreeToCommission>>, TError,{hotelId: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof agreeToCommission>>, TError,{hotelId: number}, TContext> => {
+
+const mutationKey = ['agreeToCommission'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof agreeToCommission>>, {hotelId: number}> = (props) => {
+          const {hotelId} = props ?? {};
+
+          return  agreeToCommission(hotelId,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type AgreeToCommissionMutationResult = NonNullable<Awaited<ReturnType<typeof agreeToCommission>>>
+
+    export type AgreeToCommissionMutationError = ErrorType<ErrorResponse>
+
+    /**
+ * @summary Owner agrees to the commission agreement
+ */
+export const useAgreeToCommission = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof agreeToCommission>>, TError,{hotelId: number}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof agreeToCommission>>,
+        TError,
+        {hotelId: number},
+        TContext
+      > => {
+      return useMutation(getAgreeToCommissionMutationOptions(options));
     }
 
 export const getGetEarningsOwnerUrl = (params?: GetEarningsOwnerParams,) => {

@@ -87,6 +87,20 @@ export default function HotelOwnerDashboard() {
       href: "/hotel-owner/bookings",
     },
     {
+      label: "Draft Hotels",
+      value: hotelStats?.draftHotels ?? 0,
+      icon: Building2,
+      color: "bg-slate-50 text-slate-600",
+      href: "/hotel-owner/hotels",
+    },
+    {
+      label: "Pending Hotels",
+      value: hotelStats?.pendingHotels ?? 0,
+      icon: Clock,
+      color: "bg-yellow-50 text-yellow-600",
+      href: "/hotel-owner/hotels",
+    },
+    {
       label: "Approved Hotels",
       value: hotelStats?.approvedHotels ?? 0,
       icon: CheckCircle2,

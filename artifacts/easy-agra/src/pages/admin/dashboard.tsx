@@ -1,7 +1,7 @@
 import { useGetDashboardStats, useGetRoleBreakdown } from "@workspace/api-client-react";
 import { AdminLayout } from "@/components/layout/admin-layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, FileCheck, TrendingUp, Clock, CheckCircle2, Shield, Activity, Bell } from "lucide-react";
+import { Users, FileCheck, TrendingUp, Clock, CheckCircle2, Shield, Activity, Bell, Building2 } from "lucide-react";
 import { Loader2 } from "lucide-react";
 import { Link } from "wouter";
 
@@ -15,6 +15,7 @@ export default function AdminDashboard() {
 
   const cards = [
     { label: "Total Users", value: stats?.totalUsers ?? 0, icon: Users, color: "text-blue-600 bg-blue-50", href: "/admin/users" },
+    { label: "Pending Hotels", value: stats?.pendingHotels ?? 0, icon: Building2, color: "text-amber-600 bg-amber-50", href: "/admin/hotels" },
     { label: "Pending Requests", value: stats?.pendingOwnerRequests ?? 0, icon: Clock, color: "text-yellow-600 bg-yellow-50", href: "/admin/owner-requests" },
     { label: "Active Users", value: stats?.activeUsers ?? 0, icon: CheckCircle2, color: "text-green-600 bg-green-50", href: "/admin/users" },
     { label: "Total Admins", value: stats?.totalAdmins ?? 0, icon: Shield, color: "text-primary/80 bg-primary/10", href: "/admin/users" },
@@ -29,7 +30,7 @@ export default function AdminDashboard() {
         </div>
 
         {/* Stats grid */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
           {cards.map(({ label, value, icon: Icon, color, href }) => (
             <Link key={label} href={href}>
               <Card className="hover:shadow-md transition-shadow cursor-pointer">
