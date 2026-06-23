@@ -71,7 +71,7 @@ export default function RestaurantOwnerDashboard() {
       value: unread?.count ?? 0,
       icon: Bell,
       color: "text-purple-600 bg-purple-50",
-      href: "/customer/notifications",
+      href: "/owner/notifications",
     },
   ];
 
@@ -164,7 +164,7 @@ export default function RestaurantOwnerDashboard() {
                 <CalendarCheck className="h-5 w-5" /> Reservations
               </Button>
             </Link>
-            <Link href="/restaurant-owner/menu">
+            <Link href="/restaurant-owner/restaurants">
               <Button variant="outline" className="w-full h-14 flex-col gap-1 text-xs" size="sm">
                 <ChefHat className="h-5 w-5" /> Menu
               </Button>

@@ -2,6 +2,7 @@ import { useAuth } from "@/hooks/use-auth";
 import {
   useGetHotelStats, useListHotels, useGetRoomStats,
   useListBookings, useGetEarningsOwner,
+  useGetUnreadNotificationCount,
 } from "@workspace/api-client-react";
 import { OwnerLayout } from "@/components/layout/owner-layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import {
   Building2, PlusCircle, ClipboardList, CheckCircle2, Clock,
   AlertCircle, BedDouble, IndianRupee, ArrowRight,
-  CalendarCheck, TrendingUp, LogIn, LogOut, Users,
+  CalendarCheck, TrendingUp, LogIn, LogOut, Users, Bell,
 } from "lucide-react";
 import { Link } from "wouter";
 import { format } from "date-fns";
@@ -46,6 +47,7 @@ export default function HotelOwnerDashboard() {
   const { data: roomStats } = useGetRoomStats({});
   const { data: hotelsPage } = useListHotels({ limit: 4 });
   const { data: earningsData, isLoading: earningsLoading } = useGetEarningsOwner({});
+  const { data: unreadData } = useGetUnreadNotificationCount();
 
   // Aaj ke check-ins (confirmed bookings with check-in = today)
   const { data: todayCheckIns } = useListBookings({ dateFrom: today, dateTo: today, status: "confirmed", limit: 50 });
@@ -106,6 +108,13 @@ export default function HotelOwnerDashboard() {
       icon: CheckCircle2,
       color: "bg-emerald-50 text-emerald-600",
       href: "/hotel-owner/hotels",
+    },
+    {
+      label: "Notifications",
+      value: unreadData?.count ?? 0,
+      icon: Bell,
+      color: "bg-purple-50 text-purple-600",
+      href: "/owner/notifications",
     },
     {
       label: "Total Rooms",

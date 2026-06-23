@@ -1,13 +1,13 @@
 import { Link } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
-import { useGetSpaOwnerStats, useGetOwnerSpaAppointments, useGetEarningsOwner } from "@workspace/api-client-react";
+import { useGetSpaOwnerStats, useGetOwnerSpaAppointments, useGetEarningsOwner, useGetUnreadNotificationCount } from "@workspace/api-client-react";
 import { OwnerLayout } from "@/components/layout/owner-layout";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
   Sparkles, Building2, Clock, CalendarDays, PlusCircle,
   Settings, CalendarCheck, TrendingUp, Users,
-  ArrowRight, CheckCircle2, Loader2,
+  ArrowRight, CheckCircle2, Loader2, Bell,
 } from "lucide-react";
 import { format } from "date-fns";
 
@@ -31,6 +31,7 @@ export default function SpaOwnerDashboard() {
   const { data: pendingAppts } = useGetOwnerSpaAppointments({ status: "pending", limit: 50 });
   const { data: todayAppts } = useGetOwnerSpaAppointments({ limit: 50 });
   const { data: earningsData, isLoading: earningsLoading } = useGetEarningsOwner({});
+  const { data: unreadData } = useGetUnreadNotificationCount();
 
   const earnings = earningsData?.summary;
   const thisMonthNet = (() => {
@@ -80,6 +81,13 @@ export default function SpaOwnerDashboard() {
       icon: CalendarDays,
       color: "text-slate-600 bg-slate-50",
       href: "/spa-owner/spas",
+    },
+    {
+      label: "Notifications",
+      value: unreadData?.count ?? 0,
+      icon: Bell,
+      color: "text-purple-600 bg-purple-50",
+      href: "/owner/notifications",
     },
   ];
 
