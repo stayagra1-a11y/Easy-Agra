@@ -12,7 +12,8 @@ export interface OwnerRequestUpdate {
   businessAddress?: string;
   city?: string;
   state?: string;
-  gstNumber?: string;
+  /** @nullable */
+  gstNumber?: string | null;
   ownerName?: string;
   ownerMobile?: string;
   ownerEmail?: string;

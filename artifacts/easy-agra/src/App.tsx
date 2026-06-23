@@ -74,6 +74,7 @@ import OwnerSpas from "@/pages/spa-owner/spas";
 import SpaForm from "@/pages/spa-owner/spa-form";
 import SpaServices from "@/pages/spa-owner/spa-services";
 import OwnerAppointments from "@/pages/spa-owner/appointments";
+import OwnerNotifications from "@/pages/owner/notifications";
 import AdminSpas from "@/pages/admin/admin-spas";
 
 // Customer - spas
@@ -301,6 +302,8 @@ function Router() {
 
       {/* Owner - cancellations */}
       <Route path="/owner/cancellations" component={() => <ProtectedRoute component={OwnerCancellations} allowedRoles={["hotel_owner", "restaurant_owner", "spa_owner"]} />} />
+      {/* Owner - notifications */}
+      <Route path="/owner/notifications" component={() => <ProtectedRoute component={OwnerNotifications} allowedRoles={["hotel_owner", "restaurant_owner", "spa_owner"]} />} />
 
       {/* Admin routes */}
       <Route path="/admin/dashboard" component={() => <ProtectedRoute component={AdminDashboard} allowedRoles={["admin", "super_admin"]} />} />

@@ -4945,7 +4945,7 @@ components:
         state:
           type: string
         gstNumber:
-          type: string
+          type: ["string", "null"]
         ownerName:
           type: string
         ownerMobile:
@@ -4975,7 +4975,7 @@ components:
         state:
           type: string
         gstNumber:
-          type: string
+          type: ["string", "null"]
         ownerName:
           type: string
         ownerMobile:

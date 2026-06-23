@@ -38,7 +38,7 @@ const bottomNav: NavItem[] = [
   { href: "/spa-owner/payments", icon: IndianRupee, label: "Payments", roles: ["spa_owner"] },
   { href: "/spa-owner/earnings", icon: TrendingUp, label: "Earnings", roles: ["spa_owner"] },
   { href: "/owner/cancellations", icon: CalendarX, label: "Cancellations", roles: ["hotel_owner", "restaurant_owner", "spa_owner"] },
-  { href: "/notifications", icon: Bell, label: "Alerts" },
+  { href: "/owner/notifications", icon: Bell, label: "Alerts", roles: ["hotel_owner", "restaurant_owner", "spa_owner"] },
   { href: "/profile", icon: User, label: "Profile" },
 ];
 
