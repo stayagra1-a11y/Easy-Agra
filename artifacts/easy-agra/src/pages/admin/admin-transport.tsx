@@ -31,10 +31,16 @@ interface TransportLocation {
   type: string;
   description: string | null;
   address: string | null;
+  city: string | null;
+  state: string | null;
+  pincode: string | null;
   googleMapsLink: string | null;
   contactNumber: string | null;
   timings: string | null;
   mainImage: string | null;
+  image1: string | null;
+  image2: string | null;
+  image3: string | null;
   isActive: boolean;
   createdAt: string;
   updatedAt: string;

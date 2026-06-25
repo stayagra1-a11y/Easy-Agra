@@ -28,10 +28,16 @@ interface TransportForm {
   type: string;
   description: string;
   address: string;
+  city: string;
+  pincode: string;
+  state: string;
   googleMapsLink: string;
   contactNumber: string;
   timings: string;
   mainImage: string;
+  image1: string;
+  image2: string;
+  image3: string;
   isActive: boolean;
 }
 
@@ -40,10 +46,16 @@ const emptyForm: TransportForm = {
   type: "railway_station",
   description: "",
   address: "",
+  city: "",
+  pincode: "",
+  state: "",
   googleMapsLink: "",
   contactNumber: "",
   timings: "",
   mainImage: "",
+  image1: "",
+  image2: "",
+  image3: "",
   isActive: true,
 };
 
@@ -77,10 +89,16 @@ export default function TransportForm() {
         type: existing.type || "railway_station",
         description: existing.description || "",
         address: existing.address || "",
+        city: existing.city || "",
+        pincode: existing.pincode || "",
+        state: existing.state || "",
         googleMapsLink: existing.googleMapsLink || "",
         contactNumber: existing.contactNumber || "",
         timings: existing.timings || "",
         mainImage: existing.mainImage || "",
+        image1: existing.image1 || "",
+        image2: existing.image2 || "",
+        image3: existing.image3 || "",
         isActive: existing.isActive ?? true,
       });
     }
@@ -93,13 +111,13 @@ export default function TransportForm() {
     setForm((f) => ({ ...f, [field]: value }));
   };
 
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, fieldName: "mainImage" | "image1" | "image2" | "image3") => {
     const file = e.target.files?.[0];
     if (!file) return;
     setUploading(true);
     try {
       const url = await uploadToCloudinary(file);
-      setField("mainImage", url);
+      setField(fieldName, url);
       toast({ title: "Image uploaded!" });
     } catch {
       toast({ title: "Upload failed", description: "Could not upload image", variant: "destructive" });
@@ -121,10 +139,16 @@ export default function TransportForm() {
         type: form.type,
         description: form.description.trim() || null,
         address: form.address.trim() || null,
+        city: form.city.trim() || null,
+        pincode: form.pincode.trim() || null,
+        state: form.state.trim() || null,
         googleMapsLink: form.googleMapsLink.trim() || null,
         contactNumber: form.contactNumber.trim() || null,
         timings: form.timings.trim() || null,
         mainImage: form.mainImage || null,
+        image1: form.image1 || null,
+        image2: form.image2 || null,
+        image3: form.image3 || null,
         isActive: form.isActive,
       };
 
@@ -197,10 +221,24 @@ export default function TransportForm() {
               <Textarea value={form.description} onChange={(e) => setField("description", e.target.value)} rows={3} placeholder="Short description about this location..." />
             </div>
 
-            {/* Address */}
+            {/* Address Section */}
             <div className="space-y-1.5">
-              <Label>Address</Label>
-              <Input value={form.address} onChange={(e) => setField("address", e.target.value)} placeholder="Full address" />
+              <Label>Full Address</Label>
+              <Input value={form.address} onChange={(e) => setField("address", e.target.value)} placeholder="Street / Building / Area" />
+            </div>
+            <div className="grid grid-cols-3 gap-3">
+              <div className="space-y-1.5">
+                <Label>City</Label>
+                <Input value={form.city} onChange={(e) => setField("city", e.target.value)} placeholder="Agra" />
+              </div>
+              <div className="space-y-1.5">
+                <Label>State</Label>
+                <Input value={form.state} onChange={(e) => setField("state", e.target.value)} placeholder="Uttar Pradesh" />
+              </div>
+              <div className="space-y-1.5">
+                <Label>Pincode</Label>
+                <Input value={form.pincode} onChange={(e) => setField("pincode", e.target.value)} placeholder="282001" />
+              </div>
             </div>
 
             {/* Google Maps Link */}
@@ -221,25 +259,38 @@ export default function TransportForm() {
               <Input value={form.timings} onChange={(e) => setField("timings", e.target.value)} placeholder="e.g. 24 Hours or 6:00 AM - 10:00 PM" />
             </div>
 
-            {/* Image */}
+            {/* Images */}
             <div className="space-y-1.5">
               <Label>Main Image</Label>
               {form.mainImage && (
                 <div className="relative w-40 h-24 rounded-lg overflow-hidden mb-2">
                   <img src={form.mainImage} alt="Preview" className="w-full h-full object-cover" />
-                  <button
-                    onClick={() => setField("mainImage", "")}
-                    className="absolute top-1 right-1 bg-black/60 text-white rounded-full p-0.5"
-                  >
-                    <X className="h-3 w-3" />
-                  </button>
+                  <button onClick={() => setField("mainImage", "")} className="absolute top-1 right-1 bg-black/60 text-white rounded-full p-0.5"><X className="h-3 w-3" /></button>
                 </div>
               )}
               <div className="flex items-center gap-2">
-                <Input type="file" accept="image/*" onChange={handleImageUpload} className="text-sm" />
+                <Input type="file" accept="image/*" onChange={(e) => handleImageUpload(e, "mainImage")} className="text-sm" />
                 {uploading && <Loader2 className="h-4 w-4 animate-spin text-primary" />}
               </div>
-              <p className="text-xs text-muted-foreground">Upload to Cloudinary. Image URL will be saved.</p>
+            </div>
+
+            {/* Extra Photos (3 more) */}
+            <div className="space-y-1.5">
+              <Label>Additional Photos (3)</Label>
+              <p className="text-xs text-muted-foreground">Upload extra photos to showcase this location. You can change these later.</p>
+              <div className="grid grid-cols-3 gap-3">
+                {(["image1", "image2", "image3"] as const).map((imgKey, i) => (
+                  <div key={imgKey} className="space-y-2">
+                    {(form as any)[imgKey] && (
+                      <div className="relative w-full h-20 rounded-lg overflow-hidden">
+                        <img src={(form as any)[imgKey]} alt={`Photo ${i+1}`} className="w-full h-full object-cover" />
+                        <button onClick={() => setField(imgKey, "")} className="absolute top-1 right-1 bg-black/60 text-white rounded-full p-0.5"><X className="h-3 w-3" /></button>
+                      </div>
+                    )}
+                    <Input type="file" accept="image/*" onChange={(e) => handleImageUpload(e, imgKey)} className="text-xs" />
+                  </div>
+                ))}
+              </div>
             </div>
 
             {/* Active */}

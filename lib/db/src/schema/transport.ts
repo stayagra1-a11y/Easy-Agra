@@ -25,11 +25,17 @@ export const transportLocationsTable = pgTable("transport_locations", {
 
   description: text("description"),
   address: text("address"),
+  city: text("city"),
+  pincode: text("pincode"),
+  state: text("state"),
   googleMapsLink: text("google_maps_link"),
   contactNumber: text("contact_number"),
   timings: text("timings"),
 
   mainImage: text("main_image"),
+  image1: text("image1"),
+  image2: text("image2"),
+  image3: text("image3"),
 
   isActive: boolean("is_active").notNull().default(true),
 

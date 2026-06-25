@@ -41,10 +41,16 @@ interface TransportLocation {
   type: string;
   description: string | null;
   address: string | null;
+  city: string | null;
+  pincode: string | null;
+  state: string | null;
   googleMapsLink: string | null;
   contactNumber: string | null;
   timings: string | null;
   mainImage: string | null;
+  image1: string | null;
+  image2: string | null;
+  image3: string | null;
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
@@ -188,7 +194,12 @@ export default function TransportDetail() {
                   <MapPin className="h-4 w-4 text-primary mt-0.5 shrink-0" />
                   <div>
                     <p className="text-xs text-muted-foreground">Address</p>
-                    <p className="text-sm font-medium">{loc.address}</p>
+                    <p className="text-sm font-medium">
+                      {loc.address}
+                      {loc.city && `, ${loc.city}`}
+                      {loc.state && `, ${loc.state}`}
+                      {loc.pincode && ` - ${loc.pincode}`}
+                    </p>
                   </div>
                 </div>
               )}
@@ -212,6 +223,20 @@ export default function TransportDetail() {
               )}
             </CardContent>
           </Card>
+
+          {/* Image Gallery */}
+          {((loc.image1 || loc.image2 || loc.image3)) && (
+            <Card>
+              <CardContent className="p-4">
+                <p className="text-xs text-muted-foreground mb-2">More Photos</p>
+                <div className="grid grid-cols-3 gap-2">
+                  {[loc.image1, loc.image2, loc.image3].filter(Boolean).map((img, i) => (
+                    <img key={i} src={img!} alt={`Photo ${i+1}`} className="w-full h-24 rounded-lg object-cover" />
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
           {/* Action Buttons */}
           <div className="grid grid-cols-2 gap-2">
