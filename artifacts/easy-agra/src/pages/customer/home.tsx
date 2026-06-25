@@ -9,7 +9,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import {
   BedDouble, UtensilsCrossed, Leaf, Landmark, Bell, ChevronRight,
   Clock, CheckCircle2, XCircle, AlertCircle, Star, Building2,
-  Sparkles, MapPin, Search,
+  Sparkles, MapPin, Search, Train,
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { apiRequest } from "@/lib/api-request";
@@ -271,6 +271,7 @@ export default function CustomerHome() {
 
   const features = [
     { icon: BedDouble, label: "Hotels", sub: "Luxury stays", href: "/hotels", bg: "https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?w=800&q=90" },
+    { icon: Train, label: "Transport", sub: "Rail, Bus, Air", href: "/transport", bg: "https://images.unsplash.com/photo-1474487548417-781cb71495f3?w=800&q=90" },
     { icon: Landmark, label: "Famous Places", sub: "Iconic monuments", href: "/places", bg: "https://images.unsplash.com/photo-1548013146-72479768bada?w=800&q=90" },
     { icon: UtensilsCrossed, label: "Restaurants", sub: "Fine dining", href: "/restaurants", bg: "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800&q=90" },
     { icon: Leaf, label: "Spas", sub: "Wellness & relax", href: "/spas", bg: "https://images.unsplash.com/photo-1600334089648-b0d9d3028eb2?w=800&q=90" },

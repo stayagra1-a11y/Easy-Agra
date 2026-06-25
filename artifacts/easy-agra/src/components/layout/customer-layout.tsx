@@ -25,28 +25,28 @@ export function CustomerLayout({ children }: { children: React.ReactNode }) {
     window.location.href = "/login";
   };
 
-  const navItems = [
+  const navItems: { href: string; icon: any; label: string; badge?: number }[] = [
     { href: "/", icon: Home, label: t("home") },
-    { href: "/customer/bookings", icon: CalendarDays, label: t("bookings") },
+    { href: "/hotels", icon: Building2, label: t("hotels") },
     { href: "/restaurants", icon: Utensils, label: t("restaurants") },
-    { href: "/spas", icon: Sparkles, label: t("spas") },
-    { href: "/places", icon: Landmark, label: t("places") },
     { href: "/transport", icon: Train, label: "Transport" },
-    { href: "/trips", icon: Map, label: t("trips") ?? "Trips" },
-    { href: "/support/tickets", icon: LifeBuoy, label: t("help_support") },
-    { href: "/refunds", icon: ReceiptText, label: t("refunds") ?? "Refunds" },
-    { href: "/my-payments", icon: IndianRupee, label: t("my_payments") },
-    { href: "/notifications", icon: Bell, label: t("notifications"), badge: unreadData?.count },
     { href: "/profile", icon: User, label: t("profile") },
   ];
 
   const menuLinks = [
     { href: "/profile", icon: User, label: t("profile") },
     { href: "/customer/bookings", icon: CalendarDays, label: t("my_bookings") },
+    { href: "/hotels", icon: Building2, label: t("hotels") },
+    { href: "/transport", icon: Train, label: "Transport" },
+    { href: "/restaurants", icon: Utensils, label: t("restaurants") },
+    { href: "/spas", icon: Sparkles, label: t("spas") },
+    { href: "/places", icon: Landmark, label: t("places") },
+    { href: "/trips", icon: Map, label: t("trips") ?? "Trips" },
     { href: "/my-payments", icon: IndianRupee, label: t("my_payments") },
     { href: "/my-reservations", icon: Star, label: t("my_reservations") },
     { href: "/refunds", icon: ReceiptText, label: t("refunds") ?? "Refunds" },
     { href: "/support/tickets", icon: LifeBuoy, label: t("help_support") },
+    { href: "/notifications", icon: Bell, label: t("notifications") },
     { href: "/settings", icon: Settings, label: t("settings") },
     { href: "/become-owner", icon: Building2, label: t("list_your_business"), highlight: true },
   ];
