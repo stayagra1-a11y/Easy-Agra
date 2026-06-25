@@ -66,6 +66,7 @@ import RoomForm from "@/pages/hotel-owner/room-form";
 import HotelReviews from "@/pages/hotel-owner/hotel-reviews";
 import HotelOwnerBookings from "@/pages/hotel-owner/owner-bookings";
 import RestaurantOwnerDashboard from "@/pages/restaurant-owner/dashboard";
+import RestaurantOwnerReviews from "@/pages/restaurant-owner/restaurant-reviews";
 import OwnerRestaurants from "@/pages/restaurant-owner/restaurants";
 import RestaurantForm from "@/pages/restaurant-owner/restaurant-form";
 import MenuManagement from "@/pages/restaurant-owner/menu-management";
@@ -75,6 +76,7 @@ import SpaOwnerDashboard from "@/pages/spa-owner/dashboard";
 import OwnerSpas from "@/pages/spa-owner/spas";
 import SpaForm from "@/pages/spa-owner/spa-form";
 import SpaServices from "@/pages/spa-owner/spa-services";
+import SpaOwnerReviews from "@/pages/spa-owner/spa-reviews";
 import OwnerAppointments from "@/pages/spa-owner/appointments";
 import OwnerNotifications from "@/pages/owner/notifications";
 import AdminSpas from "@/pages/admin/admin-spas";
@@ -269,6 +271,7 @@ function Router() {
       <Route path="/restaurant-owner/restaurants/:restaurantId/tables" component={() => <ProtectedRoute component={TableManagement} allowedRoles={["restaurant_owner"]} />} />
       <Route path="/restaurant-owner/restaurants" component={() => <ProtectedRoute component={OwnerRestaurants} allowedRoles={["restaurant_owner"]} />} />
       <Route path="/restaurant-owner/reservations" component={() => <ProtectedRoute component={OwnerReservations} allowedRoles={["restaurant_owner"]} />} />
+      <Route path="/restaurant-owner/reviews" component={() => <ProtectedRoute component={RestaurantOwnerReviews} allowedRoles={["restaurant_owner"]} />} />
       <Route path="/restaurant-owner/payments" component={() => <ProtectedRoute component={RestaurantOwnerPayments} allowedRoles={["restaurant_owner"]} />} />
       <Route path="/restaurant-owner/earnings" component={() => <ProtectedRoute component={RestaurantOwnerEarnings} allowedRoles={["restaurant_owner"]} />} />
       <Route path="/spa-owner/dashboard" component={() => <ProtectedRoute component={SpaOwnerDashboard} allowedRoles={["spa_owner"]} />} />
@@ -277,6 +280,7 @@ function Router() {
       <Route path="/spa-owner/spas/:id/services" component={() => <ProtectedRoute component={SpaServices} allowedRoles={["spa_owner"]} />} />
       <Route path="/spa-owner/spas" component={() => <ProtectedRoute component={OwnerSpas} allowedRoles={["spa_owner"]} />} />
       <Route path="/spa-owner/appointments" component={() => <ProtectedRoute component={OwnerAppointments} allowedRoles={["spa_owner"]} />} />
+      <Route path="/spa-owner/reviews" component={() => <ProtectedRoute component={SpaOwnerReviews} allowedRoles={["spa_owner"]} />} />
       <Route path="/spa-owner/payments" component={() => <ProtectedRoute component={SpaOwnerPayments} allowedRoles={["spa_owner"]} />} />
       <Route path="/spa-owner/earnings" component={() => <ProtectedRoute component={SpaOwnerEarnings} allowedRoles={["spa_owner"]} />} />
 

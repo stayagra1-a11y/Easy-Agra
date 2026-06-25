@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useParams, useLocation, Link } from "wouter";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { CustomerLayout } from "@/components/layout/customer-layout";
 import { MapEmbed } from "@/components/map-embed";
 import { imgUrl } from "@/lib/cloudinary";
@@ -8,6 +9,16 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { useToast } from "@/hooks/use-toast";
+import { apiRequest } from "@/lib/api-request";
 import {
   MapPin,
   Clock,
@@ -20,6 +31,13 @@ import {
   Star,
   CalendarCheck,
   Share2,
+  X,
+  Camera,
+  ThumbsUp,
+  MessageSquare,
+  ChevronDown,
+  ChevronUp,
+  Pencil,
 } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { useAuth } from "@/hooks/use-auth";
@@ -40,6 +58,434 @@ const CATEGORY_COLORS: Record<string, string> = {
   desserts: "bg-pink-100 text-pink-700",
   beverages: "bg-blue-100 text-blue-700",
 };
+
+const RATING_LABELS: Record<number, string> = {
+  1: "Poor", 2: "Fair", 3: "Good", 4: "Very Good", 5: "Excellent",
+};
+
+const RESTAURANT_CATEGORIES = [
+  { key: "overallRating", label: "Overall" },
+  { key: "foodQualityRating", label: "Food Quality" },
+  { key: "serviceRating", label: "Service" },
+  { key: "ambienceRating", label: "Ambience" },
+  { key: "cleanlinessRating", label: "Cleanliness" },
+  { key: "valueRating", label: "Value for Money" },
+] as const;
+
+function StarDisplay({ rating, size = 16 }: { rating: number; size?: number }) {
+  return (
+    <span className="flex items-center gap-0.5">
+      {[1, 2, 3, 4, 5].map((s) => (
+        <Star
+          key={s}
+          style={{ width: size, height: size }}
+          className={s <= rating ? "fill-amber-400 text-amber-400" : "text-muted-foreground/20 fill-muted-foreground/10"}
+        />
+      ))}
+    </span>
+  );
+}
+
+function StarRating({ value, onChange, size = 32 }: { value: number; onChange: (v: number) => void; size?: number }) {
+  const [hovered, setHovered] = useState(0);
+  return (
+    <div className="flex gap-1">
+      {[1, 2, 3, 4, 5].map((s) => (
+        <button
+          key={s}
+          type="button"
+          onClick={() => onChange(s)}
+          onMouseEnter={() => setHovered(s)}
+          onMouseLeave={() => setHovered(0)}
+          className="transition-transform hover:scale-110 active:scale-95"
+        >
+          <Star
+            style={{ width: size, height: size }}
+            className={s <= (hovered || value) ? "fill-amber-400 text-amber-400" : "text-muted-foreground/20 fill-muted-foreground/10"}
+          />
+        </button>
+      ))}
+    </div>
+  );
+}
+
+function RatingBar({ label, value, total }: { label: string; value: number; total: number }) {
+  const pct = total > 0 ? Math.round((value / total) * 100) : 0;
+  return (
+    <div className="flex items-center gap-2 text-sm">
+      <span className="w-16 shrink-0 text-muted-foreground">{label}</span>
+      <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
+        <div className="h-full bg-amber-400 rounded-full" style={{ width: `${pct}%` }} />
+      </div>
+      <span className="w-8 text-right text-muted-foreground">{value}</span>
+    </div>
+  );
+}
+
+interface ReviewSummary {
+  avgOverall: number;
+  avgFood: number;
+  avgService: number;
+  avgAmbience: number;
+  avgCleanliness: number;
+  avgValue: number;
+  total: number;
+  distribution: Record<number, number>;
+}
+
+interface Review {
+  id: number;
+  overallRating: number;
+  foodQualityRating: number;
+  serviceRating: number;
+  ambienceRating: number;
+  cleanlinessRating: number;
+  valueRating: number;
+  reviewTitle: string;
+  reviewDescription: string;
+  reviewPhotos: string[];
+  ownerReplyTitle: string | null;
+  ownerReplyMessage: string | null;
+  ownerRepliedAt: string | null;
+  createdAt: string;
+  customerName: string;
+  customerPhoto: string | null;
+  customerId: number;
+}
+
+function ReviewSection({ restaurantId, user }: { restaurantId: number; user: any }) {
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const [sort, setSort] = useState("newest");
+  const [ratingFilter, setRatingFilter] = useState<string>("all");
+  const [writeOpen, setWriteOpen] = useState(false);
+  const [editReview, setEditReview] = useState<Review | null>(null);
+  const [ratings, setRatings] = useState<Record<string, number>>({ overallRating: 0, foodQualityRating: 0, serviceRating: 0, ambienceRating: 0, cleanlinessRating: 0, valueRating: 0 });
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [photos, setPhotos] = useState<string[]>([]);
+
+  const { data, isLoading } = useQuery<{ reviews: Review[]; total: number; summary: ReviewSummary }>({
+    queryKey: ["restaurant-reviews", restaurantId, sort, ratingFilter],
+    queryFn: () => apiRequest(`/api/restaurant-reviews/${restaurantId}?sort=${sort}&rating=${ratingFilter !== "all" ? ratingFilter : ""}&limit=10`),
+  });
+
+  const createMut = useMutation({
+    mutationFn: (body: any) => apiRequest(`/api/restaurant-reviews/${restaurantId}`, { method: "POST", body }),
+    onSuccess: () => {
+      toast({ title: "Review submitted!", description: "Thank you for sharing your experience." });
+      queryClient.invalidateQueries({ queryKey: ["restaurant-reviews", restaurantId] });
+      setWriteOpen(false);
+      resetForm();
+    },
+    onError: (e: any) => toast({ title: "Error", description: e?.message ?? "Failed", variant: "destructive" }),
+  });
+
+  const updateMut = useMutation({
+    mutationFn: ({ id, body }: { id: number; body: any }) => apiRequest(`/api/restaurant-reviews/${id}`, { method: "PUT", body }),
+    onSuccess: () => {
+      toast({ title: "Review updated!" });
+      queryClient.invalidateQueries({ queryKey: ["restaurant-reviews", restaurantId] });
+      setWriteOpen(false);
+      setEditReview(null);
+      resetForm();
+    },
+    onError: (e: any) => toast({ title: "Error", description: e?.message ?? "Failed", variant: "destructive" }),
+  });
+
+  const resetForm = () => {
+    setRatings({ overallRating: 0, foodQualityRating: 0, serviceRating: 0, ambienceRating: 0, cleanlinessRating: 0, valueRating: 0 });
+    setTitle("");
+    setDescription("");
+    setPhotos([]);
+  };
+
+  const openWrite = () => {
+    setEditReview(null);
+    resetForm();
+    setWriteOpen(true);
+  };
+
+  const openEdit = (rev: Review) => {
+    setEditReview(rev);
+    setRatings({
+      overallRating: rev.overallRating,
+      foodQualityRating: rev.foodQualityRating,
+      serviceRating: rev.serviceRating,
+      ambienceRating: rev.ambienceRating,
+      cleanlinessRating: rev.cleanlinessRating,
+      valueRating: rev.valueRating,
+    });
+    setTitle(rev.reviewTitle);
+    setDescription(rev.reviewDescription);
+    setPhotos(rev.reviewPhotos ?? []);
+    setWriteOpen(true);
+  };
+
+  const handleSubmit = () => {
+    if (!ratings.overallRating || !title.trim() || !description.trim()) {
+      toast({ title: "Required fields missing", description: "Please add ratings, title and description", variant: "destructive" });
+      return;
+    }
+    const body = { ...ratings, reviewTitle: title.trim(), reviewDescription: description.trim(), reviewPhotos: photos };
+    if (editReview) {
+      updateMut.mutate({ id: editReview.id, body });
+    } else {
+      createMut.mutate(body);
+    }
+  };
+
+  const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("upload_preset", "easyagra");
+    try {
+      const res = await fetch(`https://api.cloudinary.com/v1_1/dq6pfttzl/image/upload`, { method: "POST", body: formData });
+      const data = await res.json();
+      if (data.secure_url) setPhotos((p) => [...p, data.secure_url]);
+    } catch {
+      toast({ title: "Upload failed", description: "Could not upload photo", variant: "destructive" });
+    }
+  };
+
+  const summary = data?.summary;
+  const reviews = data?.reviews ?? [];
+  const isPending = createMut.isPending || updateMut.isPending;
+
+  return (
+    <div className="space-y-4">
+      {/* Header + Write button */}
+      <div className="flex items-center justify-between">
+        <h2 className="font-semibold text-base flex items-center gap-2">
+          <Star className="h-5 w-5 text-primary" />
+          Reviews & Ratings
+        </h2>
+        {user?.role === "customer" && (
+          <Button size="sm" variant="outline" onClick={openWrite}>
+            <Pencil className="h-3.5 w-3.5 mr-1" /> Write Review
+          </Button>
+        )}
+      </div>
+
+      {/* Summary */}
+      {summary && summary.total > 0 && (
+        <Card className="border-0 shadow-sm">
+          <CardContent className="p-4 space-y-3">
+            <div className="flex items-start gap-4">
+              <div className="text-center shrink-0">
+                <div className="text-3xl font-bold text-amber-500">{summary.avgOverall.toFixed(1)}</div>
+                <StarDisplay rating={Math.round(summary.avgOverall)} />
+                <div className="text-xs text-muted-foreground mt-1">{summary.total} reviews</div>
+              </div>
+              <div className="flex-1 space-y-1">
+                <RatingBar label="5 Star" value={summary.distribution[5] ?? 0} total={summary.total} />
+                <RatingBar label="4 Star" value={summary.distribution[4] ?? 0} total={summary.total} />
+                <RatingBar label="3 Star" value={summary.distribution[3] ?? 0} total={summary.total} />
+                <RatingBar label="2 Star" value={summary.distribution[2] ?? 0} total={summary.total} />
+                <RatingBar label="1 Star" value={summary.distribution[1] ?? 0} total={summary.total} />
+              </div>
+            </div>
+            <div className="grid grid-cols-3 gap-2 text-xs text-center">
+              <div className="bg-muted rounded-lg p-2">
+                <div className="font-semibold text-amber-600">{summary.avgFood.toFixed(1)}</div>
+                <div className="text-muted-foreground">Food</div>
+              </div>
+              <div className="bg-muted rounded-lg p-2">
+                <div className="font-semibold text-amber-600">{summary.avgService.toFixed(1)}</div>
+                <div className="text-muted-foreground">Service</div>
+              </div>
+              <div className="bg-muted rounded-lg p-2">
+                <div className="font-semibold text-amber-600">{summary.avgAmbience.toFixed(1)}</div>
+                <div className="text-muted-foreground">Ambience</div>
+              </div>
+              <div className="bg-muted rounded-lg p-2">
+                <div className="font-semibold text-amber-600">{summary.avgCleanliness.toFixed(1)}</div>
+                <div className="text-muted-foreground">Cleanliness</div>
+              </div>
+              <div className="bg-muted rounded-lg p-2">
+                <div className="font-semibold text-amber-600">{summary.avgValue.toFixed(1)}</div>
+                <div className="text-muted-foreground">Value</div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Filters */}
+      <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+        {["newest", "highest", "lowest", "oldest"].map((s) => (
+          <button
+            key={s}
+            onClick={() => setSort(s)}
+            className={`flex-shrink-0 px-3 py-1 rounded-full text-xs font-medium transition-colors ${sort === s ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"}`}
+          >
+            {s.charAt(0).toUpperCase() + s.slice(1)}
+          </button>
+        ))}
+        {["all", "5", "4", "3", "2", "1"].map((r) => (
+          <button
+            key={r}
+            onClick={() => setRatingFilter(r)}
+            className={`flex-shrink-0 px-3 py-1 rounded-full text-xs font-medium transition-colors ${ratingFilter === r ? "bg-amber-100 text-amber-700 border border-amber-200" : "bg-muted text-muted-foreground"}`}
+          >
+            {r === "all" ? "All" : `${r} ★`}
+          </button>
+        ))}
+      </div>
+
+      {/* Reviews list */}
+      {isLoading ? (
+        <div className="space-y-2">
+          {Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-32 rounded-xl" />)}
+        </div>
+      ) : reviews.length === 0 ? (
+        <div className="text-center py-8 text-sm text-muted-foreground">
+          No reviews yet. Be the first to review!
+        </div>
+      ) : (
+        <div className="space-y-3">
+          {reviews.map((rev) => (
+            <ReviewCard key={rev.id} review={rev} onEdit={openEdit} user={user} />
+          ))}
+        </div>
+      )}
+
+      {/* Write/Edit Dialog */}
+      <Dialog open={writeOpen} onOpenChange={setWriteOpen}>
+        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>{editReview ? "Edit Review" : "Write a Review"}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 pt-2">
+            <div className="space-y-3">
+              <div className="text-center">
+                <div className="text-sm font-medium mb-2">Overall Rating *</div>
+                <StarRating value={ratings.overallRating} onChange={(v) => setRatings((r) => ({ ...r, overallRating: v }))} />
+                {ratings.overallRating > 0 && (
+                  <div className="text-sm font-semibold text-amber-600 mt-1">
+                    {ratings.overallRating} / 5 — {RATING_LABELS[ratings.overallRating]}
+                  </div>
+                )}
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                {RESTAURANT_CATEGORIES.filter((c) => c.key !== "overallRating").map((cat) => (
+                  <div key={cat.key} className="text-center">
+                    <div className="text-xs font-medium mb-1">{cat.label}</div>
+                    <StarRating value={ratings[cat.key] ?? 0} onChange={(v) => setRatings((r) => ({ ...r, [cat.key]: v }))} size={24} />
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div>
+              <label className="text-sm font-medium">Title *</label>
+              <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Summarize your experience" />
+            </div>
+            <div>
+              <label className="text-sm font-medium">Description *</label>
+              <Textarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Share details about food, service, ambience..." rows={4} />
+            </div>
+            <div>
+              <label className="text-sm font-medium">Photos</label>
+              <div className="flex gap-2 flex-wrap mt-1">
+                {photos.map((p, i) => (
+                  <div key={i} className="relative w-16 h-16 rounded-lg overflow-hidden border">
+                    <img src={imgUrl(p, 200)} alt="" className="w-full h-full object-cover" />
+                    <button onClick={() => setPhotos((ps) => ps.filter((_, j) => j !== i))} className="absolute top-0 right-0 bg-red-500 text-white rounded-bl-lg p-0.5">
+                      <X className="w-3 h-3" />
+                    </button>
+                  </div>
+                ))}
+                {photos.length < 5 && (
+                  <label className="w-16 h-16 rounded-lg border-2 border-dashed border-muted-foreground/30 flex items-center justify-center cursor-pointer hover:bg-muted">
+                    <Camera className="w-5 h-5 text-muted-foreground" />
+                    <input type="file" accept="image/*" className="hidden" onChange={handlePhotoUpload} />
+                  </label>
+                )}
+              </div>
+            </div>
+            <Button className="w-full" onClick={handleSubmit} disabled={isPending}>
+              {isPending ? "Submitting..." : editReview ? "Update Review" : "Submit Review"}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+}
+
+function ReviewCard({ review, onEdit, user }: { review: Review; onEdit: (r: Review) => void; user: any }) {
+  const [showReply, setShowReply] = useState(false);
+  const [showAll, setShowAll] = useState(false);
+  const isOwn = user?.id === review.customerId;
+  const hasReply = review.ownerReplyMessage;
+
+  return (
+    <Card className="border-0 shadow-sm">
+      <CardContent className="p-4 space-y-2">
+        <div className="flex items-start justify-between gap-2">
+          <div className="flex items-center gap-2">
+            {review.customerPhoto ? (
+              <img src={imgUrl(review.customerPhoto, 100)} alt="" className="w-8 h-8 rounded-full object-cover border" />
+            ) : (
+              <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-xs font-bold text-primary">
+                {review.customerName?.charAt(0)?.toUpperCase() ?? "U"}
+              </div>
+            )}
+            <div>
+              <div className="font-semibold text-sm">{review.customerName}</div>
+              <div className="text-xs text-muted-foreground">
+                {new Date(review.createdAt).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })}
+              </div>
+            </div>
+          </div>
+          <div className="flex items-center gap-1 bg-amber-50 border border-amber-200 rounded-lg px-2 py-1 shrink-0">
+            <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
+            <span className="font-bold text-sm">{review.overallRating}</span>
+          </div>
+        </div>
+        <div className="flex items-center gap-0.5">
+          <StarDisplay rating={review.overallRating} size={14} />
+        </div>
+        <div className="font-semibold text-sm">{review.reviewTitle}</div>
+        <p className={`text-sm text-muted-foreground ${!showAll ? "line-clamp-3" : ""}`}>{review.reviewDescription}</p>
+        {review.reviewDescription.length > 120 && (
+          <button onClick={() => setShowAll((s) => !s)} className="text-xs text-primary font-medium">
+            {showAll ? "Show less" : "Read more"}
+          </button>
+        )}
+        {review.reviewPhotos?.length > 0 && (
+          <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+            {review.reviewPhotos.map((p, i) => (
+              <img key={i} src={imgUrl(p, 300)} alt="" className="w-20 h-20 rounded-lg object-cover border flex-shrink-0" />
+            ))}
+          </div>
+        )}
+        {hasReply && (
+          <div className="bg-muted rounded-lg p-3 space-y-1">
+            <div className="flex items-center gap-2 text-sm font-semibold text-primary">
+              <MessageSquare className="h-4 w-4" />
+              Owner Reply
+              <span className="text-xs text-muted-foreground font-normal">
+                {review.ownerRepliedAt ? new Date(review.ownerRepliedAt).toLocaleDateString("en-IN", { day: "2-digit", month: "short" }) : ""}
+              </span>
+            </div>
+            {review.ownerReplyTitle && <div className="text-sm font-medium">{review.ownerReplyTitle}</div>}
+            <p className="text-sm text-muted-foreground">{review.ownerReplyMessage}</p>
+          </div>
+        )}
+        <div className="flex items-center gap-3 pt-1">
+          {isOwn && (
+            <button onClick={() => onEdit(review)} className="text-xs text-primary font-medium flex items-center gap-1">
+              <Pencil className="h-3 w-3" /> Edit
+            </button>
+          )}
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
 
 export default function RestaurantDetail() {
   const { t } = useI18n();
@@ -199,6 +645,9 @@ export default function RestaurantDetail() {
               </div>
             </div>
           )}
+
+          {/* Reviews */}
+          <ReviewSection restaurantId={id} user={user} />
 
           {/* Menu */}
           <div>

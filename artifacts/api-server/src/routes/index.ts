@@ -34,6 +34,8 @@ import pushNotificationsRouter from "./push-notifications";
 import marketingRouter from "./marketing";
 import googleAuthRouter from "./google-auth";
 import transportRouter from "./transport";
+import restaurantReviewsRouter from "./restaurant-reviews";
+import spaReviewsRouter from "./spa-reviews";
 
 const router: IRouter = Router();
 
@@ -71,6 +73,8 @@ router.use(securityRouter);
 router.use(pushNotificationsRouter);
 router.use(marketingRouter);
 router.use(transportRouter);
+router.use(restaurantReviewsRouter);
+router.use(spaReviewsRouter);
 router.use(dashboardRouter);
 
 export default router;

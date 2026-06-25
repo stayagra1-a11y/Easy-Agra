@@ -21,3 +21,5 @@ export * from "./coupons";
 export * from "./push_subscriptions";
 export * from "./marketing";
 export * from "./transport";
+export * from "./restaurant_reviews";
+export * from "./spa_reviews";
