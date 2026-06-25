@@ -33,6 +33,7 @@ import securityRouter from "./security";
 import pushNotificationsRouter from "./push-notifications";
 import marketingRouter from "./marketing";
 import googleAuthRouter from "./google-auth";
+import transportRouter from "./transport";
 
 const router: IRouter = Router();
 
@@ -69,6 +70,7 @@ router.use(couponsRouter);
 router.use(securityRouter);
 router.use(pushNotificationsRouter);
 router.use(marketingRouter);
+router.use(transportRouter);
 router.use(dashboardRouter);
 
 export default router;

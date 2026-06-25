@@ -60,6 +60,8 @@ tags:
     description: Support ticket and complaint management
   - name: coupons
     description: Coupon validation for customer checkout
+  - name: transport
+    description: Transport locations (railway stations, bus stands, airports)
 
 paths:
   /healthz:

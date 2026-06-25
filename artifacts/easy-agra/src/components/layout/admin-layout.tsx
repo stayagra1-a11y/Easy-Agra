@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { LayoutDashboard, Users, FileCheck, Bell, Activity, Settings, LogOut, Map, Menu, X, Shield, BookOpen, BarChart2, Star, Utensils, Sparkles, Landmark, IndianRupee, TrendingUp, FileBarChart, LifeBuoy, ReceiptText, Tag, ShieldAlert, Megaphone, Building2 } from "lucide-react";
+import { LayoutDashboard, Users, FileCheck, Bell, Activity, Settings, LogOut, Map, Menu, X, Shield, BookOpen, BarChart2, Star, Utensils, Sparkles, Landmark, IndianRupee, TrendingUp, FileBarChart, LifeBuoy, ReceiptText, Tag, ShieldAlert, Megaphone, Building2, Train } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { useLogout, getGetMeQueryKey } from "@workspace/api-client-react";
@@ -20,6 +20,7 @@ const adminNavItems: NavItem[] = [
   { href: "/admin/dashboard", icon: LayoutDashboard, label: "Dashboard" },
   { href: "/admin/hotels", icon: Building2, label: "Hotels" },
   { href: "/admin/tourist-places", icon: Landmark, label: "Tourist Places" },
+  { href: "/admin/transport", icon: Train, label: "Transport" },
   { href: "/admin/bookings", icon: BookOpen, label: "Bookings" },
   { href: "/admin/booking-analytics", icon: BarChart2, label: "Analytics" },
   { href: "/admin/payments", icon: IndianRupee, label: "Payments" },

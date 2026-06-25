@@ -41,6 +41,8 @@ import AdminBookings from "@/pages/admin/bookings";
 import BookingAnalytics from "@/pages/admin/booking-analytics";
 import AdminReviews from "@/pages/admin/reviews";
 import AdminHotels from "@/pages/admin/admin-hotels";
+import AdminTransport from "@/pages/admin/admin-transport";
+import TransportForm from "@/pages/admin/transport-form";
 
 // Super Admin
 import SuperAdminDashboard from "@/pages/super-admin/dashboard";
@@ -89,6 +91,8 @@ import MySpaAppointments from "@/pages/customer/my-spa-appointments";
 import CustomerPlaces from "@/pages/customer/places";
 import PlaceDetail from "@/pages/customer/place-detail";
 import MyPlaces from "@/pages/customer/my-places";
+import TransportPage from "@/pages/customer/transport";
+import TransportDetail from "@/pages/customer/transport-detail";
 
 // Customer - payments
 import MyPayments from "@/pages/customer/my-payments";
@@ -286,6 +290,8 @@ function Router() {
       <Route path="/my-places" component={() => <ProtectedRoute component={MyPlaces} allowedRoles={["customer"]} />} />
       <Route path="/places/:id" component={() => <ProtectedRoute component={PlaceDetail} allowedRoles={["customer"]} />} />
       <Route path="/places" component={() => <ProtectedRoute component={CustomerPlaces} allowedRoles={["customer"]} />} />
+      <Route path="/transport" component={() => <ProtectedRoute component={TransportPage} allowedRoles={["customer"]} />} />
+      <Route path="/transport/:id" component={() => <ProtectedRoute component={TransportDetail} allowedRoles={["customer"]} />} />
       <Route path="/my-payments" component={() => <ProtectedRoute component={MyPayments} allowedRoles={["customer"]} />} />
 
       {/* Customer - trips */}
@@ -325,6 +331,9 @@ function Router() {
       <Route path="/admin/tourist-places/:id/edit" component={() => <ProtectedRoute component={TouristPlaceForm} allowedRoles={["admin", "super_admin"]} />} />
       <Route path="/admin/tourist-places/:id/photos" component={() => <ProtectedRoute component={TouristPlacePhotos} allowedRoles={["admin", "super_admin"]} />} />
       <Route path="/admin/tourist-places" component={() => <ProtectedRoute component={AdminTouristPlaces} allowedRoles={["admin", "super_admin"]} />} />
+      <Route path="/admin/transport" component={() => <ProtectedRoute component={AdminTransport} allowedRoles={["admin", "super_admin"]} />} />
+      <Route path="/admin/transport/new" component={() => <ProtectedRoute component={TransportForm} allowedRoles={["admin", "super_admin"]} />} />
+      <Route path="/admin/transport/:id/edit" component={() => <ProtectedRoute component={TransportForm} allowedRoles={["admin", "super_admin"]} />} />
       <Route path="/admin/support" component={() => <ProtectedRoute component={AdminSupport} allowedRoles={["admin", "super_admin"]} />} />
       <Route path="/admin/refunds" component={() => <ProtectedRoute component={AdminRefunds} allowedRoles={["admin", "super_admin"]} />} />
       <Route path="/admin/trip-analytics" component={() => <ProtectedRoute component={AdminTripAnalytics} allowedRoles={["admin", "super_admin"]} />} />
