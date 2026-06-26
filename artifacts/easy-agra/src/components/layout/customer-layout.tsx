@@ -30,7 +30,6 @@ export function CustomerLayout({ children }: { children: React.ReactNode }) {
     { href: "/hotels", icon: Building2, label: t("hotels") },
     { href: "/restaurants", icon: Utensils, label: t("restaurants") },
     { href: "/transport", icon: Train, label: "Transport" },
-    { href: "/puzzle", icon: Puzzle, label: "Puzzle" },
     { href: "/profile", icon: User, label: t("profile") },
   ];
 
@@ -41,6 +40,7 @@ export function CustomerLayout({ children }: { children: React.ReactNode }) {
     { href: "/transport", icon: Train, label: "Transport" },
     { href: "/restaurants", icon: Utensils, label: t("restaurants") },
     { href: "/spas", icon: Sparkles, label: t("spas") },
+    { href: "/puzzle", icon: Puzzle, label: "Puzzle" },
     { href: "/places", icon: Landmark, label: t("places") },
     { href: "/trips", icon: Map, label: t("trips") ?? "Trips" },
     { href: "/my-payments", icon: IndianRupee, label: t("my_payments") },
