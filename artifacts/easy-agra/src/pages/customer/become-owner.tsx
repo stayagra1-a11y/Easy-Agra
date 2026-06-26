@@ -152,7 +152,8 @@ export default function BecomeOwner() {
       queryClient.invalidateQueries({ queryKey: getGetMyOwnerRequestQueryKey() });
       toast({ title: "Application submitted!", description: "We'll review your application and notify you shortly." });
     } catch (err: any) {
-      toast({ title: "Error", description: err?.response?.data?.error || "Failed to submit", variant: "destructive" });
+      const msg = err?.data?.error || err?.message || "Failed to submit";
+      toast({ title: "Error", description: msg, variant: "destructive" });
     }
   };
 
