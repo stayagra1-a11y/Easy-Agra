@@ -30,6 +30,170 @@ function validateRating(v: any, name: string): number {
 }
 
 // ───────────────────────────────────────────────────────
+// GET /spa-reviews/owner — owner list
+// ───────────────────────────────────────────────────────
+router.get("/spa-reviews/owner", requireAuth, async (req, res): Promise<void> => {
+  const cu = (req as any).currentUser;
+  const { sort = "newest", rating, status, page = "1", limit = "10" } = req.query as Record<string, string>;
+  const pageNum = Math.max(1, parseInt(page, 10));
+  const limitNum = Math.min(50, Math.max(1, parseInt(limit, 10)));
+  const offset = (pageNum - 1) * limitNum;
+
+  const conditions: any[] = [eq(spaReviewsTable.ownerId, cu.id)];
+  if (rating) conditions.push(eq(spaReviewsTable.overallRating, parseInt(rating, 10)));
+  if (status) conditions.push(eq(spaReviewsTable.status, status as any));
+
+  const sortExpr =
+    sort === "oldest" ? asc(spaReviewsTable.createdAt)
+    : sort === "highest" ? desc(spaReviewsTable.overallRating)
+    : sort === "lowest" ? asc(spaReviewsTable.overallRating)
+    : desc(spaReviewsTable.createdAt);
+
+  const [reviews, countRes] = await Promise.all([
+    db
+      .select({
+        review: spaReviewsTable,
+        customerName: usersTable.fullName,
+        customerPhoto: usersTable.profilePhoto,
+        spaName: spasTable.name,
+      })
+      .from(spaReviewsTable)
+      .innerJoin(usersTable, eq(spaReviewsTable.customerId, usersTable.id))
+      .innerJoin(spasTable, eq(spaReviewsTable.spaId, spasTable.id))
+      .where(and(...conditions))
+      .orderBy(sortExpr)
+      .limit(limitNum)
+      .offset(offset),
+    db.select({ count: sql<number>`count(*)::int` }).from(spaReviewsTable).where(and(...conditions)),
+  ]);
+
+  res.json({
+    reviews: reviews.map(({ review, customerName, customerPhoto, spaName }) => ({
+      ...serializeReview(review),
+      customerName,
+      customerPhoto: customerPhoto ?? null,
+      spaName,
+    })),
+    total: countRes[0]?.count ?? 0,
+    page: pageNum,
+    limit: limitNum,
+  });
+});
+
+// ───────────────────────────────────────────────────────
+// GET /spa-reviews/admin/stats — admin stats
+// ───────────────────────────────────────────────────────
+router.get("/spa-reviews/admin/stats", requireRole("admin", "super_admin"), async (_req, res): Promise<void> => {
+  const [row] = await db
+    .select({
+      total: sql<number>`count(*)::int`,
+      approved: sql<number>`sum(case when ${spaReviewsTable.status}='approved' then 1 else 0 end)::int`,
+      hidden: sql<number>`sum(case when ${spaReviewsTable.status}='hidden' then 1 else 0 end)::int`,
+      removed: sql<number>`sum(case when ${spaReviewsTable.status}='removed' then 1 else 0 end)::int`,
+      avgRating: sql<number>`coalesce(round(avg(${spaReviewsTable.overallRating}),2),0)::numeric`,
+      fiveStar: sql<number>`sum(case when ${spaReviewsTable.overallRating}=5 then 1 else 0 end)::int`,
+      fourStar: sql<number>`sum(case when ${spaReviewsTable.overallRating}=4 then 1 else 0 end)::int`,
+      threeStar: sql<number>`sum(case when ${spaReviewsTable.overallRating}=3 then 1 else 0 end)::int`,
+      twoStar: sql<number>`sum(case when ${spaReviewsTable.overallRating}=2 then 1 else 0 end)::int`,
+      oneStar: sql<number>`sum(case when ${spaReviewsTable.overallRating}=1 then 1 else 0 end)::int`,
+    })
+    .from(spaReviewsTable);
+
+  res.json({
+    total: row?.total ?? 0,
+    approved: row?.approved ?? 0,
+    hidden: row?.hidden ?? 0,
+    removed: row?.removed ?? 0,
+    avgRating: parseNum(row?.avgRating),
+    distribution: {
+      5: row?.fiveStar ?? 0,
+      4: row?.fourStar ?? 0,
+      3: row?.threeStar ?? 0,
+      2: row?.twoStar ?? 0,
+      1: row?.oneStar ?? 0,
+    },
+  });
+});
+
+// ───────────────────────────────────────────────────────
+// GET /spa-reviews/admin — admin list
+// ───────────────────────────────────────────────────────
+router.get("/spa-reviews/admin", requireRole("admin", "super_admin"), async (req, res): Promise<void> => {
+  const { spaId, rating, status, search, page = "1", limit = "15" } = req.query as Record<string, string>;
+  const pageNum = Math.max(1, parseInt(page, 10));
+  const limitNum = Math.min(50, Math.max(1, parseInt(limit, 10)));
+  const offset = (pageNum - 1) * limitNum;
+
+  const conditions: any[] = [];
+  if (spaId) conditions.push(eq(spaReviewsTable.spaId, parseInt(spaId, 10)));
+  if (rating) conditions.push(eq(spaReviewsTable.overallRating, parseInt(rating, 10)));
+  if (status) conditions.push(eq(spaReviewsTable.status, status as any));
+
+  const baseWhere = conditions.length > 0 ? and(...conditions) : undefined;
+  const searchWhere = search
+    ? and(baseWhere, or(ilike(spasTable.name, `%${search}%`), ilike(usersTable.fullName, `%${search}%`)))
+    : baseWhere;
+
+  const [reviews, countRes] = await Promise.all([
+    db
+      .select({
+        review: spaReviewsTable,
+        customerName: usersTable.fullName,
+        customerPhoto: usersTable.profilePhoto,
+        spaName: spasTable.name,
+      })
+      .from(spaReviewsTable)
+      .innerJoin(usersTable, eq(spaReviewsTable.customerId, usersTable.id))
+      .innerJoin(spasTable, eq(spaReviewsTable.spaId, spasTable.id))
+      .where(searchWhere)
+      .orderBy(desc(spaReviewsTable.createdAt))
+      .limit(limitNum)
+      .offset(offset),
+    db.select({ count: sql<number>`count(*)::int` }).from(spaReviewsTable).innerJoin(usersTable, eq(spaReviewsTable.customerId, usersTable.id)).innerJoin(spasTable, eq(spaReviewsTable.spaId, spasTable.id)).where(searchWhere),
+  ]);
+
+  res.json({
+    reviews: reviews.map(({ review, customerName, customerPhoto, spaName }) => ({
+      ...serializeReview(review),
+      customerName,
+      customerPhoto: customerPhoto ?? null,
+      spaName,
+    })),
+    total: countRes[0]?.count ?? 0,
+    page: pageNum,
+    limit: limitNum,
+  });
+});
+
+// ───────────────────────────────────────────────────────
+// PATCH /spa-reviews/:id/status — admin hide/restore/remove
+// ───────────────────────────────────────────────────────
+router.patch("/spa-reviews/:id/status", requireRole("admin", "super_admin"), async (req, res): Promise<void> => {
+  const cu = (req as any).currentUser;
+  const id = parseInt(String(req.params.id), 10);
+  const { status } = req.body;
+  if (!status || !["approved", "hidden", "removed"].includes(status)) {
+    res.status(400).json({ error: "Invalid status" }); return;
+  }
+  const [row] = await db.update(spaReviewsTable).set({ status }).where(eq(spaReviewsTable.id, id)).returning();
+  if (!row) { res.status(404).json({ error: "Not found" }); return; }
+  await logActivity(req, "spa_review_status", `Review #${id} set to ${status}`, cu.id, cu.role);
+  res.json({ message: "Updated", id: row.id, status });
+});
+
+// ───────────────────────────────────────────────────────
+// DELETE /spa-reviews/:id — admin delete
+// ───────────────────────────────────────────────────────
+router.delete("/spa-reviews/:id", requireRole("admin", "super_admin"), async (req, res): Promise<void> => {
+  const cu = (req as any).currentUser;
+  const id = parseInt(String(req.params.id), 10);
+  const [row] = await db.delete(spaReviewsTable).where(eq(spaReviewsTable.id, id)).returning();
+  if (!row) { res.status(404).json({ error: "Not found" }); return; }
+  await logActivity(req, "spa_review_deleted", `Review #${id} deleted`, cu.id, cu.role);
+  res.json({ message: "Deleted", id: row.id });
+});
+
+// ───────────────────────────────────────────────────────
 // GET /spa-reviews/:spaId — public reviews
 // ───────────────────────────────────────────────────────
 router.get("/spa-reviews/:spaId", async (req, res): Promise<void> => {
@@ -214,68 +378,6 @@ router.post("/spa-reviews/:id/reply", requireAuth, async (req, res): Promise<voi
 
   await createNotification(review.customerId, "Spa Owner Replied", "The spa owner replied to your review.", "general");
   res.json(serializeReview(updated));
-});
-
-// ───────────────────────────────────────────────────────
-// GET /spa-reviews/admin — admin list
-// ───────────────────────────────────────────────────────
-router.get("/spa-reviews/admin", requireRole("admin", "super_admin"), async (req, res): Promise<void> => {
-  const { spaId, rating, status, search, page = "1", limit = "15" } = req.query as Record<string, string>;
-  const pageNum = Math.max(1, parseInt(page, 10));
-  const limitNum = Math.min(50, Math.max(1, parseInt(limit, 10)));
-  const offset = (pageNum - 1) * limitNum;
-
-  const conditions: any[] = [];
-  if (spaId) conditions.push(eq(spaReviewsTable.spaId, parseInt(spaId, 10)));
-  if (rating) conditions.push(eq(spaReviewsTable.overallRating, parseInt(rating, 10)));
-  if (status) conditions.push(eq(spaReviewsTable.status, status as any));
-
-  const baseWhere = conditions.length > 0 ? and(...conditions) : undefined;
-  const searchWhere = search
-    ? and(baseWhere, or(ilike(spasTable.name, `%${search}%`), ilike(usersTable.fullName, `%${search}%`)))
-    : baseWhere;
-
-  const [reviews, countRes] = await Promise.all([
-    db
-      .select({
-        review: spaReviewsTable,
-        customerName: usersTable.fullName,
-        customerPhoto: usersTable.profilePhoto,
-        spaName: spasTable.name,
-      })
-      .from(spaReviewsTable)
-      .innerJoin(usersTable, eq(spaReviewsTable.customerId, usersTable.id))
-      .innerJoin(spasTable, eq(spaReviewsTable.spaId, spasTable.id))
-      .where(searchWhere)
-      .orderBy(desc(spaReviewsTable.createdAt))
-      .limit(limitNum)
-      .offset(offset),
-    db.select({ count: sql<number>`count(*)::int` }).from(spaReviewsTable).innerJoin(usersTable, eq(spaReviewsTable.customerId, usersTable.id)).innerJoin(spasTable, eq(spaReviewsTable.spaId, spasTable.id)).where(searchWhere),
-  ]);
-
-  res.json({
-    reviews: reviews.map(({ review, customerName, customerPhoto, spaName }) => ({
-      ...serializeReview(review),
-      customerName,
-      customerPhoto: customerPhoto ?? null,
-      spaName,
-    })),
-    total: countRes[0]?.count ?? 0,
-    page: pageNum,
-    limit: limitNum,
-  });
-});
-
-// ───────────────────────────────────────────────────────
-// DELETE /spa-reviews/:id — admin delete
-// ───────────────────────────────────────────────────────
-router.delete("/spa-reviews/:id", requireRole("admin", "super_admin"), async (req, res): Promise<void> => {
-  const cu = (req as any).currentUser;
-  const id = parseInt(String(req.params.id), 10);
-  const [row] = await db.delete(spaReviewsTable).where(eq(spaReviewsTable.id, id)).returning();
-  if (!row) { res.status(404).json({ error: "Not found" }); return; }
-  await logActivity(req, "spa_review_deleted", `Review #${id} deleted`, cu.id, cu.role);
-  res.json({ message: "Deleted", id: row.id });
 });
 
 export default router;

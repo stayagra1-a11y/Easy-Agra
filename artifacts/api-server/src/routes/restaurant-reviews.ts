@@ -30,6 +30,170 @@ function validateRating(v: any, name: string): number {
 }
 
 // ───────────────────────────────────────────────────────
+// GET /restaurant-reviews/owner — owner list
+// ───────────────────────────────────────────────────────
+router.get("/restaurant-reviews/owner", requireAuth, async (req, res): Promise<void> => {
+  const cu = (req as any).currentUser;
+  const { sort = "newest", rating, status, page = "1", limit = "10" } = req.query as Record<string, string>;
+  const pageNum = Math.max(1, parseInt(page, 10));
+  const limitNum = Math.min(50, Math.max(1, parseInt(limit, 10)));
+  const offset = (pageNum - 1) * limitNum;
+
+  const conditions: any[] = [eq(restaurantReviewsTable.ownerId, cu.id)];
+  if (rating) conditions.push(eq(restaurantReviewsTable.overallRating, parseInt(rating, 10)));
+  if (status) conditions.push(eq(restaurantReviewsTable.status, status as any));
+
+  const sortExpr =
+    sort === "oldest" ? asc(restaurantReviewsTable.createdAt)
+    : sort === "highest" ? desc(restaurantReviewsTable.overallRating)
+    : sort === "lowest" ? asc(restaurantReviewsTable.overallRating)
+    : desc(restaurantReviewsTable.createdAt);
+
+  const [reviews, countRes] = await Promise.all([
+    db
+      .select({
+        review: restaurantReviewsTable,
+        customerName: usersTable.fullName,
+        customerPhoto: usersTable.profilePhoto,
+        restaurantName: restaurantsTable.name,
+      })
+      .from(restaurantReviewsTable)
+      .innerJoin(usersTable, eq(restaurantReviewsTable.customerId, usersTable.id))
+      .innerJoin(restaurantsTable, eq(restaurantReviewsTable.restaurantId, restaurantsTable.id))
+      .where(and(...conditions))
+      .orderBy(sortExpr)
+      .limit(limitNum)
+      .offset(offset),
+    db.select({ count: sql<number>`count(*)::int` }).from(restaurantReviewsTable).where(and(...conditions)),
+  ]);
+
+  res.json({
+    reviews: reviews.map(({ review, customerName, customerPhoto, restaurantName }) => ({
+      ...serializeReview(review),
+      customerName,
+      customerPhoto: customerPhoto ?? null,
+      restaurantName,
+    })),
+    total: countRes[0]?.count ?? 0,
+    page: pageNum,
+    limit: limitNum,
+  });
+});
+
+// ───────────────────────────────────────────────────────
+// GET /restaurant-reviews/admin/stats — admin stats
+// ───────────────────────────────────────────────────────
+router.get("/restaurant-reviews/admin/stats", requireRole("admin", "super_admin"), async (_req, res): Promise<void> => {
+  const [row] = await db
+    .select({
+      total: sql<number>`count(*)::int`,
+      approved: sql<number>`sum(case when ${restaurantReviewsTable.status}='approved' then 1 else 0 end)::int`,
+      hidden: sql<number>`sum(case when ${restaurantReviewsTable.status}='hidden' then 1 else 0 end)::int`,
+      removed: sql<number>`sum(case when ${restaurantReviewsTable.status}='removed' then 1 else 0 end)::int`,
+      avgRating: sql<number>`coalesce(round(avg(${restaurantReviewsTable.overallRating}),2),0)::numeric`,
+      fiveStar: sql<number>`sum(case when ${restaurantReviewsTable.overallRating}=5 then 1 else 0 end)::int`,
+      fourStar: sql<number>`sum(case when ${restaurantReviewsTable.overallRating}=4 then 1 else 0 end)::int`,
+      threeStar: sql<number>`sum(case when ${restaurantReviewsTable.overallRating}=3 then 1 else 0 end)::int`,
+      twoStar: sql<number>`sum(case when ${restaurantReviewsTable.overallRating}=2 then 1 else 0 end)::int`,
+      oneStar: sql<number>`sum(case when ${restaurantReviewsTable.overallRating}=1 then 1 else 0 end)::int`,
+    })
+    .from(restaurantReviewsTable);
+
+  res.json({
+    total: row?.total ?? 0,
+    approved: row?.approved ?? 0,
+    hidden: row?.hidden ?? 0,
+    removed: row?.removed ?? 0,
+    avgRating: parseNum(row?.avgRating),
+    distribution: {
+      5: row?.fiveStar ?? 0,
+      4: row?.fourStar ?? 0,
+      3: row?.threeStar ?? 0,
+      2: row?.twoStar ?? 0,
+      1: row?.oneStar ?? 0,
+    },
+  });
+});
+
+// ───────────────────────────────────────────────────────
+// GET /restaurant-reviews/admin — admin list
+// ───────────────────────────────────────────────────────
+router.get("/restaurant-reviews/admin", requireRole("admin", "super_admin"), async (req, res): Promise<void> => {
+  const { restaurantId, rating, status, search, page = "1", limit = "15" } = req.query as Record<string, string>;
+  const pageNum = Math.max(1, parseInt(page, 10));
+  const limitNum = Math.min(50, Math.max(1, parseInt(limit, 10)));
+  const offset = (pageNum - 1) * limitNum;
+
+  const conditions: any[] = [];
+  if (restaurantId) conditions.push(eq(restaurantReviewsTable.restaurantId, parseInt(restaurantId, 10)));
+  if (rating) conditions.push(eq(restaurantReviewsTable.overallRating, parseInt(rating, 10)));
+  if (status) conditions.push(eq(restaurantReviewsTable.status, status as any));
+
+  const baseWhere = conditions.length > 0 ? and(...conditions) : undefined;
+  const searchWhere = search
+    ? and(baseWhere, or(ilike(restaurantsTable.name, `%${search}%`), ilike(usersTable.fullName, `%${search}%`)))
+    : baseWhere;
+
+  const [reviews, countRes] = await Promise.all([
+    db
+      .select({
+        review: restaurantReviewsTable,
+        customerName: usersTable.fullName,
+        customerPhoto: usersTable.profilePhoto,
+        restaurantName: restaurantsTable.name,
+      })
+      .from(restaurantReviewsTable)
+      .innerJoin(usersTable, eq(restaurantReviewsTable.customerId, usersTable.id))
+      .innerJoin(restaurantsTable, eq(restaurantReviewsTable.restaurantId, restaurantsTable.id))
+      .where(searchWhere)
+      .orderBy(desc(restaurantReviewsTable.createdAt))
+      .limit(limitNum)
+      .offset(offset),
+    db.select({ count: sql<number>`count(*)::int` }).from(restaurantReviewsTable).innerJoin(usersTable, eq(restaurantReviewsTable.customerId, usersTable.id)).innerJoin(restaurantsTable, eq(restaurantReviewsTable.restaurantId, restaurantsTable.id)).where(searchWhere),
+  ]);
+
+  res.json({
+    reviews: reviews.map(({ review, customerName, customerPhoto, restaurantName }) => ({
+      ...serializeReview(review),
+      customerName,
+      customerPhoto: customerPhoto ?? null,
+      restaurantName,
+    })),
+    total: countRes[0]?.count ?? 0,
+    page: pageNum,
+    limit: limitNum,
+  });
+});
+
+// ───────────────────────────────────────────────────────
+// PATCH /restaurant-reviews/:id/status — admin hide/restore/remove
+// ───────────────────────────────────────────────────────
+router.patch("/restaurant-reviews/:id/status", requireRole("admin", "super_admin"), async (req, res): Promise<void> => {
+  const cu = (req as any).currentUser;
+  const id = parseInt(String(req.params.id), 10);
+  const { status } = req.body;
+  if (!status || !["approved", "hidden", "removed"].includes(status)) {
+    res.status(400).json({ error: "Invalid status" }); return;
+  }
+  const [row] = await db.update(restaurantReviewsTable).set({ status }).where(eq(restaurantReviewsTable.id, id)).returning();
+  if (!row) { res.status(404).json({ error: "Not found" }); return; }
+  await logActivity(req, "restaurant_review_status", `Review #${id} set to ${status}`, cu.id, cu.role);
+  res.json({ message: "Updated", id: row.id, status });
+});
+
+// ───────────────────────────────────────────────────────
+// DELETE /restaurant-reviews/:id — admin delete
+// ───────────────────────────────────────────────────────
+router.delete("/restaurant-reviews/:id", requireRole("admin", "super_admin"), async (req, res): Promise<void> => {
+  const cu = (req as any).currentUser;
+  const id = parseInt(String(req.params.id), 10);
+  const [row] = await db.delete(restaurantReviewsTable).where(eq(restaurantReviewsTable.id, id)).returning();
+  if (!row) { res.status(404).json({ error: "Not found" }); return; }
+  await logActivity(req, "restaurant_review_deleted", `Review #${id} deleted`, cu.id, cu.role);
+  res.json({ message: "Deleted", id: row.id });
+});
+
+// ───────────────────────────────────────────────────────
 // GET /restaurant-reviews/:restaurantId — public reviews
 // ───────────────────────────────────────────────────────
 router.get("/restaurant-reviews/:restaurantId", async (req, res): Promise<void> => {
@@ -214,68 +378,6 @@ router.post("/restaurant-reviews/:id/reply", requireAuth, async (req, res): Prom
 
   await createNotification(review.customerId, "Restaurant Owner Replied", "The restaurant owner replied to your review.", "general");
   res.json(serializeReview(updated));
-});
-
-// ───────────────────────────────────────────────────────
-// GET /restaurant-reviews/admin — admin list
-// ───────────────────────────────────────────────────────
-router.get("/restaurant-reviews/admin", requireRole("admin", "super_admin"), async (req, res): Promise<void> => {
-  const { restaurantId, rating, status, search, page = "1", limit = "15" } = req.query as Record<string, string>;
-  const pageNum = Math.max(1, parseInt(page, 10));
-  const limitNum = Math.min(50, Math.max(1, parseInt(limit, 10)));
-  const offset = (pageNum - 1) * limitNum;
-
-  const conditions: any[] = [];
-  if (restaurantId) conditions.push(eq(restaurantReviewsTable.restaurantId, parseInt(restaurantId, 10)));
-  if (rating) conditions.push(eq(restaurantReviewsTable.overallRating, parseInt(rating, 10)));
-  if (status) conditions.push(eq(restaurantReviewsTable.status, status as any));
-
-  const baseWhere = conditions.length > 0 ? and(...conditions) : undefined;
-  const searchWhere = search
-    ? and(baseWhere, or(ilike(restaurantsTable.name, `%${search}%`), ilike(usersTable.fullName, `%${search}%`)))
-    : baseWhere;
-
-  const [reviews, countRes] = await Promise.all([
-    db
-      .select({
-        review: restaurantReviewsTable,
-        customerName: usersTable.fullName,
-        customerPhoto: usersTable.profilePhoto,
-        restaurantName: restaurantsTable.name,
-      })
-      .from(restaurantReviewsTable)
-      .innerJoin(usersTable, eq(restaurantReviewsTable.customerId, usersTable.id))
-      .innerJoin(restaurantsTable, eq(restaurantReviewsTable.restaurantId, restaurantsTable.id))
-      .where(searchWhere)
-      .orderBy(desc(restaurantReviewsTable.createdAt))
-      .limit(limitNum)
-      .offset(offset),
-    db.select({ count: sql<number>`count(*)::int` }).from(restaurantReviewsTable).innerJoin(usersTable, eq(restaurantReviewsTable.customerId, usersTable.id)).innerJoin(restaurantsTable, eq(restaurantReviewsTable.restaurantId, restaurantsTable.id)).where(searchWhere),
-  ]);
-
-  res.json({
-    reviews: reviews.map(({ review, customerName, customerPhoto, restaurantName }) => ({
-      ...serializeReview(review),
-      customerName,
-      customerPhoto: customerPhoto ?? null,
-      restaurantName,
-    })),
-    total: countRes[0]?.count ?? 0,
-    page: pageNum,
-    limit: limitNum,
-  });
-});
-
-// ───────────────────────────────────────────────────────
-// DELETE /restaurant-reviews/:id — admin delete
-// ───────────────────────────────────────────────────────
-router.delete("/restaurant-reviews/:id", requireRole("admin", "super_admin"), async (req, res): Promise<void> => {
-  const cu = (req as any).currentUser;
-  const id = parseInt(String(req.params.id), 10);
-  const [row] = await db.delete(restaurantReviewsTable).where(eq(restaurantReviewsTable.id, id)).returning();
-  if (!row) { res.status(404).json({ error: "Not found" }); return; }
-  await logActivity(req, "restaurant_review_deleted", `Review #${id} deleted`, cu.id, cu.role);
-  res.json({ message: "Deleted", id: row.id });
 });
 
 export default router;

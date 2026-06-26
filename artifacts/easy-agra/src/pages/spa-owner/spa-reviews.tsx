@@ -62,7 +62,7 @@ export default function SpaOwnerReviews() {
 
   const { data, isLoading } = useQuery<{ reviews: Review[]; total: number }>({
     queryKey: ["spa-reviews", "owner", ratingFilter, sort, page],
-    queryFn: () => apiRequest(`/api/spa-reviews/admin?rating=${ratingFilter !== "all" ? ratingFilter : ""}&sort=${sort}&page=${page}&limit=10`),
+    queryFn: () => apiRequest(`/api/spa-reviews/owner?rating=${ratingFilter !== "all" ? ratingFilter : ""}&sort=${sort}&page=${page}&limit=10`),
     enabled: !!user?.id,
   });
 

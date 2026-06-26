@@ -26,6 +26,7 @@ import CustomerProfile from "@/pages/customer/profile";
 import CustomerSettings from "@/pages/customer/settings";
 import CustomerNotifications from "@/pages/customer/notifications";
 import BecomeOwner from "@/pages/customer/become-owner";
+import PuzzleGame from "@/pages/customer/puzzle-game";
 import MyBookings from "@/pages/customer/my-bookings";
 import BookingDetail from "@/pages/customer/booking-detail";
 import WriteReview from "@/pages/customer/write-review";
@@ -241,6 +242,7 @@ function Router() {
       <Route path="/settings" component={() => <ProtectedRoute component={CustomerSettings} allowedRoles={["customer", "hotel_owner", "restaurant_owner", "spa_owner"]} />} />
       <Route path="/notifications" component={() => <ProtectedRoute component={CustomerNotifications} allowedRoles={["customer", "hotel_owner", "restaurant_owner", "spa_owner"]} />} />
       <Route path="/become-owner" component={() => <ProtectedRoute component={BecomeOwner} allowedRoles={["customer"]} />} />
+      <Route path="/puzzle" component={() => <ProtectedRoute component={PuzzleGame} allowedRoles={["customer"]} />} />
       <Route path="/customer/bookings/:id" component={() => <ProtectedRoute component={BookingDetail} allowedRoles={["customer"]} />} />
       <Route path="/customer/bookings" component={() => <ProtectedRoute component={MyBookings} allowedRoles={["customer"]} />} />
       <Route path="/customer/write-review/:bookingId" component={() => <ProtectedRoute component={WriteReview} allowedRoles={["customer"]} />} />

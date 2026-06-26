@@ -62,7 +62,7 @@ export default function RestaurantOwnerReviews() {
 
   const { data, isLoading } = useQuery<{ reviews: Review[]; total: number }>({
     queryKey: ["restaurant-reviews", "owner", ratingFilter, sort, page],
-    queryFn: () => apiRequest(`/api/restaurant-reviews/admin?rating=${ratingFilter !== "all" ? ratingFilter : ""}&sort=${sort}&page=${page}&limit=10`),
+    queryFn: () => apiRequest(`/api/restaurant-reviews/owner?rating=${ratingFilter !== "all" ? ratingFilter : ""}&sort=${sort}&page=${page}&limit=10`),
     enabled: !!user?.id,
   });
 

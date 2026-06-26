@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { Home, Bell, User, Settings, LogOut, Map, CalendarDays, Star, Utensils, Sparkles, Landmark, IndianRupee, LifeBuoy, ReceiptText, Menu, Building2, ChevronRight, X, ShieldCheck, FileText, Phone, Train } from "lucide-react";
+import { Home, Bell, User, Settings, LogOut, Map, CalendarDays, Star, Utensils, Sparkles, Landmark, IndianRupee, LifeBuoy, ReceiptText, Menu, Building2, ChevronRight, X, ShieldCheck, FileText, Phone, Train, Puzzle } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { useGetUnreadNotificationCount, useLogout, getGetMeQueryKey } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
@@ -30,6 +30,7 @@ export function CustomerLayout({ children }: { children: React.ReactNode }) {
     { href: "/hotels", icon: Building2, label: t("hotels") },
     { href: "/restaurants", icon: Utensils, label: t("restaurants") },
     { href: "/transport", icon: Train, label: "Transport" },
+    { href: "/puzzle", icon: Puzzle, label: "Puzzle" },
     { href: "/profile", icon: User, label: t("profile") },
   ];
 

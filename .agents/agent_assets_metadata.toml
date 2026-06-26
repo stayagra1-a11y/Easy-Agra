@@ -1,5 +1,10 @@
 uploads = []
-generated = []
+
+[[generated]]
+id = "VQNmQ2HD4SSeW7css6LCV"
+uri = "file://artifacts/easy-agra/public/images/taj-mahal-puzzle.png"
+type = "image"
+title = "taj-mahal-puzzle"
 
 [[outputs]]
 id = "WxXwr8aEeEUCXGtCaFAv-"
