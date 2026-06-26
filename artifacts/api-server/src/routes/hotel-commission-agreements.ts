@@ -26,7 +26,17 @@ router.get("/hotel-commission-agreements/:hotelId", requireAuth, async (req, res
     .where(eq(hotelCommissionAgreementsTable.hotelId, hotelId));
 
   if (!agreement) {
-    res.status(404).json({ error: "Agreement not found" });
+    // Return a default agreement so the frontend can show terms without error
+    res.status(200).json({
+      exists: false,
+      hotelId,
+      commissionRate: 15,
+      agreed: false,
+      agreementText: null,
+      agreedAt: null,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    });
     return;
   }
 

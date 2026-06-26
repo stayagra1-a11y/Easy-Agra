@@ -436,9 +436,10 @@ export default function HotelOwnerHotels() {
                   setAgreementLoading(true);
                   // Try to get existing agreement
                   const existing = await apiRequest(`/api/hotel-commission-agreements/${commissionTarget.id}`);
-                  if (existing && !existing.agreed) {
+                  if (existing && existing.exists !== false && !existing.agreed) {
                     await apiRequest(`/api/hotel-commission-agreements/${commissionTarget.id}/agree`, { method: "POST" });
-                  } else if (!existing) {
+                  } else {
+                    // No agreement yet — create then agree
                     await apiRequest("/api/hotel-commission-agreements", {
                       method: "POST",
                       body: { hotelId: commissionTarget.id, commissionRate: 15 },
