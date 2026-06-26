@@ -201,6 +201,8 @@ export default function HotelOwnerHotels() {
 
   useEffect(() => {
     refetch();
+    const interval = setInterval(() => { refetch(); }, 30_000);
+    return () => clearInterval(interval);
   }, []);
 
   const deleteMutation = useDeleteHotel({
