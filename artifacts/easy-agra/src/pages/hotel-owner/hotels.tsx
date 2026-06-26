@@ -13,7 +13,7 @@ import {
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
-import { Building2, PlusCircle, Search, Pencil, Trash2, Send, Eye, MapPin, Phone, Clock, Wifi, CheckCircle2, XCircle, Star, FileCheck } from "lucide-react";
+import { Building2, PlusCircle, Search, Pencil, Trash2, Send, Eye, MapPin, Phone, Clock, Wifi, CheckCircle2, XCircle, Star, FileCheck, RefreshCw } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
@@ -196,8 +196,12 @@ export default function HotelOwnerHotels() {
     limit: 50,
   };
 
-  const { data, isLoading } = useListHotels(params);
+  const { data, isLoading, refetch, isFetching } = useListHotels(params);
   const hotels = data?.hotels ?? [];
+
+  useEffect(() => {
+    refetch();
+  }, []);
 
   const deleteMutation = useDeleteHotel({
     mutation: {
@@ -230,11 +234,16 @@ export default function HotelOwnerHotels() {
             <h1 className="text-xl font-bold">My Hotels</h1>
             <p className="text-xs text-muted-foreground mt-0.5">{data?.total ?? 0} hotels total</p>
           </div>
-          <Link href="/hotel-owner/hotels/new">
-            <Button size="sm" className="gap-2">
-              <PlusCircle className="h-4 w-4" /> Add Hotel
+          <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm" className="h-8 gap-1" onClick={() => refetch()} disabled={isFetching}>
+              <RefreshCw className={`h-3.5 w-3.5 ${isFetching ? "animate-spin" : ""}`} />
             </Button>
-          </Link>
+            <Link href="/hotel-owner/hotels/new">
+              <Button size="sm" className="gap-2">
+                <PlusCircle className="h-4 w-4" /> Add Hotel
+              </Button>
+            </Link>
+          </div>
         </div>
 
         {/* Search + filter */}
