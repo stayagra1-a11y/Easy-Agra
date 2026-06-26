@@ -23,8 +23,8 @@ import {
   Utensils,
   XCircle,
   CheckCircle,
-  ChevronRight,
   Plus,
+  Star,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -185,12 +185,19 @@ export default function MyReservations() {
                     )}
 
                     {/* Actions */}
-                    <div className="flex gap-2 pt-1">
+                    <div className="flex gap-2 pt-1 flex-wrap">
                       <Link href={`/restaurants/${res.restaurantId}`} className="flex-1">
                         <Button size="sm" variant="outline" className="w-full h-8 text-xs">
                           View Menu
                         </Button>
                       </Link>
+                      {res.status === "completed" && (
+                        <Link href={`/restaurants/${res.restaurantId}#reviews`} className="flex-1">
+                          <Button size="sm" className="w-full h-8 text-xs bg-amber-500 hover:bg-amber-600 text-white">
+                            <Star className="w-3 h-3 mr-1" /> Write Review
+                          </Button>
+                        </Link>
+                      )}
                       {["pending", "confirmed"].includes(res.status) && (
                         <Button
                           size="sm"

@@ -194,6 +194,44 @@ router.delete("/spa-reviews/:id", requireRole("admin", "super_admin"), async (re
 });
 
 // ───────────────────────────────────────────────────────
+// GET /spa-reviews/customer — customer's own reviews
+// ───────────────────────────────────────────────────────
+router.get("/spa-reviews/customer", requireAuth, async (req, res): Promise<void> => {
+  const cu = (req as any).currentUser;
+  const { page = "1", limit = "10" } = req.query as Record<string, string>;
+  const pageNum = Math.max(1, parseInt(page, 10));
+  const limitNum = Math.min(50, Math.max(1, parseInt(limit, 10)));
+  const offset = (pageNum - 1) * limitNum;
+
+  const conditions: any[] = [eq(spaReviewsTable.customerId, cu.id)];
+
+  const [reviews, countRes] = await Promise.all([
+    db
+      .select({
+        review: spaReviewsTable,
+        spaName: spasTable.name,
+      })
+      .from(spaReviewsTable)
+      .innerJoin(spasTable, eq(spaReviewsTable.spaId, spasTable.id))
+      .where(and(...conditions))
+      .orderBy(desc(spaReviewsTable.createdAt))
+      .limit(limitNum)
+      .offset(offset),
+    db.select({ count: sql<number>`count(*)::int` }).from(spaReviewsTable).where(and(...conditions)),
+  ]);
+
+  res.json({
+    reviews: reviews.map(({ review, spaName }) => ({
+      ...serializeReview(review),
+      spaName,
+    })),
+    total: countRes[0]?.count ?? 0,
+    page: pageNum,
+    limit: limitNum,
+  });
+});
+
+// ───────────────────────────────────────────────────────
 // GET /spa-reviews/:spaId — public reviews
 // ───────────────────────────────────────────────────────
 router.get("/spa-reviews/:spaId", async (req, res): Promise<void> => {

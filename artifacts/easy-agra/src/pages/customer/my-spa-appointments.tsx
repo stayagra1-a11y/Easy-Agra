@@ -16,7 +16,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 import {
   CalendarCheck, Loader2, Clock, MapPin, Sparkles,
-  BadgeIndianRupee, XCircle
+  BadgeIndianRupee, XCircle, Star
 } from "lucide-react";
 import { format } from "date-fns";
 import { Link } from "wouter";
@@ -189,18 +189,31 @@ export default function MySpaAppointments() {
                     </p>
                   )}
 
-                  {/* Cancel button */}
-                  {["pending", "confirmed"].includes(a.status) && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="gap-1 h-8 text-destructive border-destructive/30 hover:bg-destructive/5"
-                      onClick={() => setCancelDialog({ id: a.id, ref: a.appointmentRef })}
-                    >
-                      <XCircle className="h-3.5 w-3.5" />
-                      Cancel Appointment
-                    </Button>
-                  )}
+                  {/* Action buttons */}
+                  <div className="flex gap-2 flex-wrap">
+                    {a.status === "completed" && (
+                      <Link href={`/spas/${a.spaId}#reviews`} className="flex-1">
+                        <Button
+                          size="sm"
+                          className="w-full gap-1 h-8 text-xs bg-amber-500 hover:bg-amber-600 text-white"
+                        >
+                          <Star className="h-3.5 w-3.5" />
+                          Write Review
+                        </Button>
+                      </Link>
+                    )}
+                    {["pending", "confirmed"].includes(a.status) && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="gap-1 h-8 text-destructive border-destructive/30 hover:bg-destructive/5"
+                        onClick={() => setCancelDialog({ id: a.id, ref: a.appointmentRef })}
+                      >
+                        <XCircle className="h-3.5 w-3.5" />
+                        Cancel Appointment
+                      </Button>
+                    )}
+                  </div>
                 </CardContent>
               </Card>
             ))}
