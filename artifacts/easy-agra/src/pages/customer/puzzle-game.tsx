@@ -4,7 +4,17 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { RotateCcw, Trophy, Clock, Grid3x3, LayoutGrid, Table2, ChevronRight, Puzzle, CheckCircle2 } from "lucide-react";
+import {
+  RotateCcw,
+  Trophy,
+  Clock,
+  Grid3x3,
+  LayoutGrid,
+  Table2,
+  ChevronRight,
+  Puzzle,
+  CheckCircle2,
+} from "lucide-react";
 
 const IMAGE_SRC = "/images/taj-mahal-puzzle.png";
 
@@ -16,11 +26,8 @@ const DIFFICULTIES = [
 
 interface Tile {
   id: number;
-  correctPos: number;
-  currentPos: number;
   bgX: string;
   bgY: string;
-  bgSize: string;
 }
 
 function createTiles(size: number): Tile[] {
@@ -31,11 +38,8 @@ function createTiles(size: number): Tile[] {
     const col = i % size;
     tiles.push({
       id: i,
-      correctPos: i,
-      currentPos: i,
       bgX: `${col * step}%`,
       bgY: `${row * step}%`,
-      bgSize: `${size * 100}%`,
     });
   }
   return tiles;
@@ -43,33 +47,26 @@ function createTiles(size: number): Tile[] {
 
 function shuffleTiles(size: number): Tile[] {
   const tiles = createTiles(size);
-  let shuffled: number[];
+  let shuffled: Tile[];
   do {
-    shuffled = Array.from({ length: size * size }, (_, i) => i);
+    shuffled = [...tiles];
     for (let i = shuffled.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
     }
-  } while (isSolved(shuffled, size));
-
-  return tiles.map((t, i) => ({ ...t, currentPos: shuffled[i] }));
+  } while (isSolved(shuffled));
+  return shuffled;
 }
 
-function isSolved(positions: number[], size: number): boolean {
-  for (let i = 0; i < positions.length; i++) {
-    const row = Math.floor(i / size);
-    const col = i % size;
-    const correctId = row * size + col;
-    if (positions[i] !== correctId) return false;
-  }
-  return true;
+function isSolved(tiles: Tile[]): boolean {
+  return tiles.every((t, i) => t.id === i);
 }
 
 export default function PuzzleGame() {
   const { toast } = useToast();
   const [difficulty, setDifficulty] = useState(0);
   const [tiles, setTiles] = useState<Tile[]>([]);
-  const [selectedTile, setSelectedTile] = useState<number | null>(null);
+  const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [timer, setTimer] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isSolvedState, setIsSolvedState] = useState(false);
@@ -77,6 +74,8 @@ export default function PuzzleGame() {
   const [bestTimes, setBestTimes] = useState<Record<number, number>>({});
   const [imageLoaded, setImageLoaded] = useState(false);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const cardRef = useRef<HTMLDivElement>(null);
+  const [cardWidth, setCardWidth] = useState(320);
 
   const size = DIFFICULTIES[difficulty].size;
 
@@ -87,7 +86,7 @@ export default function PuzzleGame() {
     setMoves(0);
     setIsPlaying(true);
     setIsSolvedState(false);
-    setSelectedTile(null);
+    setSelectedIndex(null);
 
     if (timerRef.current) clearInterval(timerRef.current);
     timerRef.current = setInterval(() => setTimer((t) => t + 1), 1000);
@@ -110,33 +109,33 @@ export default function PuzzleGame() {
   const handleTileClick = (index: number) => {
     if (!isPlaying || isSolvedState) return;
 
-    if (selectedTile === null) {
-      setSelectedTile(index);
+    if (selectedIndex === null) {
+      setSelectedIndex(index);
       return;
     }
 
-    if (selectedTile === index) {
-      setSelectedTile(null);
+    if (selectedIndex === index) {
+      setSelectedIndex(null);
       return;
     }
 
-    // Swap tiles
+    // Swap tiles at the two clicked indices
     const newTiles = [...tiles];
-    const temp = newTiles[selectedTile].currentPos;
-    newTiles[selectedTile] = { ...newTiles[selectedTile], currentPos: newTiles[index].currentPos };
-    newTiles[index] = { ...newTiles[index], currentPos: temp };
+    [newTiles[selectedIndex], newTiles[index]] = [
+      newTiles[index],
+      newTiles[selectedIndex],
+    ];
     setTiles(newTiles);
-    setSelectedTile(null);
+    setSelectedIndex(null);
     setMoves((m) => m + 1);
 
     // Check if solved
-    const positions = newTiles.map((t) => t.currentPos);
-    if (isSolved(positions, size)) {
+    if (isSolved(newTiles)) {
       stopGame();
       setIsSolvedState(true);
       const reward = DIFFICULTIES[difficulty].reward;
       toast({
-        title: "🏆 Puzzle Solved!",
+        title: "Puzzle Solved!",
         description: `Time: ${formatTime(timer)} | Moves: ${moves + 1}. You earned ${reward} points!`,
       });
       setBestTimes((prev) => {
@@ -159,24 +158,29 @@ export default function PuzzleGame() {
   useEffect(() => {
     const img = new Image();
     img.onload = () => setImageLoaded(true);
+    img.onerror = () => {
+      toast({
+        title: "Image failed to load",
+        description: "Please check your connection.",
+        variant: "destructive",
+      });
+    };
     img.src = IMAGE_SRC;
   }, []);
 
-  const gridTemplate = `repeat(${size}, 1fr)`;
-  const [containerWidth, setContainerWidth] = useState(320);
-  const gridRef = useRef<HTMLDivElement>(null);
-
+  // Measure card width
   useEffect(() => {
-    const updateWidth = () => {
-      const w = gridRef.current?.parentElement?.clientWidth ?? Math.min(320, window.innerWidth - 48);
-      setContainerWidth(Math.min(320, w - 24));
+    const update = () => {
+      const w = cardRef.current?.clientWidth ?? Math.min(320, window.innerWidth - 48);
+      setCardWidth(Math.min(320, w));
     };
-    updateWidth();
-    window.addEventListener("resize", updateWidth);
-    return () => window.removeEventListener("resize", updateWidth);
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
   }, []);
 
-  const tileSize = containerWidth / size;
+  const tileSize = Math.max(40, Math.floor(cardWidth / size));
+  const gridTemplate = `repeat(${size}, ${tileSize}px)`;
 
   return (
     <CustomerLayout>
@@ -188,7 +192,8 @@ export default function PuzzleGame() {
             <h1 className="text-xl font-bold">ताज महल जिगसो पज़ल</h1>
           </div>
           <p className="text-sm text-muted-foreground">
-            Taj Mahal Jigsaw Puzzle — pieces ko sahi jagah arrange karein</p>
+            Taj Mahal Jigsaw Puzzle — pieces ko sahi jagah arrange karein
+          </p>
         </div>
 
         {/* Difficulty */}
@@ -205,7 +210,7 @@ export default function PuzzleGame() {
                   setIsPlaying(false);
                   setIsSolvedState(false);
                   setTiles([]);
-                  setSelectedTile(null);
+                  setSelectedIndex(null);
                   setMoves(0);
                   setTimer(0);
                   if (timerRef.current) clearInterval(timerRef.current);
@@ -220,7 +225,7 @@ export default function PuzzleGame() {
         </div>
 
         {/* Stats */}
-        {isPlaying && (
+        {(isPlaying || isSolvedState) && (
           <div className="flex items-center justify-center gap-4">
             <Badge variant="secondary" className="gap-1">
               <Clock className="h-3 w-3" />
@@ -237,7 +242,7 @@ export default function PuzzleGame() {
         )}
 
         {/* Puzzle Grid */}
-        <Card className="p-3 mx-auto" style={{ maxWidth: tileSize * size + 24 }}>
+        <Card ref={cardRef} className="p-3 mx-auto flex justify-center">
           {!imageLoaded ? (
             <div className="flex items-center justify-center py-20 text-muted-foreground">
               <Puzzle className="h-8 w-8 animate-spin mr-2" />
@@ -246,13 +251,17 @@ export default function PuzzleGame() {
           ) : !isPlaying && !isSolvedState ? (
             <div className="text-center py-8 space-y-3">
               <div className="flex items-center justify-center">
-                <div className="w-40 h-30 rounded-lg overflow-hidden border-2 border-primary/20">
-                  <img src={IMAGE_SRC} alt="Taj Mahal" className="w-full h-full object-cover" />
+                <div className="w-40 h-40 rounded-lg overflow-hidden border-2 border-primary/20">
+                  <img
+                    src={IMAGE_SRC}
+                    alt="Taj Mahal"
+                    className="w-full h-full object-cover"
+                  />
                 </div>
               </div>
               <p className="text-sm text-muted-foreground">
-                {DIFFICULTIES[difficulty].size}×{DIFFICULTIES[difficulty].size} grid
-                — {DIFFICULTIES[difficulty].reward} points reward
+                {DIFFICULTIES[difficulty].size}×{DIFFICULTIES[difficulty].size}{" "}
+                grid — {DIFFICULTIES[difficulty].reward} points reward
               </p>
               <Button onClick={startGame} className="gap-1">
                 <ChevronRight className="h-4 w-4" />
@@ -262,11 +271,16 @@ export default function PuzzleGame() {
           ) : (
             <div
               className="grid gap-0.5"
-              style={{ gridTemplateColumns: gridTemplate, gridTemplateRows: gridTemplate }}
+              style={{
+                gridTemplateColumns: gridTemplate,
+                gridTemplateRows: gridTemplate,
+                width: tileSize * size + (size - 1) * 2,
+                height: tileSize * size + (size - 1) * 2,
+              }}
             >
               {tiles.map((tile, index) => {
-                const isSelected = selectedTile === index;
-                const isCorrect = tile.currentPos === tile.correctPos;
+                const isSelected = selectedIndex === index;
+                const isCorrect = tile.id === index;
                 return (
                   <div
                     key={tile.id}
@@ -284,10 +298,10 @@ export default function PuzzleGame() {
                       backgroundSize: `${size * 100}%`,
                     }}
                   >
-                    {/* Number hint (optional) */}
+                    {/* Number hint */}
                     {!isSolvedState && (
                       <span className="absolute top-0.5 left-0.5 text-[10px] font-bold text-white/80 bg-black/30 px-1 rounded">
-                        {tile.correctPos + 1}
+                        {tile.id + 1}
                       </span>
                     )}
                   </div>
@@ -300,7 +314,12 @@ export default function PuzzleGame() {
         {/* Controls */}
         {isPlaying && !isSolvedState && (
           <div className="flex justify-center gap-2">
-            <Button variant="outline" size="sm" onClick={startGame} className="gap-1">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={startGame}
+              className="gap-1"
+            >
               <RotateCcw className="h-4 w-4" />
               Reshuffle
             </Button>
@@ -341,8 +360,11 @@ export default function PuzzleGame() {
         {/* Instructions */}
         <div className="bg-muted/50 rounded-lg p-3 text-sm text-muted-foreground space-y-1">
           <p className="font-medium text-foreground">Kaise khelein:</p>
-          <p>1. “Start Puzzle” pe click karein</p>
-          <p>2. Ek tile pe click karein, phir doosri tile pe click karein — dono swap ho jayengi</p>
+          <p>1. "Start Puzzle" pe click karein</p>
+          <p>
+            2. Ek tile pe click karein, phir doosri tile pe click karein — dono
+            swap ho jayengi
+          </p>
           <p>3. Sab pieces ko sahi jagah pe arrange karein</p>
           <p>4. Image complete hone pe reward points milein!</p>
         </div>
