@@ -36,6 +36,7 @@ import googleAuthRouter from "./google-auth";
 import transportRouter from "./transport";
 import restaurantReviewsRouter from "./restaurant-reviews";
 import spaReviewsRouter from "./spa-reviews";
+import uploadRouter from "./upload";
 
 const router: IRouter = Router();
 
@@ -75,6 +76,7 @@ router.use(marketingRouter);
 router.use(transportRouter);
 router.use(restaurantReviewsRouter);
 router.use(spaReviewsRouter);
+router.use(uploadRouter);
 router.use(dashboardRouter);
 
 export default router;
