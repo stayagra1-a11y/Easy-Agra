@@ -183,7 +183,7 @@ router.post("/rooms", requireRole("hotel_owner", "admin", "super_admin"), async 
     occupiedRooms: occupiedNum,
     blockedRooms: blockedNum,
     underMaintenanceRooms: maintenanceNum,
-    status: "draft",
+    status: "active",
   }).returning();
 
   await logActivity(req, "room_created", `Room "${room.name}" created in hotel #${hotelIdNum}`, cu.id, cu.role);
@@ -261,6 +261,9 @@ router.put("/rooms/:id", requireAuth, async (req, res): Promise<void> => {
   } else if (totalRooms !== undefined || occupiedRooms !== undefined || blockedRooms !== undefined || underMaintenanceRooms !== undefined) {
     updates.availableRooms = computeAvailable(newTotal, newOccupied, newBlocked, newMaintenance);
   }
+
+  // Auto-promote draft rooms to active when owner updates them
+  if (room.status === "draft") updates.status = "active";
 
   const [updated] = await db.update(roomsTable).set(updates).where(eq(roomsTable.id, id)).returning();
   await logActivity(req, "room_updated", `Room "${updated.name}" updated`, cu.id, cu.role);
