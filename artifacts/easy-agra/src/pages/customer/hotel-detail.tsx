@@ -568,10 +568,14 @@ export default function HotelDetail() {
           {/* Name + rating */}
           <div className="flex items-start justify-between gap-2">
             <div className="flex-1">
-              <h1 className="text-xl font-bold leading-tight">{hotel.name}</h1>
-              <div className="flex items-center gap-2 mt-1 flex-wrap">
+              <div className="flex items-center gap-2 flex-wrap">
+                <h1 className="text-2xl font-extrabold leading-tight tracking-tight bg-gradient-to-r from-primary via-primary/80 to-amber-600 bg-clip-text text-transparent">
+                  {hotel.name}
+                </h1>
+              </div>
+              <div className="flex items-center gap-2 mt-1.5 flex-wrap">
                 {hotel.category && (
-                  <Badge variant="secondary" className="text-xs">{hotel.category}</Badge>
+                  <Badge className="text-xs bg-primary/10 text-primary border border-primary/20 font-semibold capitalize">{hotel.category}</Badge>
                 )}
                 {(hotel as any).starRating && (
                   <div className="flex items-center gap-0.5">
@@ -604,17 +608,23 @@ export default function HotelDetail() {
 
           {/* Check-in / out */}
           {(hotel.checkInTime || hotel.checkOutTime) && (
-            <div className="flex gap-4 text-sm">
+            <div className="flex gap-3 flex-wrap">
               {hotel.checkInTime && (
-                <div className="flex items-center gap-1.5 text-muted-foreground">
-                  <Clock className="h-4 w-4 text-primary" />
-                  <span>Check-in: <strong className="text-foreground">{hotel.checkInTime}</strong></span>
+                <div className="flex items-center gap-2 bg-emerald-600 text-white rounded-xl px-3.5 py-2 shadow-sm">
+                  <Clock className="h-4 w-4 shrink-0" />
+                  <div className="leading-tight">
+                    <p className="text-[10px] font-medium uppercase tracking-wider opacity-80">Check-in</p>
+                    <p className="text-sm font-bold">{hotel.checkInTime}</p>
+                  </div>
                 </div>
               )}
               {hotel.checkOutTime && (
-                <div className="flex items-center gap-1.5 text-muted-foreground">
-                  <Clock className="h-4 w-4 text-primary" />
-                  <span>Check-out: <strong className="text-foreground">{hotel.checkOutTime}</strong></span>
+                <div className="flex items-center gap-2 bg-rose-600 text-white rounded-xl px-3.5 py-2 shadow-sm">
+                  <Clock className="h-4 w-4 shrink-0" />
+                  <div className="leading-tight">
+                    <p className="text-[10px] font-medium uppercase tracking-wider opacity-80">Check-out</p>
+                    <p className="text-sm font-bold">{hotel.checkOutTime}</p>
+                  </div>
                 </div>
               )}
             </div>
