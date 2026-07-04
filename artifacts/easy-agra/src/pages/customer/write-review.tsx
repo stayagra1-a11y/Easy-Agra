@@ -162,7 +162,20 @@ export default function WriteReview() {
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!isValid()) return;
+
+    // Show specific validation errors instead of silently failing
+    if (!Object.values(ratings).every((v) => v > 0)) {
+      toast({ title: "Please rate all categories", description: "Overall, Cleanliness, Room Quality, Staff, Location, and Value ratings are required.", variant: "destructive" });
+      return;
+    }
+    if (reviewTitle.trim().length < 5) {
+      toast({ title: "Review title too short", description: "Title should be at least 5 characters.", variant: "destructive" });
+      return;
+    }
+    if (reviewDescription.trim().length < 20) {
+      toast({ title: "Review too short", description: `Please write at least 20 characters (currently ${reviewDescription.trim().length}).`, variant: "destructive" });
+      return;
+    }
 
     const payload = {
       bookingId,
@@ -416,10 +429,19 @@ export default function WriteReview() {
           <Button
             type="submit"
             className="w-full bg-primary hover:bg-primary/90 h-12 text-base font-semibold"
-            disabled={!isValid() || isPending}
+            disabled={isPending}
           >
             {isPending ? "Submitting…" : isEdit ? "Update Review" : "Submit Review"}
           </Button>
+          {!isValid() && (
+            <p className="text-xs text-center text-muted-foreground">
+              {!Object.values(ratings).every((v) => v > 0)
+                ? "⭐ Please rate all 6 categories above"
+                : reviewTitle.trim().length < 5
+                  ? "📝 Review title needs at least 5 characters"
+                  : `📝 Detailed review needs at least 20 characters (${reviewDescription.trim().length}/20)`}
+            </p>
+          )}
         </form>
       </div>
     </CustomerLayout>
