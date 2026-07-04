@@ -26,6 +26,9 @@ interface Hotel {
   categorizedPhotos: { url: string; category: string }[] | null;
   amenities: string[];
   status: string;
+  policies: string | null;
+  checkInTime: string | null;
+  checkOutTime: string | null;
 }
 
 function HotelPhotoCarousel({ hotel }: { hotel: Hotel }) {
@@ -207,6 +210,45 @@ export default function CustomerHotels() {
                     {hotel.description && (
                       <p className="text-sm text-muted-foreground line-clamp-2">{hotel.description}</p>
                     )}
+
+                    {/* Check-in / Check-out times */}
+                    {(hotel.checkInTime || hotel.checkOutTime) && (
+                      <div className="flex gap-2 flex-wrap">
+                        {hotel.checkInTime && (
+                          <span className="flex items-center gap-1 text-[11px] font-semibold bg-emerald-600 text-white rounded-lg px-2 py-1">
+                            ✓ In: {hotel.checkInTime}
+                          </span>
+                        )}
+                        {hotel.checkOutTime && (
+                          <span className="flex items-center gap-1 text-[11px] font-semibold bg-rose-600 text-white rounded-lg px-2 py-1">
+                            ✓ Out: {hotel.checkOutTime}
+                          </span>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Policy preview — first 2 items */}
+                    {hotel.policies && (() => {
+                      const items = hotel.policies!
+                        .split(/\s*[-–]\s+/)
+                        .map(s => s.trim())
+                        .filter(Boolean)
+                        .slice(0, 2);
+                      return (
+                        <div className="rounded-xl border border-border bg-muted/40 px-3 py-2 space-y-1">
+                          {items.map((item, i) => (
+                            <div key={i} className="flex gap-2 items-start">
+                              <span className="flex-shrink-0 w-4 h-4 rounded-full bg-primary/10 text-primary text-[9px] font-bold flex items-center justify-center mt-0.5">
+                                {i + 1}
+                              </span>
+                              <p className="text-xs text-muted-foreground leading-snug line-clamp-1">{item}</p>
+                            </div>
+                          ))}
+                          <p className="text-[10px] text-primary font-medium pl-6">+ more policies on detail page</p>
+                        </div>
+                      );
+                    })()}
+
                     <div className="flex items-center justify-between flex-wrap gap-2">
                       {hotel.pricePerNight && (
                         <div className="flex items-center gap-0.5 text-sm font-semibold text-primary">

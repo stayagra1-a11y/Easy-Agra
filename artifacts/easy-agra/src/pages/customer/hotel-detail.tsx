@@ -775,17 +775,56 @@ export default function HotelDetail() {
 
           {/* Policies */}
           {(hotel.policies || hotel.cancellationPolicy) && (
-            <Card>
-              <CardHeader className="pb-2 pt-4 px-4">
-                <CardTitle className="text-sm">Policies</CardTitle>
-              </CardHeader>
-              <CardContent className="px-4 pb-4 space-y-2 text-sm text-muted-foreground">
-                {hotel.policies && <p>{hotel.policies}</p>}
-                {hotel.cancellationPolicy && (
-                  <p><strong className="text-foreground">Cancellation:</strong> {hotel.cancellationPolicy}</p>
-                )}
-              </CardContent>
-            </Card>
+            <div className="space-y-3">
+              {hotel.policies && (() => {
+                const items = hotel.policies!
+                  .split(/\s*[-–]\s+/)
+                  .map(s => s.trim())
+                  .filter(Boolean);
+                return (
+                  <div className="rounded-2xl border border-border bg-white overflow-hidden shadow-sm">
+                    <div className="flex items-center gap-2 px-4 py-3 bg-primary/5 border-b border-border">
+                      <span className="text-base">📋</span>
+                      <h3 className="font-semibold text-sm text-primary">Hotel Policies</h3>
+                    </div>
+                    <div className="divide-y divide-border/60">
+                      {items.map((item, i) => (
+                        <div key={i} className="flex gap-3 px-4 py-3">
+                          <span className="flex-shrink-0 w-5 h-5 rounded-full bg-primary/10 text-primary text-[10px] font-bold flex items-center justify-center mt-0.5">
+                            {i + 1}
+                          </span>
+                          <p className="text-sm text-muted-foreground leading-relaxed">{item}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })()}
+              {hotel.cancellationPolicy && (() => {
+                const items = hotel.cancellationPolicy!
+                  .split(/\s*[-–]\s+/)
+                  .map(s => s.trim())
+                  .filter(Boolean);
+                return (
+                  <div className="rounded-2xl border border-amber-200 bg-amber-50/60 overflow-hidden shadow-sm">
+                    <div className="flex items-center gap-2 px-4 py-3 bg-amber-100/70 border-b border-amber-200">
+                      <span className="text-base">⚠️</span>
+                      <h3 className="font-semibold text-sm text-amber-800">Cancellation Policy</h3>
+                    </div>
+                    <div className="divide-y divide-amber-200/60">
+                      {items.map((item, i) => (
+                        <div key={i} className="flex gap-3 px-4 py-3">
+                          <span className="flex-shrink-0 w-5 h-5 rounded-full bg-amber-200 text-amber-800 text-[10px] font-bold flex items-center justify-center mt-0.5">
+                            {i + 1}
+                          </span>
+                          <p className="text-sm text-amber-900 leading-relaxed">{item}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })()}
+            </div>
           )}
         </div>
       </div>
