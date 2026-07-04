@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { LayoutDashboard, Users, FileCheck, Bell, Activity, Settings, LogOut, Map, Menu, X, Shield, BookOpen, BarChart2, Star, Utensils, Sparkles, Landmark, IndianRupee, TrendingUp, FileBarChart, LifeBuoy, ReceiptText, Tag, ShieldAlert, Megaphone, Building2, Train } from "lucide-react";
+import { LayoutDashboard, Users, FileCheck, Bell, Activity, Settings, LogOut, Map, Menu, Shield, BookOpen, BarChart2, Star, Utensils, Sparkles, Landmark, IndianRupee, TrendingUp, FileBarChart, LifeBuoy, ReceiptText, Tag, ShieldAlert, Megaphone, Building2, Train } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { useLogout, getGetMeQueryKey } from "@workspace/api-client-react";
@@ -40,15 +40,16 @@ const adminNavItems: NavItem[] = [
 
 const superAdminNavItems: NavItem[] = [
   { href: "/super-admin/dashboard", icon: Shield, label: "Super Dashboard" },
+  { href: "/admin/hotels", icon: Building2, label: "Hotels" },
+  { href: "/admin/restaurants", icon: Utensils, label: "Restaurants" },
+  { href: "/admin/spas", icon: Sparkles, label: "Spas" },
   { href: "/admin/tourist-places", icon: Landmark, label: "Tourist Places" },
+  { href: "/admin/transport", icon: Train, label: "Transport" },
   { href: "/admin/bookings", icon: BookOpen, label: "Bookings" },
   { href: "/admin/booking-analytics", icon: BarChart2, label: "Analytics" },
   { href: "/admin/payments", icon: IndianRupee, label: "Payments" },
   { href: "/admin/revenue", icon: TrendingUp, label: "Revenue" },
-  { href: "/admin/reports", icon: FileBarChart, label: "Reports" },
   { href: "/admin/reviews", icon: Star, label: "Reviews" },
-  { href: "/admin/restaurants", icon: Utensils, label: "Restaurants" },
-  { href: "/admin/spas", icon: Sparkles, label: "Spas" },
   { href: "/admin/support", icon: LifeBuoy, label: "Support Tickets" },
   { href: "/super-admin/support-analytics", icon: BarChart2, label: "Support Analytics" },
   { href: "/admin/refunds", icon: ReceiptText, label: "Refunds" },
