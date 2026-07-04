@@ -329,10 +329,24 @@ router.post(
       earlyCheckIn,
       guestName,
       guestPhone,
+      guestAddress,
     } = req.body;
 
     if (!hotelId || !roomId || !checkInDate || !checkOutDate) {
       res.status(400).json({ error: "hotelId, roomId, checkInDate, checkOutDate are required" });
+      return;
+    }
+
+    if (!guestName?.trim()) {
+      res.status(400).json({ error: "Guest name is required" });
+      return;
+    }
+    if (!guestPhone?.trim()) {
+      res.status(400).json({ error: "Guest phone number is required" });
+      return;
+    }
+    if (!guestAddress?.trim()) {
+      res.status(400).json({ error: "Guest address is required" });
       return;
     }
 
@@ -400,6 +414,7 @@ router.post(
         customerNotes: customerNotes || null,
         guestName: guestName || null,
         guestPhone: guestPhone || null,
+        guestAddress: guestAddress || null,
         status: "pending",
       })
       .returning();

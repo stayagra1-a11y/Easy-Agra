@@ -298,6 +298,7 @@ function BookingModal({
   const [earlyCheckIn, setEarlyCheckIn] = useState(false);
   const [guestName, setGuestName] = useState("");
   const [guestPhone, setGuestPhone] = useState("");
+  const [guestAddress, setGuestAddress] = useState("");
 
   const hotelEarlyEnabled = Boolean(hotel?.earlyCheckInEnabled);
   const earlyPrice = hotelEarlyEnabled && hotel?.earlyCheckInPrice
@@ -313,6 +314,22 @@ function BookingModal({
   const tax = baseAmt * 0.18;
   const total = baseAmt + tax + earlyAmt;
 
+  const handleBooking = () => {
+    if (!guestName.trim()) {
+      toast({ title: "Guest name required", description: "Please enter your full name.", variant: "destructive" });
+      return;
+    }
+    if (!guestPhone.trim() || guestPhone.trim().length < 10) {
+      toast({ title: "Valid phone required", description: "Please enter a 10-digit mobile number.", variant: "destructive" });
+      return;
+    }
+    if (!guestAddress.trim()) {
+      toast({ title: "Address required", description: "Please enter your home address.", variant: "destructive" });
+      return;
+    }
+    mutation.mutate();
+  };
+
   const mutation = useMutation({
     mutationFn: () => apiRequest("/api/bookings", {
       method: "POST",
@@ -320,8 +337,9 @@ function BookingModal({
         hotelId, roomId: room.id, checkInDate: checkIn, checkOutDate: checkOut,
         adultsCount: adults, childrenCount: children, customerNotes: notes,
         earlyCheckIn: earlyCheckIn && hotelEarlyEnabled,
-        guestName: guestName.trim() || undefined,
-        guestPhone: guestPhone.trim() || undefined,
+        guestName: guestName.trim(),
+        guestPhone: guestPhone.trim(),
+        guestAddress: guestAddress.trim(),
       },
     }),
     onSuccess: (data: any) => onSuccess(data.bookingRef),
@@ -355,7 +373,7 @@ function BookingModal({
                 placeholder="Full name"
                 value={guestName}
                 onChange={(e) => setGuestName(e.target.value)}
-                className="text-sm"
+                className={`text-sm ${!guestName.trim() ? "border-red-200 focus-visible:ring-red-300" : ""}`}
               />
             </div>
             <div className="space-y-1">
@@ -365,9 +383,21 @@ function BookingModal({
                 type="tel"
                 value={guestPhone}
                 onChange={(e) => setGuestPhone(e.target.value)}
-                className="text-sm"
+                className={`text-sm ${!guestPhone.trim() ? "border-red-200 focus-visible:ring-red-300" : ""}`}
               />
             </div>
+          </div>
+
+          {/* Guest Address */}
+          <div className="space-y-1">
+            <Label className="text-xs">Home Address <span className="text-red-500">*</span></Label>
+            <textarea
+              value={guestAddress}
+              onChange={(e) => setGuestAddress(e.target.value)}
+              rows={2}
+              placeholder="House no., Street, City, State..."
+              className={`w-full text-sm border rounded-lg px-3 py-2 resize-none focus:outline-none focus:ring-2 focus:ring-primary/50 ${!guestAddress.trim() ? "border-red-200" : "border-input"}`}
+            />
           </div>
 
           {/* Dates */}
@@ -465,7 +495,7 @@ function BookingModal({
           <Button
             className="w-full"
             disabled={nights === 0 || mutation.isPending}
-            onClick={() => mutation.mutate()}
+            onClick={handleBooking}
           >
             {mutation.isPending ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
             {t("confirm_booking")}

@@ -63,6 +63,7 @@ export const bookingsTable = pgTable("bookings", {
 
   guestName: text("guest_name"),
   guestPhone: text("guest_phone"),
+  guestAddress: text("guest_address"),
 
   status: bookingStatusEnum("status").notNull().default("pending"),
   cancelReason: text("cancel_reason"),
