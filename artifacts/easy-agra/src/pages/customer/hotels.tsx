@@ -208,7 +208,10 @@ export default function CustomerHotels() {
                       </div>
                     )}
                     {hotel.description && (
-                      <p className="text-sm text-muted-foreground line-clamp-2">{hotel.description}</p>
+                      <div className="rounded-xl bg-gradient-to-br from-orange-500 to-amber-500 px-3 py-2.5">
+                        <p className="text-[10px] font-bold uppercase tracking-wider text-white/70 mb-1">About</p>
+                        <p className="text-xs text-white leading-snug line-clamp-2">{hotel.description}</p>
+                      </div>
                     )}
 
                     {/* Check-in / Check-out times */}

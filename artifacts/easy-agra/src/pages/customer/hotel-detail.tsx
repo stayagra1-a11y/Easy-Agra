@@ -632,7 +632,10 @@ export default function HotelDetail() {
 
           {/* Description */}
           {hotel.description && (
-            <p className="text-sm text-muted-foreground leading-relaxed">{hotel.description}</p>
+            <div className="rounded-2xl bg-gradient-to-br from-orange-500 to-amber-500 p-4 shadow-sm">
+              <p className="text-[11px] font-bold uppercase tracking-widest text-white/70 mb-1.5">About This Hotel</p>
+              <p className="text-sm text-white leading-relaxed">{hotel.description}</p>
+            </div>
           )}
 
           {/* Nearby Places */}
