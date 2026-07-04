@@ -698,7 +698,7 @@ export default function HotelDetail() {
           />
 
           {/* Rooms */}
-          <div>
+          <div id="rooms-section">
             <h2 className="font-bold text-base mb-3 flex items-center gap-2">
               <BedDouble className="h-5 w-5 text-primary" />
               Available Rooms
@@ -829,6 +829,18 @@ export default function HotelDetail() {
               })()}
             </div>
           )}
+
+          {/* Book Now CTA after policies */}
+          <button
+            onClick={() => {
+              const el = document.getElementById("rooms-section");
+              if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+            }}
+            className="w-full flex items-center justify-center gap-2 bg-primary text-white font-bold text-base rounded-2xl py-4 shadow-lg active:scale-95 transition-transform"
+          >
+            <CalendarDays className="h-5 w-5" />
+            Book Now — Choose a Room
+          </button>
         </div>
       </div>
 
