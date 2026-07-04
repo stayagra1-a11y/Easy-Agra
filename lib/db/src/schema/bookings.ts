@@ -61,6 +61,9 @@ export const bookingsTable = pgTable("bookings", {
     .default("18"),
   finalAmount: numeric("final_amount", { precision: 12, scale: 2 }).notNull(),
 
+  guestName: text("guest_name"),
+  guestPhone: text("guest_phone"),
+
   status: bookingStatusEnum("status").notNull().default("pending"),
   cancelReason: text("cancel_reason"),
   rejectionReason: text("rejection_reason"),

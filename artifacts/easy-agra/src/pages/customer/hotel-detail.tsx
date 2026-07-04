@@ -296,6 +296,8 @@ function BookingModal({
   const [children, setChildren] = useState(0);
   const [notes, setNotes] = useState("");
   const [earlyCheckIn, setEarlyCheckIn] = useState(false);
+  const [guestName, setGuestName] = useState("");
+  const [guestPhone, setGuestPhone] = useState("");
 
   const hotelEarlyEnabled = Boolean(hotel?.earlyCheckInEnabled);
   const earlyPrice = hotelEarlyEnabled && hotel?.earlyCheckInPrice
@@ -314,11 +316,13 @@ function BookingModal({
   const mutation = useMutation({
     mutationFn: () => apiRequest("/api/bookings", {
       method: "POST",
-      body: JSON.stringify({
+      body: {
         hotelId, roomId: room.id, checkInDate: checkIn, checkOutDate: checkOut,
         adultsCount: adults, childrenCount: children, customerNotes: notes,
         earlyCheckIn: earlyCheckIn && hotelEarlyEnabled,
-      }),
+        guestName: guestName.trim() || undefined,
+        guestPhone: guestPhone.trim() || undefined,
+      },
     }),
     onSuccess: (data: any) => onSuccess(data.bookingRef),
     onError: (err: any) => toast({
@@ -343,6 +347,29 @@ function BookingModal({
         </div>
 
         <div className="p-4 space-y-4">
+          {/* Guest Info */}
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1">
+              <Label className="text-xs">Guest Name <span className="text-red-500">*</span></Label>
+              <Input
+                placeholder="Full name"
+                value={guestName}
+                onChange={(e) => setGuestName(e.target.value)}
+                className="text-sm"
+              />
+            </div>
+            <div className="space-y-1">
+              <Label className="text-xs">Phone <span className="text-red-500">*</span></Label>
+              <Input
+                placeholder="10-digit number"
+                type="tel"
+                value={guestPhone}
+                onChange={(e) => setGuestPhone(e.target.value)}
+                className="text-sm"
+              />
+            </div>
+          </div>
+
           {/* Dates */}
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1">

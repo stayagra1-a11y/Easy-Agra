@@ -327,6 +327,8 @@ router.post(
       childrenCount,
       customerNotes,
       earlyCheckIn,
+      guestName,
+      guestPhone,
     } = req.body;
 
     if (!hotelId || !roomId || !checkInDate || !checkOutDate) {
@@ -396,6 +398,8 @@ router.post(
         taxRate: "18",
         finalAmount: String(finalAmount.toFixed(2)),
         customerNotes: customerNotes || null,
+        guestName: guestName || null,
+        guestPhone: guestPhone || null,
         status: "pending",
       })
       .returning();
