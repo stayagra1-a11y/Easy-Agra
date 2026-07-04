@@ -235,8 +235,8 @@ function Gallery({ hotel }: { hotel: Hotel }) {
 
       {/* Lightbox */}
       {lightbox && (
-        <div className="fixed inset-0 z-50 bg-black flex flex-col" onClick={() => setLightbox(null)}>
-          <div className="flex items-center justify-between px-4 pt-safe pt-4 pb-2" onClick={(e) => e.stopPropagation()}>
+        <div className="fixed inset-0 z-[200] bg-black flex flex-col" onClick={() => setLightbox(null)}>
+          <div className="flex items-center justify-between px-4 pt-4 pb-2" onClick={(e) => e.stopPropagation()}>
             <span className="text-white text-sm font-medium">{lightbox.idx + 1} / {lightbox.imgs.length}</span>
             <button onClick={() => setLightbox(null)} className="h-8 w-8 rounded-full bg-white/10 flex items-center justify-center">
               <X className="h-5 w-5 text-white" />
@@ -329,7 +329,7 @@ function BookingModal({
   });
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/60 flex items-end justify-center sm:items-center p-4">
+    <div className="fixed inset-0 z-[200] bg-black/60 flex items-end justify-center sm:items-center p-4">
       <div className="bg-white w-full max-w-sm rounded-2xl shadow-2xl max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b">
