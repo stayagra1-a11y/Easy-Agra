@@ -168,8 +168,10 @@ router.get("/hotels/:id", requireAuth, async (req, res): Promise<void> => {
   const cu = (req as any).currentUser;
   const id = parseInt(req.params.id as string, 10);
   const hotel = await findHotel(id);
-  if (!hotel) { res.status(404).json({ error: "Hotel not found" }); return; }
-  if (!ownerGuard(hotel, cu.id, cu.role)) { res.status(403).json({ error: "Access denied" }); return; }
+  if (!hotel || hotel.deletedAt) { res.status(404).json({ error: "Hotel not found" }); return; }
+  // Approved hotels are publicly viewable by any authenticated user
+  const canView = hotel.status === "approved" || ownerGuard(hotel, cu.id, cu.role);
+  if (!canView) { res.status(403).json({ error: "Access denied" }); return; }
   res.json(serializeHotel(hotel));
 });
 
