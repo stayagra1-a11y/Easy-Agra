@@ -5293,6 +5293,16 @@ components:
           type: ["array", "null"]
           items:
             type: string
+        categorizedPhotos:
+          type: ["array", "null"]
+          items:
+            type: object
+            properties:
+              url:
+                type: string
+              category:
+                type: string
+                enum: [room, lobby, facade, nearby]
         earlyCheckInEnabled:
           type: ["boolean", "null"]
         earlyCheckInTime:
@@ -5381,6 +5391,16 @@ components:
           type: array
           items:
             type: string
+        categorizedPhotos:
+          type: array
+          items:
+            type: object
+            properties:
+              url:
+                type: string
+              category:
+                type: string
+                enum: [room, lobby, facade, nearby]
         earlyCheckInEnabled:
           type: boolean
         earlyCheckInTime:
@@ -5441,6 +5461,16 @@ components:
           type: array
           items:
             type: string
+        categorizedPhotos:
+          type: array
+          items:
+            type: object
+            properties:
+              url:
+                type: string
+              category:
+                type: string
+                enum: [room, lobby, facade, nearby]
         earlyCheckInEnabled:
           type: boolean
         earlyCheckInTime:

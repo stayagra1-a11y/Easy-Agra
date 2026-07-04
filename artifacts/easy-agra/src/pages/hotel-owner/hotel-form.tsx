@@ -119,6 +119,127 @@ function ImageUpload({
   );
 }
 
+const PHOTO_CATEGORY_OPTIONS = [
+  { value: "room", label: "Room", emoji: "🛏" },
+  { value: "lobby", label: "Lobby", emoji: "🏛" },
+  { value: "facade", label: "Exterior", emoji: "🏨" },
+  { value: "nearby", label: "Nearby", emoji: "📍" },
+] as const;
+
+function CategorizedPhotoSection({
+  photos,
+  onChange,
+}: {
+  photos: { url: string; category: string }[];
+  onChange: (photos: { url: string; category: string }[]) => void;
+}) {
+  const [selectedCategory, setSelectedCategory] = useState<string>("room");
+  const [uploading, setUploading] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const { toast } = useToast();
+
+  const handleFiles = async (files: FileList | null) => {
+    if (!files) return;
+    setUploading(true);
+    try {
+      const uploads = await Promise.all(Array.from(files).map((f) => uploadToCloudinary(f)));
+      onChange([...photos, ...uploads.map((url) => ({ url, category: selectedCategory }))]);
+    } catch {
+      toast({ title: "Upload failed", variant: "destructive" });
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const removePhoto = (idx: number) => {
+    onChange(photos.filter((_, i) => i !== idx));
+  };
+
+  return (
+    <Card>
+      <CardHeader className="pb-2 pt-4 px-4">
+        <CardTitle className="text-sm font-semibold flex items-center gap-2">
+          <Image className="h-4 w-4 text-primary" /> Gallery Photos (Categorized)
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="px-4 pb-4 space-y-3">
+        <p className="text-xs text-muted-foreground">Select a category, then upload photos for it.</p>
+
+        {/* Category selector */}
+        <div className="grid grid-cols-4 gap-2">
+          {PHOTO_CATEGORY_OPTIONS.map((cat) => {
+            const count = photos.filter((p) => p.category === cat.value).length;
+            return (
+              <button
+                key={cat.value}
+                type="button"
+                onClick={() => setSelectedCategory(cat.value)}
+                className={`flex flex-col items-center gap-1 py-2 px-1 rounded-xl border text-xs font-medium transition-colors ${
+                  selectedCategory === cat.value
+                    ? "border-primary bg-primary/10 text-primary"
+                    : "border-border bg-muted/30 text-muted-foreground"
+                }`}
+              >
+                <span className="text-lg">{cat.emoji}</span>
+                <span>{cat.label}</span>
+                {count > 0 && (
+                  <span className={`text-[10px] font-bold ${selectedCategory === cat.value ? "text-primary" : "text-muted-foreground"}`}>
+                    {count} photo{count !== 1 ? "s" : ""}
+                  </span>
+                )}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Upload button for selected category */}
+        <button
+          type="button"
+          onClick={() => inputRef.current?.click()}
+          disabled={uploading}
+          className="w-full h-12 rounded-lg border-2 border-dashed border-primary/40 flex items-center justify-center gap-2 text-primary text-sm font-medium hover:bg-primary/5 transition-colors disabled:opacity-50"
+        >
+          {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
+          {uploading ? "Uploading..." : `Add ${PHOTO_CATEGORY_OPTIONS.find((c) => c.value === selectedCategory)?.label ?? ""} photos`}
+        </button>
+        <input ref={inputRef} type="file" accept="image/*" multiple className="hidden" onChange={(e) => handleFiles(e.target.files)} />
+
+        {/* Photos by category */}
+        {PHOTO_CATEGORY_OPTIONS.map((cat) => {
+          const catPhotos = photos.filter((p) => p.category === cat.value);
+          if (!catPhotos.length) return null;
+          return (
+            <div key={cat.value}>
+              <p className="text-xs font-semibold text-muted-foreground mb-1.5">{cat.emoji} {cat.label}</p>
+              <div className="grid grid-cols-4 gap-2">
+                {catPhotos.map((photo, i) => {
+                  const globalIdx = photos.findIndex((p) => p.url === photo.url && p.category === cat.value);
+                  return (
+                    <div key={i} className="relative group aspect-square">
+                      <img src={photo.url} alt="" className="w-full h-full object-cover rounded-lg" />
+                      <button
+                        type="button"
+                        onClick={() => removePhoto(globalIdx)}
+                        className="absolute top-0.5 right-0.5 bg-black/70 text-white rounded-full h-5 w-5 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          );
+        })}
+
+        {photos.length === 0 && (
+          <p className="text-center text-xs text-muted-foreground py-2">No photos uploaded yet</p>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
 const CATEGORY_LABELS: Record<string, string> = {
   tourist_place: "Tourist Place",
   railway_station: "Railway Station",
@@ -296,6 +417,7 @@ type FormData = {
   amenities: string[];
   coverImage: string;
   galleryImages: string[];
+  categorizedPhotos: { url: string; category: string }[];
   earlyCheckInEnabled: boolean;
   earlyCheckInTime: string;
   earlyCheckInPrice: string;
@@ -307,7 +429,7 @@ const EMPTY_FORM: FormData = {
   contactPerson: "", contactMobile: "", contactEmail: "", website: "",
   checkInTime: "14:00", checkOutTime: "11:00",
   totalRooms: "", policies: "", cancellationPolicy: "",
-  amenities: [], coverImage: "", galleryImages: [],
+  amenities: [], coverImage: "", galleryImages: [], categorizedPhotos: [],
   earlyCheckInEnabled: false, earlyCheckInTime: "", earlyCheckInPrice: "",
 };
 
@@ -407,6 +529,7 @@ export default function HotelForm() {
         amenities: existingHotel.amenities || [],
         coverImage: existingHotel.coverImage || "",
         galleryImages: existingHotel.galleryImages || [],
+        categorizedPhotos: (existingHotel as any).categorizedPhotos || [],
         earlyCheckInEnabled: (existingHotel as any).earlyCheckInEnabled ?? false,
         earlyCheckInTime: (existingHotel as any).earlyCheckInTime || "",
         earlyCheckInPrice: (existingHotel as any).earlyCheckInPrice?.toString() || "",
@@ -441,6 +564,7 @@ export default function HotelForm() {
     amenities: form.amenities,
     coverImage: form.coverImage || undefined,
     galleryImages: form.galleryImages,
+    categorizedPhotos: form.categorizedPhotos,
     earlyCheckInEnabled: form.earlyCheckInEnabled,
     earlyCheckInTime: form.earlyCheckInTime || undefined,
     earlyCheckInPrice: form.earlyCheckInPrice ? parseFloat(form.earlyCheckInPrice) : undefined,
@@ -798,16 +922,10 @@ export default function HotelForm() {
                 />
               </CardContent>
             </Card>
-            <Card>
-              <CardContent className="px-4 py-4">
-                <ImageUpload
-                  label="Gallery Images (up to 8)"
-                  value={form.galleryImages}
-                  onChange={(v) => setForm((f) => ({ ...f, galleryImages: v as string[] }))}
-                  multiple
-                />
-              </CardContent>
-            </Card>
+            <CategorizedPhotoSection
+              photos={form.categorizedPhotos}
+              onChange={(photos) => setForm((f) => ({ ...f, categorizedPhotos: photos }))}
+            />
           </TabsContent>
 
           {/* Nearby Places */}

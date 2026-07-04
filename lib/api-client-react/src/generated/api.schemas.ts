@@ -478,6 +478,8 @@ export interface Hotel {
   /** @nullable */
   galleryImages?: string[] | null;
   /** @nullable */
+  categorizedPhotos?: { url: string; category: string }[] | null;
+  /** @nullable */
   earlyCheckInEnabled?: boolean | null;
   /** @nullable */
   earlyCheckInTime?: string | null;
@@ -537,6 +539,7 @@ export interface HotelInput {
   amenities?: string[];
   coverImage?: string;
   galleryImages?: string[];
+  categorizedPhotos?: { url: string; category: string }[];
   earlyCheckInEnabled?: boolean;
   earlyCheckInTime?: string;
   earlyCheckInPrice?: number;
@@ -574,6 +577,7 @@ export interface HotelUpdate {
   amenities?: string[];
   coverImage?: string;
   galleryImages?: string[];
+  categorizedPhotos?: { url: string; category: string }[];
   earlyCheckInEnabled?: boolean;
   earlyCheckInTime?: string;
   earlyCheckInPrice?: number;

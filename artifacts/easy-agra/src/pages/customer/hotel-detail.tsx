@@ -40,6 +40,7 @@ interface Hotel {
   amenities: string[];
   coverImage: string | null;
   galleryImages: string[];
+  categorizedPhotos: { url: string; category: string }[] | null;
   rating: string | null;
   reviewCount: number;
   pricePerNight: number | null;
@@ -137,41 +138,142 @@ function NearbyDistances({ hotelId }: { hotelId: number }) {
   );
 }
 
-// ── Gallery ───────────────────────────────────────────────────────────────────
-function Gallery({ images, name }: { images: string[]; name: string }) {
-  const [current, setCurrent] = useState(0);
-  if (!images.length) return (
-    <div className="h-52 bg-muted flex items-center justify-center rounded-xl">
+// ── Photo Gallery with category tabs + lightbox ───────────────────────────────
+type CategorizedPhoto = { url: string; category: string };
+const PHOTO_CATEGORIES = ["all", "room", "lobby", "facade", "nearby"] as const;
+const CATEGORY_LABELS: Record<string, string> = { all: "All", room: "Room", lobby: "Lobby", facade: "Exterior", nearby: "Nearby" };
+
+function Gallery({ hotel }: { hotel: Hotel }) {
+  const [activeTab, setActiveTab] = useState<string>("all");
+  const [lightbox, setLightbox] = useState<{ imgs: string[]; idx: number } | null>(null);
+
+  const categorized: CategorizedPhoto[] = hotel.categorizedPhotos ?? [];
+  const uncategorized: CategorizedPhoto[] = (hotel.galleryImages ?? []).map((u) => ({ url: u, category: "uncategorized" }));
+  const cover: CategorizedPhoto[] = hotel.coverImage ? [{ url: hotel.coverImage, category: "uncategorized" }] : [];
+
+  const allPhotos: CategorizedPhoto[] = [
+    ...categorized,
+    ...uncategorized.filter((u) => !categorized.some((c) => c.url === u.url)),
+    ...cover.filter((c) => !categorized.some((x) => x.url === c.url) && !uncategorized.some((x) => x.url === c.url)),
+  ];
+
+  const availableTabs = PHOTO_CATEGORIES.filter((tab) =>
+    tab === "all" ? allPhotos.length > 0 : categorized.some((p) => p.category === tab)
+  );
+
+  const filtered = activeTab === "all" ? allPhotos : allPhotos.filter((p) => p.category === activeTab);
+
+  if (!allPhotos.length) return (
+    <div className="h-44 bg-muted flex items-center justify-center rounded-xl">
       <BedDouble className="h-12 w-12 text-muted-foreground" />
     </div>
   );
+
+  const openLightbox = (photos: CategorizedPhoto[], idx: number) => {
+    setLightbox({ imgs: photos.map((p) => p.url), idx });
+  };
+
   return (
-    <div className="relative h-56 rounded-xl overflow-hidden bg-black">
-      <img src={imgUrl(images[current], 1000)} alt={name} className="w-full h-full object-cover" />
-      {images.length > 1 && (
-        <>
-          <button
-            onClick={() => setCurrent((c) => (c - 1 + images.length) % images.length)}
-            className="absolute left-2 top-1/2 -translate-y-1/2 h-8 w-8 rounded-full bg-black/50 text-white flex items-center justify-center"
-          >
-            <ChevronLeft className="h-5 w-5" />
-          </button>
-          <button
-            onClick={() => setCurrent((c) => (c + 1) % images.length)}
-            className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 rounded-full bg-black/50 text-white flex items-center justify-center"
-          >
-            <ChevronRight className="h-5 w-5" />
-          </button>
-          <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1">
-            {images.map((_, i) => (
-              <button
-                key={i}
-                onClick={() => setCurrent(i)}
-                className={`h-1.5 rounded-full transition-all ${i === current ? "w-4 bg-white" : "w-1.5 bg-white/50"}`}
+    <div className="space-y-3">
+      {/* Category tabs */}
+      {availableTabs.length > 1 && (
+        <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none">
+          {availableTabs.map((tab) => (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+                activeTab === tab
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-muted text-muted-foreground hover:bg-muted/80"
+              }`}
+            >
+              {CATEGORY_LABELS[tab] ?? tab}
+              {tab !== "all" && (
+                <span className="ml-1 opacity-70">({allPhotos.filter((p) => p.category === tab).length})</span>
+              )}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {/* Hero photo */}
+      {filtered.length > 0 && (
+        <div
+          className="relative h-52 rounded-xl overflow-hidden bg-black cursor-pointer"
+          onClick={() => openLightbox(filtered, 0)}
+        >
+          <img src={imgUrl(filtered[0].url, 800)} alt={hotel.name} className="w-full h-full object-cover" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
+          {filtered.length > 1 && (
+            <div className="absolute bottom-2 right-2 flex items-center gap-1 bg-black/60 text-white text-xs font-medium px-2.5 py-1 rounded-full">
+              +{filtered.length - 1} photos
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Thumbnail strip */}
+      {filtered.length > 1 && (
+        <div className="grid grid-cols-4 gap-1.5">
+          {filtered.slice(1, 5).map((photo, i) => (
+            <div
+              key={i}
+              className="relative aspect-square rounded-lg overflow-hidden bg-muted cursor-pointer"
+              onClick={() => openLightbox(filtered, i + 1)}
+            >
+              <img src={imgUrl(photo.url, 200)} alt="" className="w-full h-full object-cover" />
+              {i === 3 && filtered.length > 5 && (
+                <div className="absolute inset-0 bg-black/60 flex items-center justify-center text-white text-sm font-bold">
+                  +{filtered.length - 5}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Lightbox */}
+      {lightbox && (
+        <div className="fixed inset-0 z-50 bg-black flex flex-col" onClick={() => setLightbox(null)}>
+          <div className="flex items-center justify-between px-4 pt-safe pt-4 pb-2" onClick={(e) => e.stopPropagation()}>
+            <span className="text-white text-sm font-medium">{lightbox.idx + 1} / {lightbox.imgs.length}</span>
+            <button onClick={() => setLightbox(null)} className="h-8 w-8 rounded-full bg-white/10 flex items-center justify-center">
+              <X className="h-5 w-5 text-white" />
+            </button>
+          </div>
+          <div className="flex-1 flex items-center justify-center relative" onClick={(e) => e.stopPropagation()}>
+            <img
+              src={imgUrl(lightbox.imgs[lightbox.idx], 1200)}
+              alt=""
+              className="max-w-full max-h-full object-contain"
+            />
+            {lightbox.imgs.length > 1 && (
+              <>
+                <button
+                  onClick={() => setLightbox((lb) => lb ? { ...lb, idx: (lb.idx - 1 + lb.imgs.length) % lb.imgs.length } : null)}
+                  className="absolute left-3 h-10 w-10 rounded-full bg-black/60 flex items-center justify-center"
+                >
+                  <ChevronLeft className="h-6 w-6 text-white" />
+                </button>
+                <button
+                  onClick={() => setLightbox((lb) => lb ? { ...lb, idx: (lb.idx + 1) % lb.imgs.length } : null)}
+                  className="absolute right-3 h-10 w-10 rounded-full bg-black/60 flex items-center justify-center"
+                >
+                  <ChevronRight className="h-6 w-6 text-white" />
+                </button>
+              </>
+            )}
+          </div>
+          {/* Dot strip */}
+          <div className="flex justify-center gap-1.5 py-4 pb-safe" onClick={(e) => e.stopPropagation()}>
+            {lightbox.imgs.slice(0, 12).map((_, i) => (
+              <button key={i} onClick={() => setLightbox((lb) => lb ? { ...lb, idx: i } : null)}
+                className={`rounded-full transition-all ${i === lightbox.idx ? "w-4 h-2 bg-white" : "w-2 h-2 bg-white/40"}`}
               />
             ))}
           </div>
-        </>
+        </div>
       )}
     </div>
   );
@@ -370,11 +472,6 @@ export default function HotelDetail() {
   });
 
   const rooms = roomsData?.rooms ?? [];
-  const allImages = hotel ? [
-    ...(hotel.coverImage ? [hotel.coverImage] : []),
-    ...(hotel.galleryImages ?? []),
-  ] : [];
-
   if (hotelLoading) return (
     <CustomerLayout>
       <div className="flex justify-center py-20">
@@ -436,7 +533,7 @@ export default function HotelDetail() {
 
         {/* Gallery */}
         <div className="px-4 mb-4">
-          <Gallery images={allImages} name={hotel.name} />
+          <Gallery hotel={hotel} />
         </div>
 
         {/* Hotel info */}

@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { apiRequest } from "@/lib/api-request";
 import { useQuery } from "@tanstack/react-query";
-import { Loader2, BedDouble, MapPin, Search, Star, IndianRupee, Navigation } from "lucide-react";
+import { Loader2, BedDouble, MapPin, Search, Star, IndianRupee, Navigation, ChevronLeft, ChevronRight, Images } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 
 interface Hotel {
@@ -22,8 +22,67 @@ interface Hotel {
   rating: string | null;
   reviewCount: number;
   coverImage: string | null;
+  galleryImages: string[] | null;
+  categorizedPhotos: { url: string; category: string }[] | null;
   amenities: string[];
   status: string;
+}
+
+function HotelPhotoCarousel({ hotel }: { hotel: Hotel }) {
+  const [idx, setIdx] = useState(0);
+
+  const photos: string[] = [
+    ...(hotel.categorizedPhotos ?? []).map((p) => p.url),
+    ...(hotel.galleryImages ?? []),
+    ...(hotel.coverImage ? [hotel.coverImage] : []),
+  ].filter((u, i, arr) => arr.indexOf(u) === i);
+
+  if (!photos.length) return (
+    <div className="h-44 bg-muted flex items-center justify-center">
+      <BedDouble className="h-10 w-10 text-muted-foreground" />
+    </div>
+  );
+
+  const prev = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIdx((i) => (i - 1 + photos.length) % photos.length);
+  };
+  const next = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIdx((i) => (i + 1) % photos.length);
+  };
+
+  return (
+    <div className="relative h-44 overflow-hidden bg-black">
+      <img
+        src={imgUrl(photos[idx], 600)}
+        alt="Hotel photo"
+        className="w-full h-full object-cover transition-opacity duration-200"
+        onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+      />
+      {photos.length > 1 && (
+        <>
+          <button onClick={prev} className="absolute left-2 top-1/2 -translate-y-1/2 h-7 w-7 rounded-full bg-black/50 text-white flex items-center justify-center">
+            <ChevronLeft className="h-4 w-4" />
+          </button>
+          <button onClick={next} className="absolute right-2 top-1/2 -translate-y-1/2 h-7 w-7 rounded-full bg-black/50 text-white flex items-center justify-center">
+            <ChevronRight className="h-4 w-4" />
+          </button>
+          <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1 items-center">
+            {photos.map((_, i) => (
+              <button key={i} onClick={(e) => { e.stopPropagation(); setIdx(i); }}
+                className={`rounded-full transition-all ${i === idx ? "w-3.5 h-1.5 bg-white" : "w-1.5 h-1.5 bg-white/50"}`}
+              />
+            ))}
+          </div>
+          <div className="absolute top-2 right-2 flex items-center gap-1 bg-black/50 text-white text-[10px] font-medium px-2 py-0.5 rounded-full">
+            <Images className="h-3 w-3" />
+            {idx + 1}/{photos.length}
+          </div>
+        </>
+      )}
+    </div>
+  );
 }
 
 interface HotelListResult {
@@ -122,16 +181,7 @@ export default function CustomerHotels() {
                   className="overflow-hidden cursor-pointer hover:shadow-md transition-shadow"
                   onClick={() => navigate(`/hotels/${hotel.id}`)}
                 >
-                  {hotel.coverImage && (
-                    <div className="h-40 overflow-hidden">
-                      <img
-                        src={imgUrl(hotel.coverImage, 600)}
-                        alt={hotel.name}
-                        className="w-full h-full object-cover"
-                        onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
-                      />
-                    </div>
-                  )}
+                  <HotelPhotoCarousel hotel={hotel} />
                   <CardContent className="p-4 space-y-2">
                     <div className="flex items-start justify-between gap-2">
                       <div>

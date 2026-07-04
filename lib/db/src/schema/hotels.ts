@@ -61,6 +61,7 @@ export const hotelsTable = pgTable("hotels", {
   amenities: jsonb("amenities").$type<string[]>(),
   coverImage: text("cover_image"),
   galleryImages: jsonb("gallery_images").$type<string[]>(),
+  categorizedPhotos: jsonb("categorized_photos").$type<{ url: string; category: string }[]>().default([]),
 
   earlyCheckInEnabled: boolean("early_check_in_enabled").notNull().default(false),
   earlyCheckInTime: text("early_check_in_time"),

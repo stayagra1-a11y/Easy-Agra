@@ -121,7 +121,7 @@ router.post("/hotels", requireRole("hotel_owner"), async (req, res): Promise<voi
     name, description, category, address, city, state, pincode, googleMapLink, landmark,
     contactPerson, contactMobile, contactEmail, website,
     checkInTime, checkOutTime, totalRooms, policies, cancellationPolicy,
-    amenities, coverImage, galleryImages,
+    amenities, coverImage, galleryImages, categorizedPhotos,
   } = req.body;
 
   if (!name || !String(name).trim()) {
@@ -152,6 +152,7 @@ router.post("/hotels", requireRole("hotel_owner"), async (req, res): Promise<voi
     amenities: Array.isArray(amenities) ? amenities : [],
     coverImage: coverImage || null,
     galleryImages: Array.isArray(galleryImages) ? galleryImages : [],
+    categorizedPhotos: Array.isArray(categorizedPhotos) ? categorizedPhotos : [],
     status: "draft",
   }).returning();
 
@@ -191,7 +192,7 @@ router.put("/hotels/:id", requireAuth, async (req, res): Promise<void> => {
     name, description, category, address, city, state, pincode, googleMapLink, landmark,
     contactPerson, contactMobile, contactEmail, website,
     checkInTime, checkOutTime, totalRooms, policies, cancellationPolicy,
-    amenities, coverImage, galleryImages,
+    amenities, coverImage, galleryImages, categorizedPhotos,
     earlyCheckInEnabled, earlyCheckInTime, earlyCheckInPrice,
   } = req.body;
 
@@ -217,6 +218,7 @@ router.put("/hotels/:id", requireAuth, async (req, res): Promise<void> => {
   if (amenities !== undefined) updates.amenities = Array.isArray(amenities) ? amenities : [];
   if (coverImage !== undefined) updates.coverImage = coverImage || null;
   if (galleryImages !== undefined) updates.galleryImages = Array.isArray(galleryImages) ? galleryImages : [];
+  if (categorizedPhotos !== undefined) updates.categorizedPhotos = Array.isArray(categorizedPhotos) ? categorizedPhotos : [];
   if (earlyCheckInEnabled !== undefined) updates.earlyCheckInEnabled = Boolean(earlyCheckInEnabled);
   if (earlyCheckInTime !== undefined) updates.earlyCheckInTime = earlyCheckInTime || null;
   if (earlyCheckInPrice !== undefined) updates.earlyCheckInPrice = earlyCheckInPrice != null ? String(parseFloat(String(earlyCheckInPrice)).toFixed(2)) : null;
