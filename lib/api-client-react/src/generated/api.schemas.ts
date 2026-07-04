@@ -848,6 +848,9 @@ export interface Booking {
   hotelName?: string | null;
   roomName?: string | null;
   ownerName?: string | null;
+  guestName?: string | null;
+  guestPhone?: string | null;
+  guestAddress?: string | null;
   createdAt: string;
   updatedAt: string;
 }

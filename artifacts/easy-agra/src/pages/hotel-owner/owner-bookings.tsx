@@ -58,6 +58,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Eye,
+  MapPin,
 } from "lucide-react";
 import { format, parseISO } from "date-fns";
 
@@ -126,6 +127,15 @@ function BookingDetailSheet({
                 <span className="font-medium">Guest:</span>
                 <span>{booking.customerName ?? "—"}</span>
               </div>
+              {booking.guestAddress && (
+                <div className="flex items-start gap-2 text-sm">
+                  <MapPin className="h-4 w-4 text-muted-foreground shrink-0 mt-0.5" />
+                  <div>
+                    <span className="font-medium">Address:</span>
+                    <p className="text-muted-foreground mt-0.5 leading-snug">{booking.guestAddress}</p>
+                  </div>
+                </div>
+              )}
               <div className="flex items-center gap-2 text-sm">
                 <Building2 className="h-4 w-4 text-muted-foreground" />
                 <span className="font-medium">Hotel:</span>

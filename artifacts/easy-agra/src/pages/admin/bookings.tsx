@@ -394,6 +394,11 @@ export default function AdminBookings() {
                         <div className="mt-1 text-sm font-medium text-foreground truncate">
                           {b.customerName} → {b.hotelName}
                         </div>
+                        {(b as any).guestPhone && (
+                          <div className="mt-0.5 flex items-center gap-1 text-xs font-semibold text-blue-700 bg-blue-50 border border-blue-200 rounded-md px-2 py-0.5 w-fit">
+                            📞 {(b as any).guestPhone}
+                          </div>
+                        )}
                         <div className="mt-0.5 text-xs text-muted-foreground space-y-0.5">
                           <div>Room: {b.roomName} &nbsp;|&nbsp; Owner: {b.ownerName}</div>
                           <div className="flex items-center gap-1">
