@@ -403,35 +403,42 @@ export default function HotelOwnerHotels() {
           }
         }}
       >
-        <AlertDialogContent className="max-w-md">
-          <AlertDialogHeader>
+        <AlertDialogContent className="max-w-md w-[95vw] max-h-[90vh] overflow-y-auto flex flex-col">
+          <AlertDialogHeader className="shrink-0">
             <AlertDialogTitle className="flex items-center gap-2">
               <FileCheck className="h-5 w-5 text-primary" /> Commission Agreement
             </AlertDialogTitle>
-            <AlertDialogDescription className="space-y-3">
-              <p className="text-sm">
-                Before submitting <strong>"{commissionTarget?.name}"</strong>, please review and accept the commission agreement.
-              </p>
-              <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 text-sm">
-                <p className="font-medium text-amber-800 mb-1">Commission Terms</p>
-                <p className="text-amber-700">
-                  Easy Agra will charge a <strong>15% commission</strong> on every booking amount for this hotel listing. This commission will be deducted from each booking before the payout is processed to your account.
-                </p>
-              </div>
-              <div className="flex items-start gap-2 pt-1">
-                <Checkbox
-                  id="agree"
-                  checked={agreementChecked}
-                  onCheckedChange={(v) => setAgreementChecked(v === true)}
-                />
-                <label htmlFor="agree" className="text-sm text-muted-foreground leading-tight cursor-pointer">
-                  I agree to the 15% commission terms and authorize Easy Agra to deduct commission from all bookings.
-                </label>
-              </div>
-            </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter>
+          <div className="flex-1 overflow-y-auto space-y-3 py-2 text-sm text-muted-foreground">
+            <p>
+              Hotel <strong className="text-foreground">"{commissionTarget?.name}"</strong> submit karne se pehle neeche diye gaye commission terms padhen aur accept karein.
+            </p>
+            <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
+              <p className="font-semibold text-amber-800 mb-1">💰 Commission Terms — 15%</p>
+              <p className="text-amber-700 text-sm leading-relaxed">
+                Easy Agra har booking amount par <strong>15% commission</strong> charge karega. Yeh commission har booking se pehle deduct hogi aur baaki amount aapke account mein transfer kiya jayega.
+              </p>
+              <ul className="mt-2 text-amber-700 text-xs space-y-1 list-disc list-inside">
+                <li>Commission sabhi room bookings par lagegi</li>
+                <li>Payout 3-5 business days mein process hoga</li>
+                <li>Cancellation par refunded commission bhi deduct hogi</li>
+              </ul>
+            </div>
+            <div className="flex items-start gap-3 bg-muted/30 rounded-lg p-3 border">
+              <Checkbox
+                id="agree"
+                checked={agreementChecked}
+                onCheckedChange={(v) => setAgreementChecked(v === true)}
+                className="mt-0.5 shrink-0"
+              />
+              <label htmlFor="agree" className="text-sm leading-relaxed cursor-pointer select-none">
+                Main 15% commission terms se <strong>agree karta/karti hoon</strong> aur Easy Agra ko sabhi bookings se commission deduct karne ka adhikar deta/deti hoon.
+              </label>
+            </div>
+          </div>
+          <AlertDialogFooter className="shrink-0 flex-col sm:flex-row gap-2 pt-2">
             <AlertDialogCancel
+              className="w-full sm:w-auto"
               onClick={() => {
                 setCommissionTarget(null);
                 setAgreementChecked(false);
@@ -441,23 +448,24 @@ export default function HotelOwnerHotels() {
               Cancel
             </AlertDialogCancel>
             <AlertDialogAction
+              className="w-full sm:w-auto"
               onClick={async () => {
                 if (!commissionTarget || !agreementChecked) return;
                 try {
                   setAgreementLoading(true);
-                  // Try to get existing agreement
                   const existing = await apiRequest(`/api/hotel-commission-agreements/${commissionTarget.id}`);
-                  if (existing && existing.exists !== false && !existing.agreed) {
-                    await apiRequest(`/api/hotel-commission-agreements/${commissionTarget.id}/agree`, { method: "POST" });
-                  } else {
-                    // No agreement yet — create then agree
+                  if (!existing || existing.exists === false) {
+                    // No agreement — create then agree
                     await apiRequest("/api/hotel-commission-agreements", {
                       method: "POST",
                       body: { hotelId: commissionTarget.id, commissionRate: 15 },
                     });
                     await apiRequest(`/api/hotel-commission-agreements/${commissionTarget.id}/agree`, { method: "POST" });
+                  } else if (!existing.agreed) {
+                    // Agreement exists but not agreed yet
+                    await apiRequest(`/api/hotel-commission-agreements/${commissionTarget.id}/agree`, { method: "POST" });
                   }
-                  // Now submit hotel
+                  // Already agreed — proceed directly to submit
                   submitMutation.mutate({ id: commissionTarget.id });
                   setCommissionTarget(null);
                   setAgreementChecked(false);
@@ -473,7 +481,7 @@ export default function HotelOwnerHotels() {
               }}
               disabled={!agreementChecked || submitMutation.isPending || agreementLoading}
             >
-              {agreementLoading || submitMutation.isPending ? "Processing..." : "Agree & Submit"}
+              {agreementLoading || submitMutation.isPending ? "Processing..." : "✓ Agree & Submit"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
