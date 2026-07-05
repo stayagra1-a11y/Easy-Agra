@@ -43,6 +43,7 @@ interface Hotel {
   categorizedPhotos: { url: string; category: string }[] | null;
   rating: string | null;
   reviewCount: number;
+  starRating: number | null;
   pricePerNight: number | null;
   policies: string | null;
   cancellationPolicy: string | null;
@@ -627,22 +628,20 @@ export default function HotelDetail() {
           {/* Name + rating */}
           <div className="flex items-start justify-between gap-2">
             <div className="flex-1">
-              <div className="flex items-center gap-2 flex-wrap">
-                <h1 className="text-2xl font-extrabold leading-tight tracking-tight bg-gradient-to-r from-primary via-primary/80 to-amber-600 bg-clip-text text-transparent">
-                  {hotel.name}
-                </h1>
-              </div>
+              <h1 className="text-2xl font-extrabold leading-tight tracking-tight bg-gradient-to-r from-primary via-primary/80 to-amber-600 bg-clip-text text-transparent">
+                {hotel.name}
+              </h1>
+              {hotel.starRating && hotel.starRating > 0 && (
+                <div className="flex items-center gap-0.5 mt-1">
+                  {Array.from({ length: hotel.starRating }).map((_, i) => (
+                    <Star key={i} className="h-4 w-4 fill-amber-400 text-amber-400" />
+                  ))}
+                  <span className="text-xs font-medium text-amber-700 ml-1">{hotel.starRating} Star Hotel</span>
+                </div>
+              )}
               <div className="flex items-center gap-2 mt-1.5 flex-wrap">
                 {hotel.category && (
                   <Badge className="text-xs bg-primary/10 text-primary border border-primary/20 font-semibold capitalize">{hotel.category}</Badge>
-                )}
-                {(hotel as any).starRating && (
-                  <div className="flex items-center gap-0.5">
-                    {Array.from({ length: (hotel as any).starRating }).map((_: unknown, i: number) => (
-                      <Star key={i} className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
-                    ))}
-                    <span className="text-xs text-muted-foreground ml-1">{(hotel as any).starRating} Star</span>
-                  </div>
                 )}
               </div>
             </div>

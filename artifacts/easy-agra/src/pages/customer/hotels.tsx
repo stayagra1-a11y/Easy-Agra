@@ -189,6 +189,13 @@ export default function CustomerHotels() {
                     <div className="flex items-start justify-between gap-2">
                       <div>
                         <h2 className="font-bold text-base leading-tight">{hotel.name}</h2>
+                        {(hotel as any).starRating && (hotel as any).starRating > 0 && (
+                          <div className="flex items-center gap-0.5 mt-0.5">
+                            {Array.from({ length: (hotel as any).starRating }).map((_: unknown, i: number) => (
+                              <Star key={i} className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
+                            ))}
+                          </div>
+                        )}
                         {hotel.category && (
                           <Badge variant="secondary" className="text-xs mt-1">{hotel.category}</Badge>
                         )}
