@@ -168,6 +168,48 @@ import Help from "@/pages/support/help";
 import Privacy from "@/pages/support/privacy";
 import Terms from "@/pages/support/terms";
 import Maintenance from "@/pages/maintenance";
+import { useQuery } from "@tanstack/react-query";
+import { AlertTriangle } from "lucide-react";
+
+const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
+
+const ADMIN_ROLES = ["admin", "super_admin"];
+
+function MaintenanceGate({ children }: { children: React.ReactNode }) {
+  const { user } = useAuth();
+  const { data } = useQuery({
+    queryKey: ["maintenance-status"],
+    queryFn: async () => {
+      const res = await fetch(`${BASE}/api/maintenance-status`);
+      if (!res.ok) return { maintenanceMode: false };
+      return res.json() as Promise<{ maintenanceMode: boolean }>;
+    },
+    refetchInterval: 30_000,
+    staleTime: 30_000,
+  });
+
+  const isOn = data?.maintenanceMode ?? false;
+
+  if (isOn && user && !ADMIN_ROLES.includes(user.role)) {
+    return <Maintenance />;
+  }
+
+  if (isOn && (!user || !ADMIN_ROLES.includes(user.role))) {
+    return <Maintenance />;
+  }
+
+  return (
+    <>
+      {isOn && user && ADMIN_ROLES.includes(user.role) && (
+        <div className="fixed top-0 left-0 right-0 z-[999] bg-amber-500 text-white text-center text-xs py-1.5 px-4 flex items-center justify-center gap-2">
+          <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
+          <span><strong>Maintenance Mode ON</strong> — Customers see the maintenance page. Only admins can access the app.</span>
+        </div>
+      )}
+      {children}
+    </>
+  );
+}
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -373,8 +415,10 @@ function App() {
           <OfflineBanner />
           <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
             <AuthProvider>
-              <Router />
-              <PwaInstallBanner />
+              <MaintenanceGate>
+                <Router />
+                <PwaInstallBanner />
+              </MaintenanceGate>
             </AuthProvider>
           </WouterRouter>
           <Toaster />

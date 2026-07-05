@@ -3,6 +3,7 @@ import { db, platformSettingsTable, hotelsTable, restaurantsTable, spasTable, to
 import { and, eq, inArray } from "drizzle-orm";
 import { requireAuth, requireRole } from "../middlewares/requireAuth";
 import { logActivity } from "../lib/auth";
+import { bustMaintenanceCache } from "../app";
 
 const router = Router();
 
@@ -16,6 +17,11 @@ async function getOrCreateSettings() {
 }
 
 const SECRET_FIELDS = ["razorpayKeySecret", "razorpayWebhookSecret"] as const;
+
+router.get("/maintenance-status", async (_req, res): Promise<void> => {
+  const settings = await getOrCreateSettings();
+  res.json({ maintenanceMode: settings.maintenanceMode });
+});
 
 router.get("/platform-settings", requireAuth, async (req, res): Promise<void> => {
   const currentUser = (req as any).currentUser;
@@ -49,6 +55,7 @@ router.patch("/platform-settings", requireRole("super_admin"), async (req, res):
   const existing = await getOrCreateSettings();
   const [updated] = await db.update(platformSettingsTable).set(updates).where(eq(platformSettingsTable.id, existing.id)).returning();
 
+  bustMaintenanceCache();
   await logActivity(req, "settings_updated", "Platform settings updated", currentUser.id, currentUser.role);
   res.json({ ...updated, updatedAt: updated.updatedAt.toISOString() });
 });
