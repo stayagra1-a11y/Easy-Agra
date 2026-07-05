@@ -528,6 +528,20 @@ export default function HotelDetail() {
     enabled: !!hotelId,
   });
 
+  const { data: reviewsData } = useQuery<{
+    reviews: {
+      id: number; reviewTitle: string; reviewDescription: string;
+      overallRating: number; customerName: string | null;
+      customerPhoto: string | null; createdAt: string;
+    }[];
+    total: number;
+    summary: { avgOverall: number; total: number };
+  }>({
+    queryKey: ["hotel-reviews", hotelId],
+    queryFn: () => apiRequest(`/api/reviews/hotel/${hotelId}?limit=20`),
+    enabled: !!hotelId,
+  });
+
   const rooms = roomsData?.rooms ?? [];
   if (hotelLoading) return (
     <CustomerLayout>
@@ -805,6 +819,51 @@ export default function HotelDetail() {
               </div>
             )}
           </div>
+
+          {/* Customer Reviews */}
+          {reviewsData && reviewsData.total > 0 && (
+            <div>
+              <div className="flex items-center justify-between mb-3">
+                <h2 className="font-bold text-base flex items-center gap-2">
+                  <Star className="h-5 w-5 text-amber-400 fill-amber-400" />
+                  Guest Reviews
+                  <span className="text-sm font-normal text-muted-foreground">({reviewsData.total})</span>
+                </h2>
+                {reviewsData.summary.avgOverall > 0 && (
+                  <div className="flex items-center gap-1 bg-amber-50 border border-amber-200 rounded-lg px-2.5 py-1">
+                    <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
+                    <span className="font-bold text-sm">{Number(reviewsData.summary.avgOverall).toFixed(1)}</span>
+                  </div>
+                )}
+              </div>
+              <div className="space-y-3">
+                {reviewsData.reviews.map((review) => (
+                  <div key={review.id} className="rounded-2xl border border-border bg-white p-4 shadow-sm">
+                    <div className="flex items-start justify-between gap-2 mb-2">
+                      <div className="flex items-center gap-2">
+                        <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-sm shrink-0">
+                          {(review.customerName ?? "G").charAt(0).toUpperCase()}
+                        </div>
+                        <div>
+                          <p className="text-sm font-semibold leading-tight">{review.customerName ?? "Guest"}</p>
+                          <p className="text-[11px] text-muted-foreground">
+                            {new Date(review.createdAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-0.5 shrink-0">
+                        {Array.from({ length: 5 }).map((_, i) => (
+                          <Star key={i} className={`h-3.5 w-3.5 ${i < review.overallRating ? "fill-amber-400 text-amber-400" : "text-muted-foreground/30"}`} />
+                        ))}
+                      </div>
+                    </div>
+                    <p className="text-sm font-semibold text-foreground mb-1">{review.reviewTitle}</p>
+                    <p className="text-sm text-muted-foreground leading-relaxed">{review.reviewDescription}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Policies */}
           {(hotel.policies || hotel.cancellationPolicy) && (
