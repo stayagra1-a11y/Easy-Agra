@@ -59,8 +59,10 @@ interface Room {
   basePrice: number;
   finalPrice: number | null;
   discountPercentage: number;
+  description: string | null;
   amenities: string[] | null;
   coverImage: string | null;
+  galleryImages: string[];
   status: string;
   totalRooms: number;
   availableRooms: number;
@@ -522,6 +524,177 @@ function BookingModal({
   );
 }
 
+// ── Room Detail Sheet ──────────────────────────────────────────────────────────
+function RoomDetailSheet({
+  room, onClose, onBook,
+}: {
+  room: Room; onClose: () => void; onBook: () => void;
+}) {
+  const [imgIdx, setImgIdx] = useState(0);
+  const allPhotos = [
+    ...(room.coverImage ? [room.coverImage] : []),
+    ...(room.galleryImages ?? []),
+  ];
+  const ROOM_TYPE_LABELS: Record<string, string> = {
+    standard: "Standard", deluxe: "Deluxe", suite: "Suite",
+    family: "Family", single: "Single", double: "Double", twin: "Twin",
+  };
+  const AMENITY_ICONS_LOCAL: Record<string, any> = {
+    "free wifi": Wifi, "parking": Car, "air conditioning": Wind,
+    "restaurant": Utensils, "spa": Waves, "room service": Coffee,
+    "swimming pool": Waves, "lift": CheckCircle2, "power backup": Shield,
+    "laundry": CheckCircle2, "cctv security": Shield, "gym": Dumbbell,
+  };
+  const hasDiscount = room.discountPercentage > 0;
+  const price = room.finalPrice ?? room.basePrice;
+
+  return (
+    <div className="fixed inset-0 z-[200] flex flex-col" onClick={onClose}>
+      {/* Backdrop */}
+      <div className="flex-1 bg-black/50" />
+
+      {/* Sheet */}
+      <div
+        className="bg-background rounded-t-2xl overflow-hidden"
+        style={{ maxHeight: "88vh" }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Drag handle */}
+        <div className="flex justify-center pt-3 pb-1">
+          <div className="w-10 h-1 bg-muted-foreground/30 rounded-full" />
+        </div>
+
+        <div className="overflow-y-auto" style={{ maxHeight: "calc(88vh - 48px)" }}>
+          {/* Photo carousel */}
+          {allPhotos.length > 0 ? (
+            <div className="relative h-52 bg-black">
+              <img
+                src={imgUrl(allPhotos[imgIdx], 800)}
+                alt={room.name}
+                className="w-full h-full object-cover"
+              />
+              {allPhotos.length > 1 && (
+                <>
+                  <button
+                    className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 text-white rounded-full p-1"
+                    onClick={() => setImgIdx((i) => (i - 1 + allPhotos.length) % allPhotos.length)}
+                  >
+                    <ChevronLeft className="h-5 w-5" />
+                  </button>
+                  <button
+                    className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 text-white rounded-full p-1"
+                    onClick={() => setImgIdx((i) => (i + 1) % allPhotos.length)}
+                  >
+                    <ChevronRight className="h-5 w-5" />
+                  </button>
+                  <div className="absolute bottom-2 right-3 bg-black/60 text-white text-xs px-2 py-0.5 rounded-full">
+                    {imgIdx + 1}/{allPhotos.length}
+                  </div>
+                </>
+              )}
+            </div>
+          ) : (
+            <div className="h-32 bg-muted flex items-center justify-center">
+              <BedDouble className="h-10 w-10 text-muted-foreground" />
+            </div>
+          )}
+
+          <div className="p-4 space-y-4">
+            {/* Name + price */}
+            <div className="flex items-start justify-between gap-2">
+              <div>
+                <h2 className="text-lg font-bold">{room.name}</h2>
+                <Badge variant="outline" className="text-xs mt-1">
+                  {ROOM_TYPE_LABELS[room.roomType] ?? room.roomType}
+                </Badge>
+              </div>
+              <div className="text-right shrink-0">
+                {hasDiscount && (
+                  <p className="text-xs text-muted-foreground line-through">₹{room.basePrice.toLocaleString("en-IN")}</p>
+                )}
+                <div className="flex items-center gap-0.5 text-primary font-bold text-lg">
+                  <IndianRupee className="h-4 w-4" />
+                  <span>{price.toLocaleString("en-IN", { maximumFractionDigits: 0 })}</span>
+                </div>
+                <p className="text-xs text-muted-foreground">/night</p>
+              </div>
+            </div>
+
+            {/* Capacity + availability */}
+            <div className="flex flex-wrap gap-2">
+              <div className="flex items-center gap-1.5 bg-muted rounded-lg px-2.5 py-1.5 text-xs">
+                <Users className="h-3.5 w-3.5 text-primary" />
+                <span>{room.adultsCapacity} adults{room.childrenCapacity > 0 ? `, ${room.childrenCapacity} children` : ""}</span>
+              </div>
+              {hasDiscount && (
+                <div className="flex items-center gap-1.5 bg-green-50 border border-green-200 rounded-lg px-2.5 py-1.5 text-xs text-green-700 font-medium">
+                  {room.discountPercentage}% off
+                </div>
+              )}
+              <div className={`flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-medium ${
+                room.availableRooms === 0
+                  ? "bg-red-50 border border-red-200 text-red-700"
+                  : "bg-emerald-50 border border-emerald-200 text-emerald-700"
+              }`}>
+                <BedDouble className="h-3.5 w-3.5" />
+                {room.availableRooms === 0 ? "Fully Booked" : `${room.availableRooms} room${room.availableRooms !== 1 ? "s" : ""} available`}
+              </div>
+            </div>
+
+            {/* Description */}
+            {room.description && (
+              <div className="rounded-xl bg-gradient-to-br from-orange-500 to-amber-500 px-4 py-3">
+                <p className="text-[10px] font-bold uppercase tracking-wider text-white/70 mb-1">About this Room</p>
+                <p className="text-sm text-white leading-snug">{room.description}</p>
+              </div>
+            )}
+
+            {/* Amenities */}
+            {room.amenities && room.amenities.length > 0 && (
+              <div>
+                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Room Amenities</p>
+                <div className="flex flex-wrap gap-2">
+                  {room.amenities.map((a) => {
+                    const Icon = AMENITY_ICONS_LOCAL[a.toLowerCase()] ?? CheckCircle2;
+                    return (
+                      <div key={a} className="flex items-center gap-1.5 text-xs bg-muted rounded-lg px-2.5 py-1.5">
+                        <Icon className="h-3.5 w-3.5 text-primary" />
+                        <span className="capitalize">{a}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* Pay at hotel note */}
+            <div className="flex items-center gap-2 bg-green-50 border border-green-200 rounded-xl px-3 py-2.5">
+              <IndianRupee className="h-4 w-4 text-green-700 shrink-0" />
+              <div>
+                <p className="text-xs font-semibold text-green-800">Payment at Hotel</p>
+                <p className="text-[11px] text-green-700">No online payment needed — pay directly at the hotel.</p>
+              </div>
+            </div>
+
+            {/* Book button */}
+            <div className="pb-2 flex gap-2">
+              <Button variant="outline" className="flex-1" onClick={onClose}>Close</Button>
+              <Button
+                className="flex-1"
+                disabled={room.availableRooms === 0}
+                onClick={onBook}
+              >
+                <CalendarDays className="h-4 w-4 mr-2" />
+                {room.availableRooms === 0 ? "Fully Booked" : "Book this Room"}
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ── Main Page ─────────────────────────────────────────────────────────────────
 export default function HotelDetail() {
   const { t } = useI18n();
@@ -530,6 +703,7 @@ export default function HotelDetail() {
   const { toast } = useToast();
   const hotelId = parseInt(id, 10);
   const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
+  const [detailRoom, setDetailRoom] = useState<Room | null>(null);
   const [bookingSuccess, setBookingSuccess] = useState<string | null>(null);
 
   const { data: hotel, isLoading: hotelLoading } = useQuery<Hotel>({
@@ -781,7 +955,7 @@ export default function HotelDetail() {
                     <Card
                       key={room.id}
                       className="overflow-hidden cursor-pointer hover:shadow-md transition-shadow"
-                      onClick={() => room.availableRooms > 0 && setSelectedRoom(room)}
+                      onClick={() => setDetailRoom(room)}
                     >
                       {room.coverImage && (
                         <div className="h-32 overflow-hidden">
@@ -973,6 +1147,15 @@ export default function HotelDetail() {
           WhatsApp pe share karo
         </a>
       </div>
+
+      {/* Room detail sheet */}
+      {detailRoom && !selectedRoom && (
+        <RoomDetailSheet
+          room={detailRoom}
+          onClose={() => setDetailRoom(null)}
+          onBook={() => { setSelectedRoom(detailRoom); setDetailRoom(null); }}
+        />
+      )}
 
       {/* Booking modal */}
       {selectedRoom && (
