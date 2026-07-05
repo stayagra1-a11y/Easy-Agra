@@ -185,10 +185,7 @@ router.put("/hotels/:id", requireAuth, async (req, res): Promise<void> => {
   if (!hotel) { res.status(404).json({ error: "Hotel not found" }); return; }
   if (!ownerGuard(hotel, cu.id, cu.role)) { res.status(403).json({ error: "Access denied" }); return; }
 
-  if (cu.role === "hotel_owner" && !["draft", "rejected"].includes(hotel.status)) {
-    res.status(400).json({ error: "Hotel can only be edited in draft or rejected state" });
-    return;
-  }
+  const isOwnerEditingApproved = cu.role === "hotel_owner" && !["draft", "rejected"].includes(hotel.status);
 
   const {
     name, description, category, address, city, state, pincode, googleMapLink, landmark,
@@ -199,31 +196,40 @@ router.put("/hotels/:id", requireAuth, async (req, res): Promise<void> => {
   } = req.body;
 
   const updates: Partial<typeof hotelsTable.$inferInsert> = {};
-  if (name !== undefined) updates.name = String(name).trim();
-  if (description !== undefined) updates.description = description || null;
-  if (category !== undefined) updates.category = category;
-  if (address !== undefined) updates.address = address || null;
-  if (city !== undefined) updates.city = city || null;
-  if (state !== undefined) updates.state = state || null;
-  if (pincode !== undefined) updates.pincode = pincode || null;
-  if (googleMapLink !== undefined) updates.googleMapLink = googleMapLink || null;
-  if (landmark !== undefined) updates.landmark = landmark || null;
-  if (contactPerson !== undefined) updates.contactPerson = contactPerson || null;
-  if (contactMobile !== undefined) updates.contactMobile = contactMobile || null;
-  if (contactEmail !== undefined) updates.contactEmail = contactEmail || null;
-  if (website !== undefined) updates.website = website || null;
-  if (checkInTime !== undefined) updates.checkInTime = checkInTime || null;
-  if (checkOutTime !== undefined) updates.checkOutTime = checkOutTime || null;
-  if (totalRooms !== undefined) updates.totalRooms = totalRooms ? parseInt(String(totalRooms), 10) : null;
-  if (policies !== undefined) updates.policies = policies || null;
-  if (cancellationPolicy !== undefined) updates.cancellationPolicy = cancellationPolicy || null;
-  if (amenities !== undefined) updates.amenities = Array.isArray(amenities) ? amenities : [];
-  if (coverImage !== undefined) updates.coverImage = coverImage || null;
-  if (galleryImages !== undefined) updates.galleryImages = Array.isArray(galleryImages) ? galleryImages : [];
-  if (categorizedPhotos !== undefined) updates.categorizedPhotos = Array.isArray(categorizedPhotos) ? categorizedPhotos : [];
-  if (earlyCheckInEnabled !== undefined) updates.earlyCheckInEnabled = Boolean(earlyCheckInEnabled);
-  if (earlyCheckInTime !== undefined) updates.earlyCheckInTime = earlyCheckInTime || null;
-  if (earlyCheckInPrice !== undefined) updates.earlyCheckInPrice = earlyCheckInPrice != null ? String(parseFloat(String(earlyCheckInPrice)).toFixed(2)) : null;
+
+  if (isOwnerEditingApproved) {
+    // Approved hotels: owners can only update photos/media
+    if (coverImage !== undefined) updates.coverImage = coverImage || null;
+    if (galleryImages !== undefined) updates.galleryImages = Array.isArray(galleryImages) ? galleryImages : [];
+    if (categorizedPhotos !== undefined) updates.categorizedPhotos = Array.isArray(categorizedPhotos) ? categorizedPhotos : [];
+  } else {
+    // Draft / rejected hotels (owner) OR admin/super_admin: full update allowed
+    if (name !== undefined) updates.name = String(name).trim();
+    if (description !== undefined) updates.description = description || null;
+    if (category !== undefined) updates.category = category;
+    if (address !== undefined) updates.address = address || null;
+    if (city !== undefined) updates.city = city || null;
+    if (state !== undefined) updates.state = state || null;
+    if (pincode !== undefined) updates.pincode = pincode || null;
+    if (googleMapLink !== undefined) updates.googleMapLink = googleMapLink || null;
+    if (landmark !== undefined) updates.landmark = landmark || null;
+    if (contactPerson !== undefined) updates.contactPerson = contactPerson || null;
+    if (contactMobile !== undefined) updates.contactMobile = contactMobile || null;
+    if (contactEmail !== undefined) updates.contactEmail = contactEmail || null;
+    if (website !== undefined) updates.website = website || null;
+    if (checkInTime !== undefined) updates.checkInTime = checkInTime || null;
+    if (checkOutTime !== undefined) updates.checkOutTime = checkOutTime || null;
+    if (totalRooms !== undefined) updates.totalRooms = totalRooms ? parseInt(String(totalRooms), 10) : null;
+    if (policies !== undefined) updates.policies = policies || null;
+    if (cancellationPolicy !== undefined) updates.cancellationPolicy = cancellationPolicy || null;
+    if (amenities !== undefined) updates.amenities = Array.isArray(amenities) ? amenities : [];
+    if (coverImage !== undefined) updates.coverImage = coverImage || null;
+    if (galleryImages !== undefined) updates.galleryImages = Array.isArray(galleryImages) ? galleryImages : [];
+    if (categorizedPhotos !== undefined) updates.categorizedPhotos = Array.isArray(categorizedPhotos) ? categorizedPhotos : [];
+    if (earlyCheckInEnabled !== undefined) updates.earlyCheckInEnabled = Boolean(earlyCheckInEnabled);
+    if (earlyCheckInTime !== undefined) updates.earlyCheckInTime = earlyCheckInTime || null;
+    if (earlyCheckInPrice !== undefined) updates.earlyCheckInPrice = earlyCheckInPrice != null ? String(parseFloat(String(earlyCheckInPrice)).toFixed(2)) : null;
+  }
 
   const [updated] = await db.update(hotelsTable).set(updates).where(eq(hotelsTable.id, id)).returning();
   await logActivity(req, "hotel_updated", `Hotel "${updated.name}" updated`, cu.id, cu.role);

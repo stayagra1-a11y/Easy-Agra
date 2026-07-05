@@ -661,6 +661,17 @@ export default function HotelForm() {
           </div>
         )}
 
+        {/* Approved hotel notice */}
+        {isEdit && existingHotel && !["draft", "rejected"].includes((existingHotel as any).status ?? "") && (
+          <div className="flex items-start gap-2.5 bg-amber-50 border border-amber-200 rounded-xl px-3 py-2.5">
+            <Info className="h-4 w-4 text-amber-600 mt-0.5 shrink-0" />
+            <div>
+              <p className="text-xs font-semibold text-amber-800">Hotel approved hai</p>
+              <p className="text-[11px] text-amber-700 mt-0.5">Hotel ki basic details lock hain. Sirf <strong>Media tab</strong> se cover photo aur gallery photos update kar sakte hain.</p>
+            </div>
+          </div>
+        )}
+
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="flex h-auto p-1 gap-1 overflow-x-auto">
             <TabsTrigger value="basic" className="flex-col h-12 text-xs gap-0.5 px-2 shrink-0">
