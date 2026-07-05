@@ -963,39 +963,64 @@ export default function HotelDetail() {
                         </div>
                       )}
                       <CardContent className="p-4 space-y-3">
+                        {/* Room name + type */}
                         <div className="flex items-start justify-between gap-2">
                           <div>
                             <h3 className="font-semibold">{room.name}</h3>
-                            <Badge variant="outline" className="text-xs mt-1">
-                              {ROOM_TYPE_LABELS[room.roomType] ?? room.roomType}
-                            </Badge>
-                          </div>
-                          <div className="text-right shrink-0">
-                            {hasDiscount && (
-                              <p className="text-xs text-muted-foreground line-through">
-                                ₹{room.basePrice.toLocaleString("en-IN")}
-                              </p>
-                            )}
-                            <div className="flex items-center gap-0.5 text-primary font-bold">
-                              <IndianRupee className="h-3.5 w-3.5" />
-                              <span>{price.toLocaleString("en-IN", { maximumFractionDigits: 0 })}</span>
+                            <div className="flex items-center gap-1.5 mt-1 flex-wrap">
+                              <Badge variant="outline" className="text-xs">
+                                {ROOM_TYPE_LABELS[room.roomType] ?? room.roomType}
+                              </Badge>
+                              <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                                <Users className="h-3 w-3" />
+                                <span>{room.adultsCapacity} adults{room.childrenCapacity > 0 ? `, ${room.childrenCapacity} children` : ""}</span>
+                              </div>
                             </div>
-                            <p className="text-xs text-muted-foreground">/night</p>
                           </div>
-                        </div>
-
-                        <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                          <div className="flex items-center gap-1">
-                            <Users className="h-3.5 w-3.5" />
-                            <span>{room.adultsCapacity} adults{room.childrenCapacity > 0 ? `, ${room.childrenCapacity} children` : ""}</span>
-                          </div>
-                          {hasDiscount && (
-                            <Badge className="text-xs bg-green-100 text-green-700 hover:bg-green-100">
-                              {room.discountPercentage}% off
-                            </Badge>
+                          {room.availableRooms > 0 ? (
+                            <span className="shrink-0 text-[10px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-full px-2 py-0.5">
+                              Available
+                            </span>
+                          ) : (
+                            <span className="shrink-0 text-[10px] font-semibold text-red-700 bg-red-50 border border-red-200 rounded-full px-2 py-0.5">
+                              Full
+                            </span>
                           )}
                         </div>
 
+                        {/* Price Card */}
+                        <div className="rounded-xl border border-primary/20 bg-gradient-to-r from-primary/5 to-amber-50 px-3 py-2.5">
+                          <div className="flex items-end justify-between gap-2">
+                            <div>
+                              <div className="flex items-baseline gap-1">
+                                <span className="text-2xl font-extrabold text-primary">
+                                  ₹{price.toLocaleString("en-IN", { maximumFractionDigits: 0 })}
+                                </span>
+                                <span className="text-xs text-muted-foreground font-medium">/night</span>
+                              </div>
+                              {hasDiscount && (
+                                <div className="flex items-center gap-2 mt-0.5">
+                                  <span className="text-sm text-muted-foreground line-through">
+                                    ₹{room.basePrice.toLocaleString("en-IN")}
+                                  </span>
+                                  <span className="text-xs font-bold text-green-700 bg-green-100 rounded px-1.5 py-0.5">
+                                    Save {Math.round(room.discountPercentage)}%
+                                  </span>
+                                </div>
+                              )}
+                            </div>
+                            {hasDiscount && (
+                              <div className="text-right shrink-0">
+                                <p className="text-[10px] text-muted-foreground">You save</p>
+                                <p className="text-sm font-bold text-green-700">
+                                  ₹{(room.basePrice - price).toLocaleString("en-IN", { maximumFractionDigits: 0 })}
+                                </p>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Book button + Pay at hotel */}
                         <div className="flex items-center gap-2">
                           <Button
                             className="flex-1 h-9 text-sm"
