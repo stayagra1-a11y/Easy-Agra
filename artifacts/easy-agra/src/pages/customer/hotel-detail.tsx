@@ -66,8 +66,23 @@ interface Room {
 }
 
 const AMENITY_ICONS: Record<string, any> = {
-  wifi: Wifi, parking: Car, breakfast: Coffee, restaurant: Utensils,
-  gym: Dumbbell, ac: Wind, pool: Waves, security: Shield,
+  "free wifi": Wifi,
+  "parking": Car,
+  "air conditioning": Wind,
+  "restaurant": Utensils,
+  "spa": Waves,
+  "room service": Coffee,
+  "swimming pool": Waves,
+  "lift": CheckCircle2,
+  "power backup": Shield,
+  "laundry": CheckCircle2,
+  "cctv security": Shield,
+  "gym": Dumbbell,
+  "breakfast": Coffee,
+  "wifi": Wifi,
+  "pool": Waves,
+  "ac": Wind,
+  "security": Shield,
 };
 
 const ROOM_TYPE_LABELS: Record<string, string> = {
