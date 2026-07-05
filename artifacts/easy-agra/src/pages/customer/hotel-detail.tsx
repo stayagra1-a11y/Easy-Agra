@@ -778,7 +778,11 @@ export default function HotelDetail() {
                   const price = room.finalPrice ?? room.basePrice;
                   const hasDiscount = room.discountPercentage > 0;
                   return (
-                    <Card key={room.id} className="overflow-hidden">
+                    <Card
+                      key={room.id}
+                      className="overflow-hidden cursor-pointer hover:shadow-md transition-shadow"
+                      onClick={() => room.availableRooms > 0 && setSelectedRoom(room)}
+                    >
                       {room.coverImage && (
                         <div className="h-32 overflow-hidden">
                           <img src={imgUrl(room.coverImage, 600)} alt={room.name} className="w-full h-full object-cover" />
@@ -818,14 +822,22 @@ export default function HotelDetail() {
                           )}
                         </div>
 
-                        <Button
-                          className="w-full h-9 text-sm"
-                          onClick={() => setSelectedRoom(room)}
-                          disabled={room.availableRooms === 0}
-                        >
-                          <CalendarDays className="h-4 w-4 mr-2" />
-                          {room.availableRooms === 0 ? t("fully_booked") : t("book_room")}
-                        </Button>
+                        <div className="flex items-center gap-2">
+                          <Button
+                            className="flex-1 h-9 text-sm"
+                            onClick={(e) => { e.stopPropagation(); setSelectedRoom(room); }}
+                            disabled={room.availableRooms === 0}
+                          >
+                            <CalendarDays className="h-4 w-4 mr-2" />
+                            {room.availableRooms === 0 ? t("fully_booked") : t("book_room")}
+                          </Button>
+                          {room.availableRooms > 0 && (
+                            <div className="flex items-center gap-1 shrink-0 bg-green-50 border border-green-200 rounded-lg px-2.5 py-2">
+                              <IndianRupee className="h-3 w-3 text-green-700" />
+                              <span className="text-[11px] font-semibold text-green-700 whitespace-nowrap">Pay at Hotel</span>
+                            </div>
+                          )}
+                        </div>
                       </CardContent>
                     </Card>
                   );
