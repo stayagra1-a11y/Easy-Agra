@@ -16,6 +16,8 @@ import {
   Clock, Phone, Globe, Wifi, Car, Coffee, Utensils, Dumbbell,
   Wind, Waves, Shield, CheckCircle2, ChevronLeft, ChevronRight,
   CalendarDays, X, Navigation, Train, Plane, Bus, Hospital, ShoppingBag, Share2,
+  Tv, Refrigerator, Droplets, Lock, Shirt, Building2, ConciergeBell,
+  MonitorDot, Bath, Zap, Package, ChevronDown, ChevronUp,
 } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { useGetHotelNearbyPlaces } from "@workspace/api-client-react";
@@ -540,13 +542,34 @@ function RoomDetailSheet({
     family: "Family", single: "Single", double: "Double", twin: "Twin",
   };
   const AMENITY_ICONS_LOCAL: Record<string, any> = {
-    "free wifi": Wifi, "parking": Car, "air conditioning": Wind,
-    "restaurant": Utensils, "spa": Waves, "room service": Coffee,
-    "swimming pool": Waves, "lift": CheckCircle2, "power backup": Shield,
-    "laundry": CheckCircle2, "cctv security": Shield, "gym": Dumbbell,
+    "free wifi": Wifi, "wifi": Wifi,
+    "parking": Car, "free parking": Car,
+    "air conditioning": Wind, "ac": Wind,
+    "restaurant": Utensils,
+    "spa": Waves, "hot tub": Waves, "jacuzzi": Waves,
+    "room service": ConciergeBell, "24 hour room service": ConciergeBell, "24-hour room service": ConciergeBell,
+    "swimming pool": Waves, "pool": Waves,
+    "lift": Package, "elevator": Package,
+    "power backup": Zap,
+    "laundry": Shirt,
+    "cctv security": Shield, "security": Shield,
+    "gym": Dumbbell, "fitness center": Dumbbell,
+    "smart tv": Tv, "tv": Tv, "television": Tv,
+    "mini fridge": Refrigerator, "refrigerator": Refrigerator, "fridge": Refrigerator,
+    "hot water": Droplets, "geyser": Droplets, "water heater": Droplets,
+    "work desk": MonitorDot, "desk": MonitorDot,
+    "safe locker": Lock, "safe": Lock, "locker": Lock,
+    "telephone": Phone, "phone": Phone,
+    "hair dryer": Wind,
+    "wardrobe": Shirt, "closet": Shirt,
+    "tea/coffee maker": Coffee, "coffee maker": Coffee, "tea maker": Coffee, "kettle": Coffee,
+    "balcony": Building2, "terrace": Building2,
+    "bathroom": Bath, "private bathroom": Bath, "attached bathroom": Bath,
+    "24x7 facility manager": Clock, "24/7 support": Clock,
   };
   const hasDiscount = room.discountPercentage > 0;
   const price = room.finalPrice ?? room.basePrice;
+  const [showAllAmenities, setShowAllAmenities] = useState(false);
 
   return (
     <div className="fixed inset-0 z-[200] flex flex-col" onClick={onClose}>
@@ -649,21 +672,39 @@ function RoomDetailSheet({
               </div>
             )}
 
-            {/* Amenities */}
+            {/* Amenities — vertical list like booking.com */}
             {room.amenities && room.amenities.length > 0 && (
               <div>
-                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Room Amenities</p>
-                <div className="flex flex-wrap gap-2">
-                  {room.amenities.map((a) => {
+                <p className="text-base font-bold mb-3">Amenities</p>
+                <div className="space-y-0">
+                  {(showAllAmenities ? room.amenities! : room.amenities!.slice(0, 6)).map((a, idx) => {
                     const Icon = AMENITY_ICONS_LOCAL[a.toLowerCase()] ?? CheckCircle2;
+                    const isLast = idx === (showAllAmenities ? room.amenities!.length : Math.min(6, room.amenities!.length)) - 1;
                     return (
-                      <div key={a} className="flex items-center gap-1.5 text-xs bg-muted rounded-lg px-2.5 py-1.5">
-                        <Icon className="h-3.5 w-3.5 text-primary" />
-                        <span className="capitalize">{a}</span>
+                      <div
+                        key={a}
+                        className={`flex items-center gap-4 py-3.5 ${!isLast ? "border-b border-muted" : ""}`}
+                      >
+                        <div className="h-10 w-10 rounded-xl border border-border flex items-center justify-center shrink-0 bg-background">
+                          <Icon className="h-5 w-5 text-foreground" />
+                        </div>
+                        <span className="text-sm font-medium capitalize">{a}</span>
                       </div>
                     );
                   })}
                 </div>
+                {room.amenities!.length > 6 && (
+                  <button
+                    className="mt-3 w-full py-3 rounded-xl border border-border text-sm font-semibold text-foreground flex items-center justify-center gap-2 hover:bg-muted/50 transition-colors"
+                    onClick={() => setShowAllAmenities((v) => !v)}
+                  >
+                    {showAllAmenities ? (
+                      <><ChevronUp className="h-4 w-4" /> Show less</>
+                    ) : (
+                      <><ChevronDown className="h-4 w-4" /> View all {room.amenities.length} amenities</>
+                    )}
+                  </button>
+                )}
               </div>
             )}
 
