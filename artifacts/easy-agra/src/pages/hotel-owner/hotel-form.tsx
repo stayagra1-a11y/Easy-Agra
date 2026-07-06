@@ -292,12 +292,12 @@ function NearbyPlacesManager({ hotelId }: { hotelId: number }) {
     if (editingId) {
       updateMutation.mutate({ id: hotelId, nearbyId: editingId, data: payload }, {
         onSuccess: () => { queryClient.invalidateQueries({ queryKey: getGetHotelNearbyPlacesQueryKey(hotelId) }); resetForm(); toast({ title: "Updated!" }); },
-        onError: () => toast({ title: "Error", variant: "destructive" }),
+        onError: (err: any) => toast({ title: err?.data?.error ?? err?.message ?? "Kuch galat ho gaya, dobara try karein", variant: "destructive" }),
       });
     } else {
       addMutation.mutate({ id: hotelId, data: payload }, {
         onSuccess: () => { queryClient.invalidateQueries({ queryKey: getGetHotelNearbyPlacesQueryKey(hotelId) }); resetForm(); toast({ title: "Added!" }); },
-        onError: () => toast({ title: "Error", variant: "destructive" }),
+        onError: (err: any) => toast({ title: err?.data?.error ?? err?.message ?? "Kuch galat ho gaya, dobara try karein", variant: "destructive" }),
       });
     }
   };

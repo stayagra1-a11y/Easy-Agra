@@ -109,4 +109,14 @@ async function maintenanceMiddleware(req: Request, res: Response, next: NextFunc
 app.use("/api", maintenanceMiddleware);
 app.use("/api", router);
 
+// Global error handler — catches unhandled async errors from all routes
+import type { ErrorRequestHandler } from "express";
+const globalErrorHandler: ErrorRequestHandler = (err, req, res, _next) => {
+  const log = (req as any).log ?? logger;
+  log.error({ err }, "Unhandled route error");
+  if (res.headersSent) return;
+  res.status(500).json({ error: "Internal server error" });
+};
+app.use(globalErrorHandler);
+
 export default app;

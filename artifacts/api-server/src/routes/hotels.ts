@@ -387,17 +387,22 @@ router.get("/hotels/:id/nearby", requireAuth, async (req, res): Promise<void> =>
 router.post("/hotels/:id/nearby", requireRole("hotel_owner", "admin", "super_admin"), async (req, res): Promise<void> => {
   const cu = (req as any).currentUser;
   const id = parseInt(req.params.id as string, 10);
+  if (isNaN(id)) { res.status(400).json({ error: "Invalid hotel ID" }); return; }
   const hotel = await findHotel(id);
   if (!hotel) { res.status(404).json({ error: "Hotel not found" }); return; }
-  if (!ownerGuard(hotel, cu.id, cu.role)) { res.status(403).json({ error: "Access denied" }); return; }
+  if (!ownerGuard(hotel, cu.id, cu.role)) { res.status(403).json({ error: "Is hotel ko edit karne ki permission nahi hai" }); return; }
   const { placeName, category, distanceKm, estimatedTimeMinutes } = req.body;
-  if (!placeName?.trim()) { res.status(400).json({ error: "Place name is required" }); return; }
+  if (!placeName?.trim()) { res.status(400).json({ error: "Jagah ka naam zaroori hai" }); return; }
+  const validCategories = ["tourist_place", "railway_station", "airport", "bus_stand", "hospital", "market", "other"];
+  const safeCategory = validCategories.includes(category) ? category : "tourist_place";
+  const safeDistanceKm = distanceKm != null && !isNaN(parseFloat(distanceKm)) ? String(parseFloat(distanceKm)) : null;
+  const safeTime = estimatedTimeMinutes != null && !isNaN(parseInt(estimatedTimeMinutes, 10)) ? parseInt(estimatedTimeMinutes, 10) : null;
   const [row] = await db.insert(hotelNearbyPlacesTable).values({
     hotelId: id,
     placeName: placeName.trim(),
-    category: category || "tourist_place",
-    distanceKm: distanceKm != null ? String(distanceKm) : null,
-    estimatedTimeMinutes: estimatedTimeMinutes != null ? parseInt(estimatedTimeMinutes, 10) : null,
+    category: safeCategory as any,
+    distanceKm: safeDistanceKm,
+    estimatedTimeMinutes: safeTime,
   }).returning();
   res.status(201).json(serializeNearby(row));
 });
