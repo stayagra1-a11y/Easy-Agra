@@ -186,6 +186,8 @@ export interface OwnerRequest {
   /** @nullable */
   identityProof?: string | null;
   /** @nullable */
+  identityProofBack?: string | null;
+  /** @nullable */
   rejectionReason?: string | null;
   /** @nullable */
   reviewedBy?: number | null;
@@ -226,6 +228,7 @@ export interface OwnerRequestInput {
   ownerEmail?: string;
   businessPhotos?: string[];
   identityProof?: string;
+  identityProofBack?: string;
 }
 
 export interface OwnerRequestUpdate {
@@ -241,6 +244,7 @@ export interface OwnerRequestUpdate {
   ownerEmail?: string;
   businessPhotos?: string[];
   identityProof?: string;
+  identityProofBack?: string;
 }
 
 export interface OwnerRequestRejectInput {

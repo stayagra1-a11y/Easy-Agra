@@ -107,11 +107,30 @@ function RequestDetail({ id, onApprove, onReject }: { id: number; onApprove: (r:
         </div>
       )}
 
-      {/* Identity proof */}
-      {request.identityProof && (
-        <div className="flex items-center gap-2 p-3 bg-green-50 border border-green-200 rounded-lg">
-          <FileText className="h-4 w-4 text-green-600" />
-          <p className="text-sm text-green-700 font-medium">Identity proof uploaded</p>
+      {/* Identity proof — show actual images */}
+      {(request.identityProof || (request as any).identityProofBack) && (
+        <div className="space-y-2">
+          <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide flex items-center gap-1">
+            <FileText className="h-3.5 w-3.5" />Identity Proof
+          </h3>
+          <div className={`grid gap-2 ${request.identityProof && (request as any).identityProofBack ? "grid-cols-2" : "grid-cols-1"}`}>
+            {request.identityProof && (
+              <div className="space-y-1">
+                <p className="text-xs text-muted-foreground font-medium">Front Side</p>
+                <a href={request.identityProof} target="_blank" rel="noopener noreferrer">
+                  <img src={request.identityProof} alt="ID Front" className="w-full h-36 object-cover rounded-xl border hover:opacity-90 transition-opacity cursor-zoom-in" />
+                </a>
+              </div>
+            )}
+            {(request as any).identityProofBack && (
+              <div className="space-y-1">
+                <p className="text-xs text-muted-foreground font-medium">Back Side</p>
+                <a href={(request as any).identityProofBack} target="_blank" rel="noopener noreferrer">
+                  <img src={(request as any).identityProofBack} alt="ID Back" className="w-full h-36 object-cover rounded-xl border hover:opacity-90 transition-opacity cursor-zoom-in" />
+                </a>
+              </div>
+            )}
+          </div>
         </div>
       )}
 

@@ -68,7 +68,7 @@ router.post("/owner-requests", requireAuth, async (req, res): Promise<void> => {
     requestedRole, businessName, businessDescription,
     businessAddress, city, state, gstNumber,
     ownerName, ownerMobile, ownerEmail,
-    businessPhotos, identityProof,
+    businessPhotos, identityProof, identityProofBack,
   } = req.body;
 
   if (!requestedRole || !["hotel_owner", "restaurant_owner", "spa_owner"].includes(requestedRole)) {
@@ -103,6 +103,7 @@ router.post("/owner-requests", requireAuth, async (req, res): Promise<void> => {
       ownerEmail: ownerEmail || null,
       businessPhotos: Array.isArray(businessPhotos) ? businessPhotos : null,
       identityProof: identityProof || null,
+      identityProofBack: identityProofBack || null,
       status: "pending",
     })
     .returning();
@@ -136,7 +137,7 @@ router.put("/owner-requests/:id", requireAuth, async (req, res): Promise<void> =
 
   const {
     businessName, businessDescription, businessAddress, city, state,
-    gstNumber, ownerName, ownerMobile, ownerEmail, businessPhotos, identityProof,
+    gstNumber, ownerName, ownerMobile, ownerEmail, businessPhotos, identityProof, identityProofBack,
   } = req.body;
 
   const [updated] = await db
@@ -153,6 +154,7 @@ router.put("/owner-requests/:id", requireAuth, async (req, res): Promise<void> =
       ownerEmail: ownerEmail !== undefined ? ownerEmail || null : request.ownerEmail,
       businessPhotos: businessPhotos !== undefined ? (Array.isArray(businessPhotos) ? businessPhotos : null) : request.businessPhotos,
       identityProof: identityProof !== undefined ? identityProof || null : request.identityProof,
+      identityProofBack: identityProofBack !== undefined ? identityProofBack || null : request.identityProofBack,
     })
     .where(eq(ownerRequestsTable.id, id))
     .returning();

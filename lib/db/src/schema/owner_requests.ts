@@ -44,6 +44,7 @@ export const ownerRequestsTable = pgTable("owner_requests", {
   // Files stored as base64 data URIs
   businessPhotos: jsonb("business_photos").$type<string[]>(),
   identityProof: text("identity_proof"),
+  identityProofBack: text("identity_proof_back"),
   // Review
   rejectionReason: text("rejection_reason"),
   reviewedBy: integer("reviewed_by").references(() => usersTable.id),

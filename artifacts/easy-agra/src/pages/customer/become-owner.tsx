@@ -69,6 +69,7 @@ interface FormState {
   ownerEmail: string;
   businessPhotos: string[];
   identityProof: string;
+  identityProofBack: string;
 }
 
 const emptyForm: FormState = {
@@ -84,6 +85,7 @@ const emptyForm: FormState = {
   ownerEmail: "",
   businessPhotos: [],
   identityProof: "",
+  identityProofBack: "",
 };
 
 export default function BecomeOwner() {
@@ -91,6 +93,7 @@ export default function BecomeOwner() {
   const { toast } = useToast();
   const photoRef = useRef<HTMLInputElement>(null);
   const proofRef = useRef<HTMLInputElement>(null);
+  const proofBackRef = useRef<HTMLInputElement>(null);
 
   const { data: existingRequest, isLoading: loadingRequest } = useGetMyOwnerRequest({
     query: { retry: false, queryKey: getGetMyOwnerRequestQueryKey() },
@@ -107,6 +110,7 @@ export default function BecomeOwner() {
   const [showCancel, setShowCancel] = useState(false);
   const [uploadingPhotos, setUploadingPhotos] = useState(false);
   const [uploadingProof, setUploadingProof] = useState(false);
+  const [uploadingProofBack, setUploadingProofBack] = useState(false);
 
   const setField = (key: keyof FormState, val: any) =>
     setForm(f => ({ ...f, [key]: val }));
@@ -138,6 +142,18 @@ export default function BecomeOwner() {
       else setField("identityProof", base64);
     } finally {
       setUploadingProof(false);
+    }
+  };
+
+  const handleProofBackUpload = async (files: FileList | null, forEdit = false) => {
+    if (!files || files.length === 0) return;
+    setUploadingProofBack(true);
+    try {
+      const base64 = await fileToBase64(files[0]);
+      if (forEdit) setEditForm(f => ({ ...f, identityProofBack: base64 }));
+      else setField("identityProofBack", base64);
+    } finally {
+      setUploadingProofBack(false);
     }
   };
 
@@ -384,21 +400,49 @@ export default function BecomeOwner() {
               </div>
 
               {/* Identity proof */}
-              <div className="space-y-1.5">
-                <Label>Identity Proof</Label>
-                {(editForm.identityProof || existingRequest.identityProof) ? (
-                  <div className="flex items-center gap-2 p-2.5 rounded-lg bg-green-50 border border-green-200 text-sm">
-                    <FileText className="h-4 w-4 text-green-600" />
-                    <span className="flex-1 text-green-700">Document uploaded</span>
-                    <button type="button" onClick={() => { setEditForm(f => ({ ...f, identityProof: "" })); if (proofRef.current) proofRef.current.value = ""; }}><X className="h-4 w-4 text-muted-foreground" /></button>
-                  </div>
-                ) : (
-                  <button type="button" onClick={() => proofRef.current?.click()} className="w-full flex items-center justify-center gap-2 p-3 rounded-lg border-2 border-dashed border-border text-muted-foreground hover:border-primary hover:text-primary transition-colors text-sm">
-                    {uploadingProof ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
-                    Upload ID Proof (Aadhar, PAN, etc.)
-                  </button>
-                )}
-                <input ref={proofRef} type="file" accept="image/*,.pdf" className="hidden" onChange={e => handleProofUpload(e.target.files, true)} />
+              <div className="space-y-2">
+                <Label>Identity Proof (Aadhar, PAN, Passport)</Label>
+                <p className="text-xs text-muted-foreground">Dono taraf upload karein — front aur back</p>
+                {/* Front */}
+                <div className="space-y-1">
+                  <p className="text-xs font-medium">Front Side</p>
+                  {(editForm.identityProof ?? existingRequest.identityProof) ? (
+                    <div className="relative rounded-xl overflow-hidden border">
+                      <img src={(editForm.identityProof ?? existingRequest.identityProof)!} alt="ID Front" className="w-full h-32 object-cover" />
+                      <button type="button"
+                        className="absolute top-2 right-2 h-6 w-6 bg-black/60 text-white rounded-full flex items-center justify-center"
+                        onClick={() => { setEditForm(f => ({ ...f, identityProof: "" })); if (proofRef.current) proofRef.current.value = ""; }}>
+                        <X className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
+                  ) : (
+                    <button type="button" onClick={() => proofRef.current?.click()} className="w-full flex items-center justify-center gap-2 p-3 rounded-lg border-2 border-dashed border-border text-muted-foreground hover:border-primary hover:text-primary transition-colors text-sm">
+                      {uploadingProof ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+                      Upload Front Side
+                    </button>
+                  )}
+                  <input ref={proofRef} type="file" accept="image/*" className="hidden" onChange={e => handleProofUpload(e.target.files, true)} />
+                </div>
+                {/* Back */}
+                <div className="space-y-1">
+                  <p className="text-xs font-medium">Back Side</p>
+                  {(editForm.identityProofBack ?? existingRequest.identityProofBack) ? (
+                    <div className="relative rounded-xl overflow-hidden border">
+                      <img src={(editForm.identityProofBack ?? existingRequest.identityProofBack)!} alt="ID Back" className="w-full h-32 object-cover" />
+                      <button type="button"
+                        className="absolute top-2 right-2 h-6 w-6 bg-black/60 text-white rounded-full flex items-center justify-center"
+                        onClick={() => { setEditForm(f => ({ ...f, identityProofBack: "" })); if (proofBackRef.current) proofBackRef.current.value = ""; }}>
+                        <X className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
+                  ) : (
+                    <button type="button" onClick={() => proofBackRef.current?.click()} className="w-full flex items-center justify-center gap-2 p-3 rounded-lg border-2 border-dashed border-border text-muted-foreground hover:border-primary hover:text-primary transition-colors text-sm">
+                      {uploadingProofBack ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+                      Upload Back Side
+                    </button>
+                  )}
+                  <input ref={proofBackRef} type="file" accept="image/*" className="hidden" onChange={e => handleProofBackUpload(e.target.files, true)} />
+                </div>
               </div>
 
               <div className="flex gap-2 pt-2">
@@ -568,27 +612,50 @@ export default function BecomeOwner() {
                   <span className="text-xs font-normal text-muted-foreground ml-auto">Optional</span>
                 </CardTitle>
               </CardHeader>
-              <CardContent>
-                {form.identityProof ? (
-                  <div className="flex items-center gap-3 p-3 bg-green-50 border border-green-200 rounded-lg">
-                    <FileText className="h-5 w-5 text-green-600 shrink-0" />
-                    <div className="flex-1">
-                      <p className="text-sm font-medium text-green-700">Document uploaded</p>
-                      <p className="text-xs text-green-600">Aadhar / PAN / Passport</p>
+              <CardContent className="space-y-3">
+                <p className="text-xs text-muted-foreground">Aadhar Card, PAN Card, ya Passport — dono taraf upload karein</p>
+                {/* Front side */}
+                <div className="space-y-1.5">
+                  <p className="text-xs font-semibold text-foreground">Front Side</p>
+                  {form.identityProof ? (
+                    <div className="relative rounded-xl overflow-hidden border">
+                      <img src={form.identityProof} alt="ID Front" className="w-full h-36 object-cover" />
+                      <button type="button"
+                        className="absolute top-2 right-2 h-7 w-7 bg-black/60 text-white rounded-full flex items-center justify-center"
+                        onClick={() => { setField("identityProof", ""); if (proofRef.current) proofRef.current.value = ""; }}>
+                        <X className="h-4 w-4" />
+                      </button>
                     </div>
-                    <button type="button" onClick={() => { setField("identityProof", ""); if (proofRef.current) proofRef.current.value = ""; }}>
-                      <X className="h-4 w-4 text-muted-foreground" />
+                  ) : (
+                    <button type="button" onClick={() => proofRef.current?.click()}
+                      className="w-full flex flex-col items-center justify-center gap-2 p-4 rounded-xl border-2 border-dashed border-border text-muted-foreground hover:border-primary hover:text-primary transition-colors">
+                      {uploadingProof ? <Loader2 className="h-5 w-5 animate-spin" /> : <Upload className="h-5 w-5" />}
+                      <span className="text-sm">Upload Front Side</span>
                     </button>
-                  </div>
-                ) : (
-                  <button type="button" onClick={() => proofRef.current?.click()}
-                    className="w-full flex flex-col items-center justify-center gap-2 p-5 rounded-xl border-2 border-dashed border-border text-muted-foreground hover:border-primary hover:text-primary transition-colors">
-                    {uploadingProof ? <Loader2 className="h-6 w-6 animate-spin" /> : <Upload className="h-6 w-6" />}
-                    <span className="text-sm font-medium">Upload ID Proof</span>
-                    <span className="text-xs">Aadhar Card, PAN Card, Passport</span>
-                  </button>
-                )}
-                <input ref={proofRef} type="file" accept="image/*,.pdf" className="hidden" onChange={e => handleProofUpload(e.target.files)} />
+                  )}
+                  <input ref={proofRef} type="file" accept="image/*" className="hidden" onChange={e => handleProofUpload(e.target.files)} />
+                </div>
+                {/* Back side */}
+                <div className="space-y-1.5">
+                  <p className="text-xs font-semibold text-foreground">Back Side</p>
+                  {form.identityProofBack ? (
+                    <div className="relative rounded-xl overflow-hidden border">
+                      <img src={form.identityProofBack} alt="ID Back" className="w-full h-36 object-cover" />
+                      <button type="button"
+                        className="absolute top-2 right-2 h-7 w-7 bg-black/60 text-white rounded-full flex items-center justify-center"
+                        onClick={() => { setField("identityProofBack", ""); if (proofBackRef.current) proofBackRef.current.value = ""; }}>
+                        <X className="h-4 w-4" />
+                      </button>
+                    </div>
+                  ) : (
+                    <button type="button" onClick={() => proofBackRef.current?.click()}
+                      className="w-full flex flex-col items-center justify-center gap-2 p-4 rounded-xl border-2 border-dashed border-border text-muted-foreground hover:border-primary hover:text-primary transition-colors">
+                      {uploadingProofBack ? <Loader2 className="h-5 w-5 animate-spin" /> : <Upload className="h-5 w-5" />}
+                      <span className="text-sm">Upload Back Side</span>
+                    </button>
+                  )}
+                  <input ref={proofBackRef} type="file" accept="image/*" className="hidden" onChange={e => handleProofBackUpload(e.target.files)} />
+                </div>
               </CardContent>
             </Card>
 
