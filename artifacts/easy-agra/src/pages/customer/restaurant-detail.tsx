@@ -495,6 +495,7 @@ export default function RestaurantDetail() {
   const { user } = useAuth();
   const [activeCategory, setActiveCategory] = useState("all");
   const [galleryIndex, setGalleryIndex] = useState(0);
+  const [lightboxImg, setLightboxImg] = useState<string | null>(null);
 
   const restaurantQuery = useGetRestaurant(id);
   const menuQuery = useGetRestaurantMenu(id);
@@ -558,7 +559,7 @@ export default function RestaurantDetail() {
 
         {/* Cover */}
         {r.coverPhoto ? (
-          <div className="h-56 overflow-hidden">
+          <div className="h-56 overflow-hidden cursor-zoom-in" onClick={() => setLightboxImg(imgUrl(r.coverPhoto!, 1400))}>
             <img src={imgUrl(r.coverPhoto, 1000)} alt={r.name} className="w-full h-full object-cover" />
           </div>
         ) : (
@@ -577,9 +578,13 @@ export default function RestaurantDetail() {
               </Badge>
             </div>
             {r.cuisineType && (
-              <Badge variant="outline" className="mt-1 bg-primary/5 text-primary border-primary/20">
-                {r.cuisineType}
-              </Badge>
+              <div className="flex flex-wrap gap-1.5 mt-2">
+                {r.cuisineType.split(",").map((c) => c.trim()).filter(Boolean).map((c) => (
+                  <Badge key={c} variant="outline" className="text-xs bg-primary/5 text-primary border-primary/20">
+                    {c}
+                  </Badge>
+                ))}
+              </div>
             )}
           </div>
 
@@ -638,11 +643,37 @@ export default function RestaurantDetail() {
               <h2 className="font-semibold mb-2">Gallery</h2>
               <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
                 {gallery.map((p, i) => (
-                  <div key={i} className="flex-shrink-0 w-28 h-20 rounded-xl overflow-hidden border">
-                    <img src={imgUrl(p, 400)} alt="" className="w-full h-full object-cover" />
-                  </div>
+                  <button
+                    key={i}
+                    type="button"
+                    className="flex-shrink-0 w-28 h-20 rounded-xl overflow-hidden border cursor-zoom-in focus:outline-none focus:ring-2 focus:ring-primary"
+                    onClick={() => setLightboxImg(imgUrl(p, 1400))}
+                  >
+                    <img src={imgUrl(p, 400)} alt={`Gallery ${i + 1}`} className="w-full h-full object-cover" />
+                  </button>
                 ))}
               </div>
+            </div>
+          )}
+
+          {/* Lightbox */}
+          {lightboxImg && (
+            <div
+              className="fixed inset-0 z-[300] flex items-center justify-center bg-black/90"
+              onClick={() => setLightboxImg(null)}
+            >
+              <button
+                className="absolute top-4 right-4 h-9 w-9 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center text-white transition-colors"
+                onClick={() => setLightboxImg(null)}
+              >
+                <X className="h-5 w-5" />
+              </button>
+              <img
+                src={lightboxImg}
+                alt="Full view"
+                className="max-w-full max-h-[90vh] rounded-lg object-contain"
+                onClick={(e) => e.stopPropagation()}
+              />
             </div>
           )}
 
