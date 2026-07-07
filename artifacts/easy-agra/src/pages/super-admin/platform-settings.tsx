@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { AdminLayout } from "@/components/layout/admin-layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,8 +10,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { Settings, Loader2, Save, AlertTriangle, Globe, Percent, CreditCard, MessageSquare, Scale, Share2, Eye, EyeOff, Image, Plus, Trash2, GripVertical } from "lucide-react";
+import { Settings, Loader2, Save, AlertTriangle, Globe, Percent, CreditCard, MessageSquare, Scale, Share2, Eye, EyeOff, Image, Plus, Trash2, GripVertical, Upload } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { uploadToCloudinary } from "@/lib/cloudinary";
 
 const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
 
@@ -66,6 +67,8 @@ export default function PlatformSettings() {
   const [templates, setTemplates] = useState({ whatsappTemplate: "", smsTemplate: "", emailTemplate: "" });
   const [legal, setLegal] = useState({ termsAndConditions: "", privacyPolicy: "", maintenanceMode: false });
   const [heroSlides, setHeroSlides] = useState<{ img: string; title: string; sub: string }[]>([]);
+  const [uploadingIdx, setUploadingIdx] = useState<number | null>(null);
+  const fileInputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
   useEffect(() => {
     if (!data) return;
@@ -95,6 +98,19 @@ export default function PlatformSettings() {
       [arr[idx], arr[next]] = [arr[next], arr[idx]];
       return arr;
     });
+  }
+
+  async function handleSlideImageUpload(idx: number, file: File) {
+    setUploadingIdx(idx);
+    try {
+      const url = await uploadToCloudinary(file);
+      updateSlide(idx, "img", url);
+      toast({ title: "Photo upload ho gayi!", description: "Image slide mein set ho gayi." });
+    } catch (e: any) {
+      toast({ title: "Upload failed", description: e.message, variant: "destructive" });
+    } finally {
+      setUploadingIdx(null);
+    }
   }
 
   const mutation = useMutation({
@@ -237,12 +253,41 @@ export default function PlatformSettings() {
                       </div>
                     )}
 
-                    <FieldRow label="Image URL" hint="Unsplash ya koi bhi direct image link (jpg/png)">
-                      <Input
-                        value={slide.img}
-                        onChange={e => updateSlide(idx, "img", e.target.value)}
-                        placeholder="https://images.unsplash.com/photo-..."
-                      />
+                    {/* Hidden file input */}
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      ref={el => { fileInputRefs.current[idx] = el; }}
+                      onChange={e => {
+                        const file = e.target.files?.[0];
+                        if (file) handleSlideImageUpload(idx, file);
+                        e.target.value = "";
+                      }}
+                    />
+
+                    <FieldRow label="Photo" hint="Gallery se photo upload karo ya direct image link paste karo">
+                      <div className="flex gap-2">
+                        <Input
+                          value={slide.img}
+                          onChange={e => updateSlide(idx, "img", e.target.value)}
+                          placeholder="https://images.unsplash.com/photo-..."
+                          className="flex-1"
+                        />
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          className="flex-shrink-0 gap-1.5"
+                          disabled={uploadingIdx === idx}
+                          onClick={() => fileInputRefs.current[idx]?.click()}
+                        >
+                          {uploadingIdx === idx
+                            ? <Loader2 className="h-4 w-4 animate-spin" />
+                            : <Upload className="h-4 w-4" />}
+                          {uploadingIdx === idx ? "Uploading…" : "Upload"}
+                        </Button>
+                      </div>
                     </FieldRow>
                     <div className="grid grid-cols-2 gap-3">
                       <FieldRow label="Heading (Title)">
