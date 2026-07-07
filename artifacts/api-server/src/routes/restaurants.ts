@@ -145,7 +145,7 @@ router.post(
     const {
       name, description, address, city, state,
       contactNumber, contactEmail, openingTime, closingTime,
-      cuisineType, seatingCapacity, coverPhoto, galleryPhotos,
+      cuisineType, seatingCapacity, coverPhoto, galleryPhotos, googleMapLink,
     } = req.body;
 
     if (!name?.trim()) { res.status(400).json({ error: "Restaurant name is required" }); return; }
@@ -167,6 +167,7 @@ router.post(
         seatingCapacity: seatingCapacity ? parseInt(seatingCapacity, 10) : null,
         coverPhoto: coverPhoto ?? null,
         galleryPhotos: Array.isArray(galleryPhotos) ? galleryPhotos : [],
+        googleMapLink: googleMapLink?.trim() ?? null,
         status: "active",
       })
       .returning();
@@ -211,7 +212,7 @@ router.put(
     const {
       name, description, address, city, state,
       contactNumber, contactEmail, openingTime, closingTime,
-      cuisineType, seatingCapacity, coverPhoto, galleryPhotos,
+      cuisineType, seatingCapacity, coverPhoto, galleryPhotos, googleMapLink,
     } = req.body;
 
     const [updated] = await db
@@ -230,6 +231,7 @@ router.put(
         seatingCapacity: seatingCapacity != null ? parseInt(seatingCapacity, 10) : r.seatingCapacity,
         coverPhoto: coverPhoto !== undefined ? coverPhoto : r.coverPhoto,
         galleryPhotos: Array.isArray(galleryPhotos) ? galleryPhotos : r.galleryPhotos,
+        googleMapLink: googleMapLink !== undefined ? (googleMapLink?.trim() || null) : r.googleMapLink,
       })
       .where(eq(restaurantsTable.id, id))
       .returning();

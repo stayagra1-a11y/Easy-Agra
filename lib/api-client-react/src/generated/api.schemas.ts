@@ -1096,6 +1096,7 @@ export interface RestaurantDetail {
   seatingCapacity?: number | null;
   coverPhoto?: string | null;
   galleryPhotos: string[];
+  googleMapLink?: string | null;
   upiId?: string | null;
   upiQrImage?: string | null;
   status: string;
@@ -1118,6 +1119,7 @@ export interface RestaurantInput {
   seatingCapacity?: number | null;
   coverPhoto?: string | null;
   galleryPhotos?: string[];
+  googleMapLink?: string | null;
 }
 
 export interface RestaurantsPage {

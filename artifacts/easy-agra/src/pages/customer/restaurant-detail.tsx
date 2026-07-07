@@ -635,6 +635,7 @@ export default function RestaurantDetail() {
             name={r.name}
             address={r.address}
             city={r.city}
+            googleMapLink={r.googleMapLink}
           />
 
           {/* Gallery */}

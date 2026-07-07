@@ -36,6 +36,7 @@ interface FormState {
   seatingCapacity: string;
   coverPhoto: string;
   galleryPhotos: string[];
+  googleMapLink: string;
 }
 
 const INITIAL: FormState = {
@@ -52,6 +53,7 @@ const INITIAL: FormState = {
   seatingCapacity: "",
   coverPhoto: "",
   galleryPhotos: [],
+  googleMapLink: "",
 };
 
 export default function RestaurantForm() {
@@ -138,6 +140,7 @@ export default function RestaurantForm() {
         seatingCapacity: r.seatingCapacity ? String(r.seatingCapacity) : "",
         coverPhoto: r.coverPhoto ?? "",
         galleryPhotos: Array.isArray(r.galleryPhotos) ? r.galleryPhotos : [],
+        googleMapLink: r.googleMapLink ?? "",
       });
     }
   }, [getQuery.data]);
@@ -197,6 +200,7 @@ export default function RestaurantForm() {
       seatingCapacity: form.seatingCapacity ? parseInt(form.seatingCapacity, 10) : undefined,
       coverPhoto: form.coverPhoto || undefined,
       galleryPhotos: form.galleryPhotos,
+      googleMapLink: form.googleMapLink.trim() || undefined,
     };
 
     if (isEdit && restaurantId) {
@@ -367,6 +371,17 @@ export default function RestaurantForm() {
                   <label className="text-xs text-muted-foreground mb-1 block">State</label>
                   <Input placeholder="State" value={form.state} onChange={(e) => set("state", e.target.value)} />
                 </div>
+              </div>
+              <div>
+                <label className="text-xs text-muted-foreground mb-1 block">Google Maps Link (optional)</label>
+                <Input
+                  placeholder="https://maps.google.com/..."
+                  value={form.googleMapLink}
+                  onChange={(e) => set("googleMapLink", e.target.value)}
+                />
+                <p className="text-xs text-muted-foreground mt-1">
+                  Google Maps pe apni location search karein → Share → Link copy karein
+                </p>
               </div>
             </CardContent>
           </Card>

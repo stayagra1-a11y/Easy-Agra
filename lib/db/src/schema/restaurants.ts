@@ -69,6 +69,8 @@ export const restaurantsTable = pgTable("restaurants", {
   coverPhoto: text("cover_photo"),
   galleryPhotos: jsonb("gallery_photos").$type<string[]>(),
 
+  googleMapLink: text("google_map_link"),
+
   upiId: text("upi_id"),
   upiQrImage: text("upi_qr_image"),
 
