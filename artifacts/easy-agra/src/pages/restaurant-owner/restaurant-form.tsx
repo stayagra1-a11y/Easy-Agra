@@ -32,7 +32,7 @@ interface FormState {
   contactEmail: string;
   openingTime: string;
   closingTime: string;
-  cuisineType: string;
+  cuisineTypes: string[];
   seatingCapacity: string;
   coverPhoto: string;
   galleryPhotos: string[];
@@ -48,7 +48,7 @@ const INITIAL: FormState = {
   contactEmail: "",
   openingTime: "10:00",
   closingTime: "22:00",
-  cuisineType: "",
+  cuisineTypes: [],
   seatingCapacity: "",
   coverPhoto: "",
   galleryPhotos: [],
@@ -134,7 +134,7 @@ export default function RestaurantForm() {
         contactEmail: r.contactEmail ?? "",
         openingTime: r.openingTime ?? "10:00",
         closingTime: r.closingTime ?? "22:00",
-        cuisineType: r.cuisineType ?? "",
+        cuisineTypes: r.cuisineType ? r.cuisineType.split(",").map((s) => s.trim()).filter(Boolean) : [],
         seatingCapacity: r.seatingCapacity ? String(r.seatingCapacity) : "",
         coverPhoto: r.coverPhoto ?? "",
         galleryPhotos: Array.isArray(r.galleryPhotos) ? r.galleryPhotos : [],
@@ -193,7 +193,7 @@ export default function RestaurantForm() {
       contactEmail: form.contactEmail.trim() || undefined,
       openingTime: form.openingTime || undefined,
       closingTime: form.closingTime || undefined,
-      cuisineType: form.cuisineType.trim() || undefined,
+      cuisineType: form.cuisineTypes.length > 0 ? form.cuisineTypes.join(", ") : undefined,
       seatingCapacity: form.seatingCapacity ? parseInt(form.seatingCapacity, 10) : undefined,
       coverPhoto: form.coverPhoto || undefined,
       galleryPhotos: form.galleryPhotos,
@@ -300,15 +300,46 @@ export default function RestaurantForm() {
                 <Textarea placeholder="Describe your restaurant…" value={form.description} onChange={(e) => set("description", e.target.value)} rows={3} />
               </div>
               <div>
-                <label className="text-xs text-muted-foreground mb-1 block">Cuisine Type</label>
-                <select
-                  className="w-full border rounded-md px-3 py-2 text-sm bg-background"
-                  value={form.cuisineType}
-                  onChange={(e) => set("cuisineType", e.target.value)}
-                >
-                  <option value="">Select cuisine</option>
-                  {CUISINE_TYPES.map((c) => <option key={c} value={c}>{c}</option>)}
-                </select>
+                <label className="text-xs text-muted-foreground mb-1 block">
+                  Cuisine Type
+                  {form.cuisineTypes.length > 0 && (
+                    <span className="ml-2 text-primary font-medium">{form.cuisineTypes.length} selected</span>
+                  )}
+                </label>
+                <div className="grid grid-cols-2 gap-1.5">
+                  {CUISINE_TYPES.map((c) => {
+                    const checked = form.cuisineTypes.includes(c);
+                    return (
+                      <button
+                        key={c}
+                        type="button"
+                        onClick={() =>
+                          setForm((f) => ({
+                            ...f,
+                            cuisineTypes: checked
+                              ? f.cuisineTypes.filter((x) => x !== c)
+                              : [...f.cuisineTypes, c],
+                          }))
+                        }
+                        className={`flex items-center gap-2 px-3 py-2 rounded-lg border text-sm text-left transition-colors ${
+                          checked
+                            ? "border-primary bg-primary/10 text-primary font-medium"
+                            : "border-border bg-background text-foreground hover:border-primary/50"
+                        }`}
+                      >
+                        <span className={`h-4 w-4 rounded border-2 flex-shrink-0 flex items-center justify-center ${checked ? "border-primary bg-primary" : "border-muted-foreground"}`}>
+                          {checked && <svg className="h-2.5 w-2.5 text-white" viewBox="0 0 10 10" fill="currentColor"><path d="M1.5 5l2.5 2.5 4.5-4.5" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round"/></svg>}
+                        </span>
+                        {c}
+                      </button>
+                    );
+                  })}
+                </div>
+                {form.cuisineTypes.length > 0 && (
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Selected: {form.cuisineTypes.join(", ")}
+                  </p>
+                )}
               </div>
               <div>
                 <label className="text-xs text-muted-foreground mb-1 block">Seating Capacity</label>
