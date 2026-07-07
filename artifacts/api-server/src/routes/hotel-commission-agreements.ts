@@ -30,7 +30,7 @@ router.get("/hotel-commission-agreements/:hotelId", requireAuth, async (req, res
     res.status(200).json({
       exists: false,
       hotelId,
-      commissionRate: 15,
+      commissionRate: 10,
       agreed: false,
       agreementText: null,
       agreedAt: null,
@@ -42,7 +42,7 @@ router.get("/hotel-commission-agreements/:hotelId", requireAuth, async (req, res
 
   res.json({
     ...agreement,
-    commissionRate: agreement.commissionRate ? parseFloat(String(agreement.commissionRate)) : 15,
+    commissionRate: agreement.commissionRate ? parseFloat(String(agreement.commissionRate)) : 10,
     createdAt: agreement.createdAt.toISOString(),
     updatedAt: agreement.updatedAt.toISOString(),
     agreedAt: agreement.agreedAt?.toISOString() ?? null,
@@ -54,7 +54,7 @@ router.get("/hotel-commission-agreements/:hotelId", requireAuth, async (req, res
 // ──────────────────────────────────────────────────
 router.post("/hotel-commission-agreements", requireRole("hotel_owner"), async (req, res): Promise<void> => {
   const cu = (req as any).currentUser;
-  const { hotelId, commissionRate = 15, agreementText } = req.body;
+  const { hotelId, commissionRate = 10, agreementText } = req.body;
 
   if (!hotelId) { res.status(400).json({ error: "hotelId is required" }); return; }
 
@@ -83,7 +83,7 @@ router.post("/hotel-commission-agreements", requireRole("hotel_owner"), async (r
 
   res.status(201).json({
     ...agreement,
-    commissionRate: agreement.commissionRate ? parseFloat(String(agreement.commissionRate)) : 15,
+    commissionRate: agreement.commissionRate ? parseFloat(String(agreement.commissionRate)) : 10,
     createdAt: agreement.createdAt.toISOString(),
     updatedAt: agreement.updatedAt.toISOString(),
   });
@@ -118,7 +118,7 @@ router.post("/hotel-commission-agreements/:hotelId/agree", requireRole("hotel_ow
 
   res.json({
     ...updated,
-    commissionRate: updated.commissionRate ? parseFloat(String(updated.commissionRate)) : 15,
+    commissionRate: updated.commissionRate ? parseFloat(String(updated.commissionRate)) : 10,
     createdAt: updated.createdAt.toISOString(),
     updatedAt: updated.updatedAt.toISOString(),
     agreedAt: updated.agreedAt?.toISOString() ?? null,

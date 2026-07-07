@@ -414,14 +414,13 @@ export default function HotelOwnerHotels() {
               Hotel <strong className="text-foreground">"{commissionTarget?.name}"</strong> submit karne se pehle neeche diye gaye commission terms padhen aur accept karein.
             </p>
             <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
-              <p className="font-semibold text-amber-800 mb-1">💰 Commission Terms — 15%</p>
+              <p className="font-semibold text-amber-800 mb-2">💰 Commission Terms — 10%</p>
               <p className="text-amber-700 text-sm leading-relaxed">
-                Easy Agra har booking amount par <strong>15% commission</strong> charge karega. Yeh commission har booking se pehle deduct hogi aur baaki amount aapke account mein transfer kiya jayega.
+                Easy Agra ke madhyam se aayi har successful booking par <strong>10% commission</strong> lagu hoga. Agar customer hotel par aakar payment karta hai, to hotel owner booking complete hone ke baad 3 din se lekar adhiktam 7 din (weekly) ke andar commission Easy Agra ko dene ke liye sahmat hoga.
               </p>
-              <ul className="mt-2 text-amber-700 text-xs space-y-1 list-disc list-inside">
-                <li>Commission sabhi room bookings par lagegi</li>
-                <li>Payout 3-5 business days mein process hoga</li>
-                <li>Cancellation par refunded commission bhi deduct hogi</li>
+              <ul className="mt-3 text-amber-700 text-sm space-y-1.5">
+                <li className="flex items-start gap-1.5"><span className="shrink-0">✅</span> Commission ka payment booking ke 3–7 din ke andar karna hoga.</li>
+                <li className="flex items-start gap-1.5"><span className="shrink-0">✅</span> Cancellation ki sthiti mein sirf successful stay wali booking par hi commission lagu hoga.</li>
               </ul>
             </div>
             <div className="flex items-start gap-3 bg-muted/30 rounded-lg p-3 border">
@@ -432,7 +431,7 @@ export default function HotelOwnerHotels() {
                 className="mt-0.5 shrink-0"
               />
               <label htmlFor="agree" className="text-sm leading-relaxed cursor-pointer select-none">
-                Main 15% commission terms se <strong>agree karta/karti hoon</strong> aur Easy Agra ko sabhi bookings se commission deduct karne ka adhikar deta/deti hoon.
+                Main <strong>10% commission terms</strong> se agree karta/karti hoon aur Easy Agra ko sabhi successful bookings se commission lene ka adhikar deta/deti hoon.
               </label>
             </div>
           </div>
@@ -458,7 +457,7 @@ export default function HotelOwnerHotels() {
                     // No agreement — create then agree
                     await apiRequest("/api/hotel-commission-agreements", {
                       method: "POST",
-                      body: { hotelId: commissionTarget.id, commissionRate: 15 },
+                      body: { hotelId: commissionTarget.id, commissionRate: 10 },
                     });
                     await apiRequest(`/api/hotel-commission-agreements/${commissionTarget.id}/agree`, { method: "POST" });
                   } else if (!existing.agreed) {
