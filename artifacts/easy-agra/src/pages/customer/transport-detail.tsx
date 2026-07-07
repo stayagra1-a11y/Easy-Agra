@@ -8,7 +8,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import {
   Train, Bus, Plane, MapPin, Phone, Clock, ArrowLeft, ExternalLink,
-  Loader2, Navigation, Share2,
+  Loader2, Navigation, Share2, X, ChevronLeft, ChevronRight,
 } from "lucide-react";
 import { Link } from "wouter";
 
@@ -66,6 +66,7 @@ export default function TransportDetail() {
   const params = useParams();
   const { toast } = useToast();
   const id = params.id;
+  const [lightbox, setLightbox] = useState<{ imgs: string[]; idx: number } | null>(null);
   const { data, isLoading } = useQuery({
     queryKey: ["transport", id],
     queryFn: () => fetchTransportDetail(id!),
@@ -139,7 +140,13 @@ export default function TransportDetail() {
       <div className="pb-6">
         {/* Image Header */}
         {loc.mainImage ? (
-          <div className="relative h-48 w-full">
+          <div
+            className="relative h-48 w-full cursor-pointer"
+            onClick={() => {
+              const all = [loc.mainImage, loc.image1, loc.image2, loc.image3].filter(Boolean) as string[];
+              setLightbox({ imgs: all, idx: 0 });
+            }}
+          >
             <img src={loc.mainImage} alt={loc.name} className="w-full h-full object-cover" />
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
             <div className="absolute bottom-0 left-0 right-0 px-4 py-4">
@@ -230,9 +237,19 @@ export default function TransportDetail() {
               <CardContent className="p-4">
                 <p className="text-xs text-muted-foreground mb-2">More Photos</p>
                 <div className="grid grid-cols-3 gap-2">
-                  {[loc.image1, loc.image2, loc.image3].filter(Boolean).map((img, i) => (
-                    <img key={i} src={img!} alt={`Photo ${i+1}`} className="w-full h-24 rounded-lg object-cover" />
-                  ))}
+                  {[loc.image1, loc.image2, loc.image3].filter(Boolean).map((img, i) => {
+                    const all = [loc.mainImage, loc.image1, loc.image2, loc.image3].filter(Boolean) as string[];
+                    const lightboxIdx = all.indexOf(img!);
+                    return (
+                      <button
+                        key={i}
+                        onClick={() => setLightbox({ imgs: all, idx: lightboxIdx })}
+                        className="w-full h-24 rounded-lg overflow-hidden focus:outline-none active:scale-95 transition-transform"
+                      >
+                        <img src={img!} alt={`Photo ${i+1}`} className="w-full h-full object-cover" />
+                      </button>
+                    );
+                  })}
                 </div>
               </CardContent>
             </Card>
@@ -255,6 +272,70 @@ export default function TransportDetail() {
           )}
         </div>
       </div>
+
+      {/* Lightbox */}
+      {lightbox && (
+        <div
+          className="fixed inset-0 bg-black/95 flex items-center justify-center"
+          style={{ zIndex: 300 }}
+          onClick={() => setLightbox(null)}
+        >
+          {/* Close */}
+          <button
+            className="absolute top-4 right-4 text-white bg-black/50 rounded-full p-2"
+            onClick={() => setLightbox(null)}
+          >
+            <X className="h-5 w-5" />
+          </button>
+
+          {/* Counter */}
+          <div className="absolute top-4 left-1/2 -translate-x-1/2 text-white/70 text-sm">
+            {lightbox.idx + 1} / {lightbox.imgs.length}
+          </div>
+
+          {/* Prev */}
+          {lightbox.imgs.length > 1 && (
+            <button
+              className="absolute left-3 text-white bg-black/50 rounded-full p-2"
+              onClick={e => { e.stopPropagation(); setLightbox(l => l ? { ...l, idx: (l.idx - 1 + l.imgs.length) % l.imgs.length } : null); }}
+            >
+              <ChevronLeft className="h-6 w-6" />
+            </button>
+          )}
+
+          {/* Image */}
+          <img
+            src={lightbox.imgs[lightbox.idx]}
+            alt=""
+            className="max-w-full max-h-[85vh] object-contain rounded-lg"
+            onClick={e => e.stopPropagation()}
+          />
+
+          {/* Next */}
+          {lightbox.imgs.length > 1 && (
+            <button
+              className="absolute right-3 text-white bg-black/50 rounded-full p-2"
+              onClick={e => { e.stopPropagation(); setLightbox(l => l ? { ...l, idx: (l.idx + 1) % l.imgs.length } : null); }}
+            >
+              <ChevronRight className="h-6 w-6" />
+            </button>
+          )}
+
+          {/* Dot indicators */}
+          {lightbox.imgs.length > 1 && (
+            <div className="absolute bottom-6 flex gap-2">
+              {lightbox.imgs.map((_, i) => (
+                <button
+                  key={i}
+                  onClick={e => { e.stopPropagation(); setLightbox(l => l ? { ...l, idx: i } : null); }}
+                  className="rounded-full transition-all"
+                  style={{ width: i === lightbox.idx ? 20 : 8, height: 8, background: i === lightbox.idx ? "white" : "rgba(255,255,255,0.4)" }}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      )}
     </CustomerLayout>
   );
 }
