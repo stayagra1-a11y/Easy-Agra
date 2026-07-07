@@ -125,6 +125,11 @@ const PHOTO_CATEGORY_OPTIONS = [
   { value: "lobby", label: "Lobby", emoji: "🏛" },
   { value: "facade", label: "Exterior", emoji: "🏨" },
   { value: "nearby", label: "Nearby", emoji: "📍" },
+  { value: "restaurant", label: "Restaurant", emoji: "🍽️" },
+  { value: "gym", label: "Gym", emoji: "🏋️" },
+  { value: "playground", label: "Playground", emoji: "🛝" },
+  { value: "parking", label: "Parking", emoji: "🅿️" },
+  { value: "balcony", label: "Balcony", emoji: "🌅" },
 ] as const;
 
 function CategorizedPhotoSection({
