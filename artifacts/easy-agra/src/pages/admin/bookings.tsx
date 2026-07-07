@@ -629,18 +629,22 @@ export default function AdminBookings() {
                               </Badge>
                             </div>
                             {/* Spa Name — prominently */}
-                            <div className="mt-1.5 flex items-center gap-1.5">
-                              <Sparkles className="w-3.5 h-3.5 text-purple-500 flex-shrink-0" />
-                              <span className="text-sm font-semibold text-foreground truncate">
-                                {a.spaName ?? "—"}
-                              </span>
-                              {a.spaCity && (
-                                <span className="text-xs text-muted-foreground flex-shrink-0">({a.spaCity})</span>
-                              )}
+                            <div className="mt-1.5 flex items-start gap-1.5">
+                              <Sparkles className="w-3.5 h-3.5 text-purple-500 flex-shrink-0 mt-0.5" />
+                              <div>
+                                <span className="text-[10px] font-semibold uppercase tracking-wide text-purple-500 mr-1">Spa:</span>
+                                <span className="text-sm font-semibold text-foreground">
+                                  {a.spaName ?? "—"}
+                                </span>
+                                {a.spaCity && (
+                                  <span className="text-xs text-muted-foreground ml-1">({a.spaCity})</span>
+                                )}
+                              </div>
                             </div>
                             {/* Customer */}
                             <div className="mt-0.5 flex items-center gap-1.5 text-xs text-muted-foreground">
                               <Users className="w-3 h-3 flex-shrink-0" />
+                              <span className="font-semibold text-[10px] uppercase tracking-wide text-muted-foreground mr-0.5">Customer:</span>
                               <span>{a.customerName}</span>
                               {a.customerMobile && (
                                 <>
