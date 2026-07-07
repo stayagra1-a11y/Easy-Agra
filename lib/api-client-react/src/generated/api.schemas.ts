@@ -1265,6 +1265,7 @@ export interface SpaInput {
   coverPhoto?: string | null;
   galleryPhotos?: string[] | null;
   facilities?: string[] | null;
+  googleMapLink?: string | null;
 }
 
 export interface SpasPage {

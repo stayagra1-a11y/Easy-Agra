@@ -557,7 +557,7 @@ export default function SpaDetail() {
           )}
 
           {/* Map */}
-          <MapEmbed name={spa.name} address={spa.address} city={spa.city} />
+          <MapEmbed name={spa.name} address={spa.address} city={spa.city} googleMapLink={spa.googleMapLink} />
 
           {/* Contact */}
           {(spa.contactNumber || spaAny.website) && (

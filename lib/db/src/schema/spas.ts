@@ -54,6 +54,7 @@ export const spasTable = pgTable("spas", {
   address: text("address"),
   city: text("city"),
   state: text("state"),
+  googleMapLink: text("google_map_link"),
 
   contactNumber: text("contact_number"),
   contactEmail: text("contact_email"),

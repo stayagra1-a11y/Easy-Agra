@@ -44,6 +44,7 @@ interface SpaFormState {
   coverPhoto: string;
   galleryPhotos: string[];
   facilities: string[];
+  googleMapLink: string;
 }
 
 const EMPTY: SpaFormState = {
@@ -59,6 +60,7 @@ const EMPTY: SpaFormState = {
   coverPhoto: "",
   galleryPhotos: [],
   facilities: [],
+  googleMapLink: "",
 };
 
 export default function SpaForm() {
@@ -174,6 +176,7 @@ export default function SpaForm() {
         coverPhoto: existingSpa.coverPhoto ?? "",
         galleryPhotos: existingSpa.galleryPhotos ?? [],
         facilities: existingSpa.facilities ?? [],
+        googleMapLink: existingSpa.googleMapLink ?? "",
       });
     }
   }, [existingSpa, isEdit]);
@@ -230,6 +233,7 @@ export default function SpaForm() {
       coverPhoto: form.coverPhoto.trim() || null,
       galleryPhotos: form.galleryPhotos,
       facilities: form.facilities,
+      googleMapLink: form.googleMapLink.trim() || null,
     };
 
     const invalidate = () => {
@@ -402,6 +406,18 @@ export default function SpaForm() {
                   placeholder="Uttar Pradesh"
                 />
               </div>
+            </div>
+            <div>
+              <Label htmlFor="googleMapLink">Google Maps Link (optional)</Label>
+              <Input
+                id="googleMapLink"
+                value={form.googleMapLink}
+                onChange={(e) => set("googleMapLink", e.target.value)}
+                placeholder="https://maps.google.com/..."
+              />
+              <p className="text-xs text-muted-foreground mt-1">
+                Google Maps pe apni spa search karein → Share → Link copy karein
+              </p>
             </div>
           </CardContent>
         </Card>

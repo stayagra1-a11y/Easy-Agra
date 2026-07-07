@@ -235,6 +235,7 @@ router.post(
       coverPhoto,
       galleryPhotos,
       facilities,
+      googleMapLink,
     } = req.body;
 
     if (!name?.trim()) {
@@ -258,6 +259,7 @@ router.post(
         coverPhoto: coverPhoto ?? null,
         galleryPhotos: Array.isArray(galleryPhotos) ? galleryPhotos : [],
         facilities: Array.isArray(facilities) ? facilities : [],
+        googleMapLink: googleMapLink?.trim() ?? null,
         status: "draft",
       })
       .returning();
@@ -343,6 +345,7 @@ router.put(
       coverPhoto,
       galleryPhotos,
       facilities,
+      googleMapLink,
     } = req.body;
 
     const [updated] = await db
@@ -362,6 +365,7 @@ router.put(
           ? galleryPhotos
           : s.galleryPhotos,
         facilities: Array.isArray(facilities) ? facilities : s.facilities,
+        googleMapLink: googleMapLink !== undefined ? (googleMapLink?.trim() || null) : s.googleMapLink,
       })
       .where(eq(spasTable.id, id))
       .returning();
