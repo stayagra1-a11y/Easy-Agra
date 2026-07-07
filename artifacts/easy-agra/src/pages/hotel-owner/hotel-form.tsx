@@ -608,9 +608,31 @@ export default function HotelForm() {
 
   const handleSave = () => {
     if (!form.name.trim()) {
-      toast({ title: "Hotel name required", variant: "destructive" });
+      toast({ title: "Hotel naam zaroori hai", variant: "destructive" });
       setActiveTab("basic");
       return;
+    }
+    if (!isEdit) {
+      if (!form.contactMobile.trim()) {
+        toast({ title: "Phone number zaroori hai", description: "Contact tab mein mobile number bharein.", variant: "destructive" });
+        setActiveTab("contact");
+        return;
+      }
+      if (!form.coverImage) {
+        toast({ title: "Cover photo zaroori hai", description: "Media tab mein hotel ki ek photo upload karein.", variant: "destructive" });
+        setActiveTab("media");
+        return;
+      }
+      if (form.amenities.length === 0) {
+        toast({ title: "Kam se kam ek amenity select karein", description: "Amenities tab mein koi bhi ek amenity chunein.", variant: "destructive" });
+        setActiveTab("amenities");
+        return;
+      }
+      if (!commissionAgreed) {
+        toast({ title: "Commission terms accept karein", description: "Amenities tab mein commission agreement pe tick karein.", variant: "destructive" });
+        setActiveTab("amenities");
+        return;
+      }
     }
     if (isEdit && hotelId) {
       updateMutation.mutate({ id: hotelId, data: buildPayload() as HotelUpdate });
