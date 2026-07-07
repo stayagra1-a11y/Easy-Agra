@@ -14,13 +14,14 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, Building2, MapPin, Phone, Info, Wifi, Image, Save, Send, Loader2, IndianRupee, Clock, Navigation, Plus, Pencil, Trash2, Check, X, Star } from "lucide-react";
+import { ArrowLeft, Building2, MapPin, Phone, Info, Wifi, Image, Save, Send, Loader2, IndianRupee, Clock, Navigation, Plus, Pencil, Trash2, Check, X, Star, FileCheck } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { UpiSettingsCard } from "@/components/upi-settings-card";
 import { uploadToCloudinary } from "@/lib/cloudinary";
 import { Link, useLocation, useParams } from "wouter";
 import { useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
+import { apiRequest } from "@/lib/api-request";
 
 const AMENITIES_LIST = [
   "Free WiFi", "Parking", "Air Conditioning", "Restaurant", "Spa",
@@ -442,6 +443,7 @@ export default function HotelForm() {
   const [activeTab, setActiveTab] = useState("basic");
   const [draftSaved, setDraftSaved] = useState(false);
   const [hasDraft, setHasDraft] = useState(false);
+  const [commissionAgreed, setCommissionAgreed] = useState(false);
   const [, navigate] = useLocation();
   const queryClient = useQueryClient();
   const { toast } = useToast();
@@ -572,9 +574,20 @@ export default function HotelForm() {
 
   const createMutation = useCreateHotel({
     mutation: {
-      onSuccess: () => {
+      onSuccess: async (created: any) => {
         queryClient.invalidateQueries({ queryKey: getListHotelsQueryKey() });
         clearDraft();
+        if (commissionAgreed && created?.id) {
+          try {
+            await apiRequest("/api/hotel-commission-agreements", {
+              method: "POST",
+              body: { hotelId: created.id, commissionRate: 10 },
+            });
+            await apiRequest(`/api/hotel-commission-agreements/${created.id}/agree`, { method: "POST" });
+          } catch {
+            // Agreement will be captured at submit time if this fails
+          }
+        }
         toast({ title: "Hotel created!", description: "Saved as draft. Submit for approval when ready." });
         navigate("/hotel-owner/hotels");
       },
@@ -895,7 +908,7 @@ export default function HotelForm() {
           </TabsContent>
 
           {/* Amenities */}
-          <TabsContent value="amenities" className="mt-3">
+          <TabsContent value="amenities" className="mt-3 space-y-4">
             <Card>
               <CardHeader className="pb-2 pt-4 px-4">
                 <CardTitle className="text-sm font-semibold flex items-center gap-2">
@@ -920,6 +933,45 @@ export default function HotelForm() {
                 )}
               </CardContent>
             </Card>
+
+            {/* Commission Agreement — only for new hotels */}
+            {!isEdit && (
+              <Card className="border-amber-200">
+                <CardHeader className="pb-2 pt-4 px-4">
+                  <CardTitle className="text-sm font-semibold flex items-center gap-2">
+                    <FileCheck className="h-4 w-4 text-amber-600" /> Commission Agreement
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="px-4 pb-4 space-y-3">
+                  <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
+                    <p className="font-semibold text-amber-800 mb-2 text-sm">💰 Commission Terms — 10%</p>
+                    <p className="text-amber-700 text-xs leading-relaxed">
+                      Easy Agra ke madhyam se aayi har successful booking par <strong>10% commission</strong> lagu hoga. Agar customer hotel par aakar payment karta hai, to hotel owner booking complete hone ke baad 3 din se lekar adhiktam 7 din (weekly) ke andar commission Easy Agra ko dene ke liye sahmat hoga.
+                    </p>
+                    <ul className="mt-2.5 text-amber-700 text-xs space-y-1.5">
+                      <li className="flex items-start gap-1.5"><span className="shrink-0">✅</span> Commission ka payment booking ke 3–7 din ke andar karna hoga.</li>
+                      <li className="flex items-start gap-1.5"><span className="shrink-0">✅</span> Cancellation ki sthiti mein sirf successful stay wali booking par hi commission lagu hoga.</li>
+                    </ul>
+                  </div>
+                  <div className="flex items-start gap-3 bg-muted/30 rounded-lg p-3 border">
+                    <Checkbox
+                      id="commission-agree"
+                      checked={commissionAgreed}
+                      onCheckedChange={(v) => setCommissionAgreed(v === true)}
+                      className="mt-0.5 shrink-0"
+                    />
+                    <label htmlFor="commission-agree" className="text-xs leading-relaxed cursor-pointer select-none">
+                      Main <strong>10% commission terms</strong> se agree karta/karti hoon aur Easy Agra ko sabhi successful bookings se commission lene ka adhikar deta/deti hoon.
+                    </label>
+                  </div>
+                  {!commissionAgreed && (
+                    <p className="text-xs text-amber-600 flex items-center gap-1">
+                      ⚠ Hotel submit karne ke liye commission terms accept karna hoga.
+                    </p>
+                  )}
+                </CardContent>
+              </Card>
+            )}
           </TabsContent>
 
           {/* Media */}
