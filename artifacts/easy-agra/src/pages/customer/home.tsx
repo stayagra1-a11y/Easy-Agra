@@ -30,7 +30,7 @@ const requestStatusIcon: Record<string, any> = {
   rejected: <XCircle className="h-4 w-4 text-red-500" />,
 };
 
-const HERO_SLIDES = [
+const DEFAULT_HERO_SLIDES = [
   {
     img: "https://images.unsplash.com/photo-1564507592333-c60657eea523?w=900&q=85",
     title: "Taj Mahal",
@@ -57,16 +57,31 @@ function HeroCarousel({ userName }: { userName: string }) {
   const [current, setCurrent] = useState(0);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
+  const { data: slidesData } = useQuery({
+    queryKey: ["hero-slides"],
+    queryFn: async () => {
+      const res = await fetch(`${BASE}/api/hero-slides`);
+      if (!res.ok) return null;
+      return res.json() as Promise<{ heroSlides: { img: string; title: string; sub: string }[] | null }>;
+    },
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const slides = (slidesData?.heroSlides && slidesData.heroSlides.length > 0)
+    ? slidesData.heroSlides
+    : DEFAULT_HERO_SLIDES;
+
   function startTimer() {
     timerRef.current = setInterval(() => {
-      setCurrent((c) => (c + 1) % HERO_SLIDES.length);
+      setCurrent((c) => (c + 1) % slides.length);
     }, 4000);
   }
 
   useEffect(() => {
+    setCurrent(0);
     startTimer();
     return () => { if (timerRef.current) clearInterval(timerRef.current); };
-  }, []);
+  }, [slides.length]);
 
   function goTo(idx: number) {
     setCurrent(idx);
@@ -74,11 +89,11 @@ function HeroCarousel({ userName }: { userName: string }) {
     startTimer();
   }
 
-  const slide = HERO_SLIDES[current];
+  const slide = slides[current] ?? slides[0];
 
   return (
     <div className="relative w-full rounded-2xl overflow-hidden shadow-lg" style={{ height: 220 }}>
-      {HERO_SLIDES.map((s, i) => (
+      {slides.map((s, i) => (
         <img
           key={i}
           src={s.img}
@@ -95,7 +110,7 @@ function HeroCarousel({ userName }: { userName: string }) {
         <p className="text-white/75 text-xs mt-0.5 drop-shadow">{slide.sub}</p>
 
         <div className="flex gap-1.5 mt-3">
-          {HERO_SLIDES.map((_, i) => (
+          {slides.map((_, i) => (
             <button
               key={i}
               onClick={() => goTo(i)}

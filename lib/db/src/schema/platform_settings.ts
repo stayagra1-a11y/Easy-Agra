@@ -38,6 +38,8 @@ export const platformSettingsTable = pgTable("platform_settings", {
   whatsappTemplate: text("whatsapp_template"),
   smsTemplate: text("sms_template"),
   emailTemplate: text("email_template"),
+  // Hero banner slides
+  heroSlides: jsonb("hero_slides").$type<{ img: string; title: string; sub: string }[]>(),
   // Featured content IDs
   featuredHotelIds: jsonb("featured_hotel_ids").$type<number[]>().default([]),
   featuredRestaurantIds: jsonb("featured_restaurant_ids").$type<number[]>().default([]),

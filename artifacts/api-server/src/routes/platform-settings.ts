@@ -23,6 +23,12 @@ router.get("/maintenance-status", async (_req, res): Promise<void> => {
   res.json({ maintenanceMode: settings.maintenanceMode });
 });
 
+// Public: hero slides (no auth needed — used on home page)
+router.get("/hero-slides", async (_req, res): Promise<void> => {
+  const settings = await getOrCreateSettings();
+  res.json({ heroSlides: settings.heroSlides ?? null });
+});
+
 router.get("/platform-settings", requireAuth, async (req, res): Promise<void> => {
   const currentUser = (req as any).currentUser;
   const settings = await getOrCreateSettings();
@@ -41,6 +47,7 @@ const ALL_FIELDS = [
   "hotelCommissionPct", "restaurantCommissionPct", "spaCommissionPct",
   "paymentMode", "razorpayKeyId", "razorpayKeySecret", "razorpayWebhookSecret", "refundPolicy",
   "whatsappTemplate", "smsTemplate", "emailTemplate",
+  "heroSlides",
   "featuredHotelIds", "featuredRestaurantIds", "featuredSpaIds", "featuredTouristPlaceIds",
   "termsAndConditions", "privacyPolicy", "maintenanceMode",
 ];

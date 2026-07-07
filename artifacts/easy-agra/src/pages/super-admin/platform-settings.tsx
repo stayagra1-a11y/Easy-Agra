@@ -10,7 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { Settings, Loader2, Save, AlertTriangle, Globe, Percent, CreditCard, MessageSquare, Scale, Share2, Eye, EyeOff } from "lucide-react";
+import { Settings, Loader2, Save, AlertTriangle, Globe, Percent, CreditCard, MessageSquare, Scale, Share2, Eye, EyeOff, Image, Plus, Trash2, GripVertical } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
@@ -65,6 +65,7 @@ export default function PlatformSettings() {
   const [payment, setPayment] = useState({ paymentMode: "razorpay", razorpayKeyId: "", razorpayKeySecret: "", razorpayWebhookSecret: "", refundPolicy: "" });
   const [templates, setTemplates] = useState({ whatsappTemplate: "", smsTemplate: "", emailTemplate: "" });
   const [legal, setLegal] = useState({ termsAndConditions: "", privacyPolicy: "", maintenanceMode: false });
+  const [heroSlides, setHeroSlides] = useState<{ img: string; title: string; sub: string }[]>([]);
 
   useEffect(() => {
     if (!data) return;
@@ -74,7 +75,27 @@ export default function PlatformSettings() {
     setPayment({ paymentMode: data.paymentMode ?? "razorpay", razorpayKeyId: data.razorpayKeyId ?? "", razorpayKeySecret: data.razorpayKeySecret ?? "", razorpayWebhookSecret: data.razorpayWebhookSecret ?? "", refundPolicy: data.refundPolicy ?? "" });
     setTemplates({ whatsappTemplate: data.whatsappTemplate ?? "", smsTemplate: data.smsTemplate ?? "", emailTemplate: data.emailTemplate ?? "" });
     setLegal({ termsAndConditions: data.termsAndConditions ?? "", privacyPolicy: data.privacyPolicy ?? "", maintenanceMode: data.maintenanceMode ?? false });
+    setHeroSlides(Array.isArray(data.heroSlides) ? data.heroSlides : []);
   }, [data]);
+
+  function addSlide() {
+    setHeroSlides(s => [...s, { img: "", title: "", sub: "" }]);
+  }
+  function removeSlide(idx: number) {
+    setHeroSlides(s => s.filter((_, i) => i !== idx));
+  }
+  function updateSlide(idx: number, field: "img" | "title" | "sub", value: string) {
+    setHeroSlides(s => s.map((sl, i) => i === idx ? { ...sl, [field]: value } : sl));
+  }
+  function moveSlide(idx: number, dir: -1 | 1) {
+    const next = idx + dir;
+    if (next < 0 || next >= heroSlides.length) return;
+    setHeroSlides(s => {
+      const arr = [...s];
+      [arr[idx], arr[next]] = [arr[next], arr[idx]];
+      return arr;
+    });
+  }
 
   const mutation = useMutation({
     mutationFn: saveSettings,
@@ -108,9 +129,10 @@ export default function PlatformSettings() {
         </div>
 
         <Tabs defaultValue="general">
-          <TabsList className="grid grid-cols-3 lg:grid-cols-6 mb-6 h-auto gap-1">
+          <TabsList className="grid grid-cols-4 lg:grid-cols-7 mb-6 h-auto gap-1">
             <TabsTrigger value="general" className="flex items-center gap-1 text-xs py-2"><Globe className="h-3.5 w-3.5" />General</TabsTrigger>
             <TabsTrigger value="social" className="flex items-center gap-1 text-xs py-2"><Share2 className="h-3.5 w-3.5" />Social</TabsTrigger>
+            <TabsTrigger value="hero" className="flex items-center gap-1 text-xs py-2"><Image className="h-3.5 w-3.5" />Hero Slides</TabsTrigger>
             <TabsTrigger value="commission" className="flex items-center gap-1 text-xs py-2"><Percent className="h-3.5 w-3.5" />Commission</TabsTrigger>
             <TabsTrigger value="payment" className="flex items-center gap-1 text-xs py-2"><CreditCard className="h-3.5 w-3.5" />Payment</TabsTrigger>
             <TabsTrigger value="templates" className="flex items-center gap-1 text-xs py-2"><MessageSquare className="h-3.5 w-3.5" />Templates</TabsTrigger>
@@ -148,6 +170,106 @@ export default function PlatformSettings() {
                 <FieldRow label="Twitter / X URL"><Input value={social.twitterUrl} onChange={e => setSocial(s => ({ ...s, twitterUrl: e.target.value }))} placeholder="https://x.com/easyagra" /></FieldRow>
                 <div className="flex justify-end">
                   <SaveButton isPending={mutation.isPending} onClick={() => mutation.mutate(social)} />
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* HERO SLIDES TAB */}
+          <TabsContent value="hero">
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base flex items-center gap-2"><Image className="h-4 w-4" />Hero Banner Slides</CardTitle>
+                <p className="text-xs text-muted-foreground">
+                  Ye slides home page ke banner mein dikhti hain. Agar koi slide save nahi hai toh default Agra photos dikhenge.
+                </p>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {heroSlides.length === 0 && (
+                  <div className="rounded-lg border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
+                    Abhi koi custom slide nahi hai — default Agra slides dikh rahe hain home page pe.
+                  </div>
+                )}
+
+                {heroSlides.map((slide, idx) => (
+                  <div key={idx} className="rounded-lg border border-border p-4 space-y-3 bg-muted/20">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Slide {idx + 1}</span>
+                      <div className="flex items-center gap-1">
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          className="h-7 w-7 p-0"
+                          disabled={idx === 0}
+                          onClick={() => moveSlide(idx, -1)}
+                          title="Move Up"
+                        >
+                          <GripVertical className="h-3.5 w-3.5 rotate-90 scale-x-[-1]" />
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          className="h-7 w-7 p-0"
+                          disabled={idx === heroSlides.length - 1}
+                          onClick={() => moveSlide(idx, 1)}
+                          title="Move Down"
+                        >
+                          <GripVertical className="h-3.5 w-3.5 rotate-90" />
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          className="h-7 w-7 p-0 text-red-500 hover:text-red-600 hover:bg-red-50"
+                          onClick={() => removeSlide(idx)}
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </Button>
+                      </div>
+                    </div>
+
+                    {/* Image preview */}
+                    {slide.img && (
+                      <div className="w-full h-24 rounded-lg overflow-hidden bg-muted">
+                        <img src={slide.img} alt={slide.title} className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
+                      </div>
+                    )}
+
+                    <FieldRow label="Image URL" hint="Unsplash ya koi bhi direct image link (jpg/png)">
+                      <Input
+                        value={slide.img}
+                        onChange={e => updateSlide(idx, "img", e.target.value)}
+                        placeholder="https://images.unsplash.com/photo-..."
+                      />
+                    </FieldRow>
+                    <div className="grid grid-cols-2 gap-3">
+                      <FieldRow label="Heading (Title)">
+                        <Input
+                          value={slide.title}
+                          onChange={e => updateSlide(idx, "title", e.target.value)}
+                          placeholder="Taj Mahal"
+                        />
+                      </FieldRow>
+                      <FieldRow label="Subtitle">
+                        <Input
+                          value={slide.sub}
+                          onChange={e => updateSlide(idx, "sub", e.target.value)}
+                          placeholder="Duniya ka sabse khoobsurat monument"
+                        />
+                      </FieldRow>
+                    </div>
+                  </div>
+                ))}
+
+                <Button type="button" variant="outline" className="w-full gap-2" onClick={addSlide}>
+                  <Plus className="h-4 w-4" />
+                  Naya Slide Add Karo
+                </Button>
+
+                <div className="flex justify-end">
+                  <SaveButton isPending={mutation.isPending} onClick={() => mutation.mutate({ heroSlides })} />
                 </div>
               </CardContent>
             </Card>
