@@ -1241,6 +1241,7 @@ export interface Spa {
   coverPhoto?: string | null;
   galleryPhotos?: string[] | null;
   facilities?: string[] | null;
+  googleMapLink?: string | null;
   upiId?: string | null;
   upiQrImage?: string | null;
   status: SpaStatus;

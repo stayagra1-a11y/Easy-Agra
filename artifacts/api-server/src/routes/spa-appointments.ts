@@ -116,6 +116,58 @@ router.get(
 );
 
 // ────────────────────────────────────────────────────────────────────────
+// GET /spa-appointments/admin — admin/super_admin: all appointments
+// ────────────────────────────────────────────────────────────────────────
+router.get(
+  "/spa-appointments/admin",
+  requireRole("admin", "super_admin"),
+  async (req, res): Promise<void> => {
+    const { spaId, status, search, dateFrom, dateTo, page = "1", limit = "20" } = req.query as any;
+    const pageNum = Math.max(1, parseInt(page, 10));
+    const limitNum = Math.min(50, parseInt(limit, 10));
+    const offset = (pageNum - 1) * limitNum;
+
+    const conditions: any[] = [];
+    if (spaId) conditions.push(eq(spaAppointmentsTable.spaId, parseInt(spaId, 10)));
+    if (status && status !== "all") conditions.push(eq(spaAppointmentsTable.status, status as any));
+    if (dateFrom) conditions.push(sql`${spaAppointmentsTable.appointmentDate} >= ${dateFrom}`);
+    if (dateTo) conditions.push(sql`${spaAppointmentsTable.appointmentDate} <= ${dateTo}`);
+    if (search) {
+      conditions.push(
+        sql`(${spaAppointmentsTable.appointmentRef} ilike ${"%" + search + "%"} or ${spaAppointmentsTable.customerName} ilike ${"%" + search + "%"})`,
+      );
+    }
+
+    const where = conditions.length > 0 ? and(...conditions) : undefined;
+
+    const [countRow] = await db
+      .select({ total: sql<number>`count(*)::int` })
+      .from(spaAppointmentsTable)
+      .where(where);
+
+    const rows = await db
+      .select({
+        appt: spaAppointmentsTable,
+        spaName: spasTable.name,
+        spaCity: spasTable.city,
+      })
+      .from(spaAppointmentsTable)
+      .leftJoin(spasTable, eq(spaAppointmentsTable.spaId, spasTable.id))
+      .where(where)
+      .orderBy(desc(spaAppointmentsTable.createdAt))
+      .limit(limitNum)
+      .offset(offset);
+
+    res.json({
+      appointments: rows.map((r) => serializeAppt(r.appt, r.spaName, r.spaCity)),
+      total: countRow?.total ?? 0,
+      page: pageNum,
+      limit: limitNum,
+    });
+  },
+);
+
+// ────────────────────────────────────────────────────────────────────────
 // GET /spa-appointments/owner — spa_owner: MUST be before /:id
 // ────────────────────────────────────────────────────────────────────────
 router.get(
