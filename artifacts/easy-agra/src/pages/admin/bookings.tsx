@@ -612,6 +612,7 @@ export default function AdminBookings() {
                       <div key={a.id} className="p-4 hover:bg-muted/30 transition-colors">
                         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
                           <div className="flex-1 min-w-0">
+                            {/* Ref + Status */}
                             <div className="flex items-center gap-2 flex-wrap">
                               <span className="font-mono text-xs font-bold text-primary">{a.appointmentRef}</span>
                               <Badge
@@ -627,32 +628,46 @@ export default function AdminBookings() {
                                 {a.status}
                               </Badge>
                             </div>
-                            <div className="mt-1 text-sm font-medium text-foreground">
-                              {a.customerName} → {a.spaName ?? "—"}
+                            {/* Spa Name — prominently */}
+                            <div className="mt-1.5 flex items-center gap-1.5">
+                              <Sparkles className="w-3.5 h-3.5 text-purple-500 flex-shrink-0" />
+                              <span className="text-sm font-semibold text-foreground truncate">
+                                {a.spaName ?? "—"}
+                              </span>
+                              {a.spaCity && (
+                                <span className="text-xs text-muted-foreground flex-shrink-0">({a.spaCity})</span>
+                              )}
                             </div>
-                            <div className="mt-0.5 flex items-center gap-1 text-xs text-muted-foreground">
-                              <Phone className="w-3 h-3" />
-                              {a.customerMobile}
+                            {/* Customer */}
+                            <div className="mt-0.5 flex items-center gap-1.5 text-xs text-muted-foreground">
+                              <Users className="w-3 h-3 flex-shrink-0" />
+                              <span>{a.customerName}</span>
+                              {a.customerMobile && (
+                                <>
+                                  <span className="text-muted-foreground/40">·</span>
+                                  <Phone className="w-3 h-3 flex-shrink-0" />
+                                  <span>{a.customerMobile}</span>
+                                </>
+                              )}
                             </div>
+                            {/* Service + Date */}
                             <div className="mt-0.5 text-xs text-muted-foreground space-y-0.5">
-                              <div>Service: {a.serviceName} &nbsp;|&nbsp; Persons: {a.numberOfPersons}</div>
+                              <div>Service: <span className="font-medium text-foreground/80">{a.serviceName}</span> &nbsp;|&nbsp; Persons: {a.numberOfPersons}</div>
                               <div className="flex items-center gap-1">
                                 <CalendarDays className="w-3 h-3" />
                                 {a.appointmentDate} at {a.appointmentTime}
                               </div>
-                              <div className="text-[11px] text-muted-foreground/70">
+                              <div className="text-[11px] text-muted-foreground/60">
                                 Booked: {fmtDatetime(a.createdAt)}
                               </div>
                             </div>
                           </div>
+                          {/* Amount */}
                           <div className="flex flex-col items-end gap-1 flex-shrink-0">
                             {a.amount != null && (
                               <div className="font-bold text-foreground">
                                 ₹{Number(a.amount).toLocaleString("en-IN")}
                               </div>
-                            )}
-                            {a.spaCity && (
-                              <div className="text-xs text-muted-foreground">{a.spaCity}</div>
                             )}
                           </div>
                         </div>
