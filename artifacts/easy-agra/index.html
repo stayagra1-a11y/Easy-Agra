@@ -40,9 +40,10 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-    <!-- Force unregister any old service worker & clear caches -->
+    <!-- Cache buster: force fresh load every deploy -->
     <script>
       (function() {
+        // 1) Unregister all service workers & clear caches
         if ('serviceWorker' in navigator) {
           navigator.serviceWorker.getRegistrations().then(function(regs) {
             regs.forEach(function(r) { r.unregister(); });
@@ -52,6 +53,11 @@
               names.forEach(function(n) { caches.delete(n); });
             });
           }
+        }
+        // 2) If no cache-bust param, redirect with one to force fresh HTML+JS
+        if (!location.search.match(/[?&]nocache=/)) {
+          var sep = location.search ? '&' : '?';
+          location.replace(location.href + sep + 'nocache=' + Date.now());
         }
       })();
     </script>
