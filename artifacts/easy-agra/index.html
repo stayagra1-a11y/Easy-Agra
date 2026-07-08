@@ -6,6 +6,9 @@
     <title>Easy Agra</title>
     <meta name="description" content="Your guide to Agra — Hotels, Restaurants, Spas &amp; Tourism" />
     <meta name="robots" content="index, follow" />
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
 
     <!-- PWA Meta Tags -->
     <meta name="application-name" content="Easy Agra" />
@@ -43,21 +46,34 @@
     <!-- Cache buster: force fresh load every deploy -->
     <script>
       (function() {
-        // 1) Unregister all service workers & clear caches
+        var done = false;
+        function reload() {
+          if (done) return;
+          done = true;
+          var url = location.href;
+          url = url.replace(/[?&]nocache=[^&]*/g, '');
+          var sep = url.indexOf('?') > -1 ? '&' : '?';
+          location.href = url + sep + 'nocache=' + Date.now();
+        }
         if ('serviceWorker' in navigator) {
           navigator.serviceWorker.getRegistrations().then(function(regs) {
-            regs.forEach(function(r) { r.unregister(); });
-          });
-          if ('caches' in window) {
-            caches.keys().then(function(names) {
-              names.forEach(function(n) { caches.delete(n); });
+            var pending = regs.length;
+            if (pending === 0) { reload(); return; }
+            regs.forEach(function(r) {
+              r.unregister().then(function(s) {
+                if ('caches' in window) {
+                  caches.keys().then(function(names) {
+                    return Promise.all(names.map(function(n) { return caches.delete(n); }));
+                  });
+                }
+              }).catch(function(){}).finally(function() {
+                pending--;
+                if (pending === 0) reload();
+              });
             });
-          }
-        }
-        // 2) If no cache-bust param, redirect with one to force fresh HTML+JS
-        if (!location.search.match(/[?&]nocache=/)) {
-          var sep = location.search ? '&' : '?';
-          location.replace(location.href + sep + 'nocache=' + Date.now());
+          }).catch(reload);
+        } else {
+          reload();
         }
       })();
     </script>
