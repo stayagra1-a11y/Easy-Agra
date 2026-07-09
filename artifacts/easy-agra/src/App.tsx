@@ -201,7 +201,7 @@ function MaintenanceGate({ children }: { children: React.ReactNode }) {
   return (
     <>
       {isOn && user && ADMIN_ROLES.includes(user.role) && (
-        <div className="fixed top-0 left-0 right-0 z-[999] bg-amber-500 text-white text-center text-xs py-1.5 px-4 flex items-center justify-center gap-2">
+        <div className="fixed top-0 left-0 right-0 z-[9999] bg-amber-500 text-white text-center text-xs py-1.5 px-4 flex items-center justify-center gap-2">
           <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
           <span><strong>Maintenance Mode ON</strong> — Customers see the maintenance page. Only admins can access the app.</span>
         </div>

@@ -75,7 +75,8 @@ export function OwnerLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-primary text-primary-foreground shadow-md">
+      <header className="sticky top-0 z-[9999] bg-primary text-primary-foreground shadow-md will-change-transform pt-[env(safe-area-inset-top)]"
+        style={{ WebkitTransform: 'translateZ(0)', transform: 'translateZ(0)' }}>
         <div className="flex items-center justify-between px-4 py-3 max-w-2xl mx-auto">
           <div className="flex items-center gap-2">
             <Map className="h-5 w-5 text-accent" />
@@ -108,7 +109,7 @@ export function OwnerLayout({ children }: { children: React.ReactNode }) {
       </main>
 
       {/* Bottom Navigation */}
-      <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-border">
+      <nav className="fixed bottom-0 left-0 right-0 z-[9998] bg-white border-t border-border pb-[env(safe-area-inset-bottom)]">
         <div className="flex items-center justify-around max-w-2xl mx-auto">
           {navItems.map(({ href, icon: Icon, label }) => {
             const isActive = location === href || location.startsWith(href + "/");

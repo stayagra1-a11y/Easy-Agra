@@ -191,7 +191,7 @@ export default function Onboarding() {
 
   return (
     <div
-      className={`min-h-screen bg-gradient-to-br ${slide.bg} flex flex-col overflow-hidden relative transition-all duration-700`}
+      className={`min-h-dvh bg-gradient-to-br ${slide.bg} flex flex-col relative transition-all duration-700`}
       onTouchStart={onTouchStart}
       onTouchEnd={onTouchEnd}
     >
@@ -199,14 +199,15 @@ export default function Onboarding() {
       {!isLast && (
         <button
           onClick={finish}
-          className="absolute top-5 right-5 z-20 text-white/60 text-sm font-medium px-3 py-1.5 rounded-full border border-white/20 hover:bg-white/10 transition-colors"
+          className="absolute z-20 text-white/60 text-sm font-medium px-3 py-1.5 rounded-full border border-white/20 hover:bg-white/10 transition-colors"
+          style={{ top: 'max(1.25rem, env(safe-area-inset-top))', right: '1.25rem' }}
         >
           Skip
         </button>
       )}
 
       {/* Logo top-left */}
-      <div className="absolute top-4 left-4 z-20">
+      <div className="absolute left-4 z-20" style={{ top: 'max(1rem, env(safe-area-inset-top))' }}>
         <EasyAgraLogo size="sm" variant="full" />
       </div>
 

@@ -87,7 +87,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
   const roleName = isSuperAdmin ? "Super Admin" : "Admin";
 
   return (
-    <div className="min-h-screen bg-muted/30 flex">
+    <div className="min-h-screen bg-muted/30 flex flex-col lg:flex-row">
       {/* Sidebar overlay */}
       {sidebarOpen && (
         <div className="fixed inset-0 bg-black/50 z-40 lg:hidden" onClick={() => setSidebarOpen(false)} />
@@ -145,7 +145,8 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
       {/* Main */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Top bar */}
-        <header className="sticky top-0 z-30 bg-white border-b border-border shadow-sm flex items-center px-4 py-3 gap-4">
+        <header className="sticky top-0 z-[9999] bg-white border-b border-border shadow-sm flex items-center px-4 py-3 gap-4 will-change-transform pt-[env(safe-area-inset-top)]"
+          style={{ WebkitTransform: 'translateZ(0)', transform: 'translateZ(0)' }}>
           <Button variant="ghost" size="icon" className="lg:hidden" onClick={() => setSidebarOpen(true)}>
             <Menu className="h-5 w-5" />
           </Button>
