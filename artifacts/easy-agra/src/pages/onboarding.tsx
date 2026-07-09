@@ -9,39 +9,11 @@ const slides = [
     bg: "from-[#0d2b20] via-[#1a4a35] to-[#0d2b20]",
     accent: "#c9a84c",
     icon: (
-      <svg viewBox="0 0 200 160" className="w-72 h-56 drop-shadow-2xl" fill="none">
-        {/* Taj Mahal silhouette */}
-        <rect x="80" y="100" width="40" height="45" fill="#c9a84c" opacity="0.9" rx="1"/>
-        <ellipse cx="100" cy="100" rx="28" ry="30" fill="#c9a84c" opacity="0.95"/>
-        <ellipse cx="100" cy="72" rx="16" ry="18" fill="#e8c96a"/>
-        <ellipse cx="100" cy="56" rx="8" ry="12" fill="#e8c96a"/>
-        <line x1="100" y1="44" x2="100" y2="36" stroke="#e8c96a" strokeWidth="2.5"/>
-        <ellipse cx="100" cy="35" rx="3" ry="4" fill="#e8c96a"/>
-        {/* Side minarets */}
-        <rect x="25" y="80" width="12" height="65" fill="#c9a84c" opacity="0.7" rx="2"/>
-        <ellipse cx="31" cy="79" rx="7" ry="10" fill="#c9a84c" opacity="0.8"/>
-        <line x1="31" y1="69" x2="31" y2="64" stroke="#c9a84c" strokeWidth="2"/>
-        <ellipse cx="31" cy="63" rx="2.5" ry="3.5" fill="#c9a84c"/>
-        <rect x="163" y="80" width="12" height="65" fill="#c9a84c" opacity="0.7" rx="2"/>
-        <ellipse cx="169" cy="79" rx="7" ry="10" fill="#c9a84c" opacity="0.8"/>
-        <line x1="169" y1="69" x2="169" y2="64" stroke="#c9a84c" strokeWidth="2"/>
-        <ellipse cx="169" cy="63" rx="2.5" ry="3.5" fill="#c9a84c"/>
-        {/* Base platform */}
-        <rect x="10" y="143" width="180" height="10" fill="#c9a84c" opacity="0.4" rx="2"/>
-        {/* Reflection */}
-        <ellipse cx="100" cy="158" rx="60" ry="5" fill="#c9a84c" opacity="0.15"/>
-        {/* Stars */}
-        <circle cx="30" cy="20" r="1.5" fill="white" opacity="0.8"/>
-        <circle cx="60" cy="10" r="1" fill="white" opacity="0.6"/>
-        <circle cx="140" cy="15" r="1.5" fill="white" opacity="0.8"/>
-        <circle cx="170" cy="25" r="1" fill="white" opacity="0.6"/>
-        <circle cx="50" cy="35" r="1" fill="white" opacity="0.5"/>
-        <circle cx="155" cy="40" r="1" fill="white" opacity="0.5"/>
-      </svg>
+      <img src="/logo.png" alt="Easy Agra" className="w-64 h-auto drop-shadow-2xl object-contain" />
     ),
-    tag: "17वीं सदी का अजूबा",
-    title: "ताजमहल की\nनगरी में\nआपका स्वागत है",
-    subtitle: "Agra — UNESCO World Heritage City. Love, history aur beauty ka sangam.",
+    tag: "Easy Agra",
+    title: "Easy Agra में\nआपका स्वागत है",
+    subtitle: "Agra — UNESCO World Heritage City. Hotels, Restaurants, Spas aur Tourist Places — sab kuch ek hi jagah.",
   },
   {
     id: 2,
