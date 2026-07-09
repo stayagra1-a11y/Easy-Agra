@@ -17,3 +17,9 @@ id = "R1vPn5pzMxJRSpMbMoYSo"
 uri = "file://easy-agra-qr.png"
 type = "image"
 title = "Easy Agra — App QR Code"
+
+[[outputs]]
+id = "7VvZrUCmbcbbA-xo36L2S"
+uri = "file://easy-agra-android-complete.zip"
+type = "unspecified"
+title = "Easy Agra — Complete Android Project (Ready for Android Studio)"
