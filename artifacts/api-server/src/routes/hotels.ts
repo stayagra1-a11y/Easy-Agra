@@ -72,7 +72,7 @@ router.get("/hotels/stats", requireAuth, async (req, res): Promise<void> => {
 // ──────────────────────────────────────────────────
 // GET /hotels — list
 // ──────────────────────────────────────────────────
-router.get("/hotels", requireAuth, async (req, res): Promise<void> => {
+router.get("/hotels", optionalAuth, async (req, res): Promise<void> => {
   const cu = (req as any).currentUser;
   const { status, search, city, page = "1", limit = "20", sort } = req.query as Record<string, string>;
   const pageNum = Math.max(1, parseInt(page, 10));
@@ -81,7 +81,8 @@ router.get("/hotels", requireAuth, async (req, res): Promise<void> => {
 
   const conditions: any[] = [];
 
-  if (cu.role === "hotel_owner") {
+  // For logged-in hotel owners, show only their own hotels
+  if (cu?.role === "hotel_owner") {
     conditions.push(eq(hotelsTable.ownerId, cu.id));
     conditions.push(isNull(hotelsTable.deletedAt));
   } else {

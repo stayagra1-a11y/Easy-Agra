@@ -12,7 +12,7 @@ import {
   or,
 } from "drizzle-orm";
 import { logActivity, createNotification } from "../lib/auth";
-import { requireAuth, requireRole } from "../middlewares/requireAuth";
+import { optionalAuth, requireAuth, requireRole } from "../middlewares/requireAuth";
 
 const router = Router();
 
@@ -280,7 +280,7 @@ router.post(
 // ────────────────────────────────────────────────────────────────────────
 // GET /spas/:id — detail (auth required)
 // ────────────────────────────────────────────────────────────────────────
-router.get("/spas/:id", requireAuth, async (req, res): Promise<void> => {
+router.get("/spas/:id", optionalAuth, async (req, res): Promise<void> => {
   const id = parseInt(req.params.id as string, 10);
   if (isNaN(id)) {
     res.status(400).json({ error: "Invalid id" });
@@ -294,8 +294,8 @@ router.get("/spas/:id", requireAuth, async (req, res): Promise<void> => {
     return;
   }
 
-  // Spa owners can only see their own spas
-  if (cu.role === "spa_owner" && s.ownerId !== cu.id) {
+  // Spa owners can only see their own spas (logged-in only)
+  if (cu?.role === "spa_owner" && s.ownerId !== cu.id) {
     res.status(403).json({ error: "Forbidden" });
     return;
   }
