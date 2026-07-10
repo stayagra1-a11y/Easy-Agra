@@ -8,6 +8,26 @@ All builds run in the cloud. You only need a browser on your Android phone.
 
 ---
 
+## One-Click APK Download (GitHub Actions)
+
+The easiest way to get an APK:
+
+1. Go to your GitHub repository: **https://github.com/stayagra1-a11y/Easy-Agra**
+2. Click **"Actions"** tab at the top
+3. Click **"Build APK"** workflow on the left
+4. Click the **latest green run** (top of the list)
+5. Scroll down to **"Artifacts"** section
+6. Click **"easy-agra-apk"** → ZIP download ho jayega
+7. ZIP extract karein → APK file phone mein install karein
+
+**OR**
+
+1. Go directly to: **https://github.com/stayagra1-a11y/Easy-Agra/actions**
+2. Latest successful run par click karein
+3. **Artifacts** → **easy-agra-apk** download karein
+
+---
+
 ## Step 1: Create a Codemagic Account
 
 1. Open your phone browser and go to: **https://codemagic.io**
@@ -110,12 +130,13 @@ Go to **"Environment variables"** and add these as a group named `easy_agra_secr
 
 ---
 
-## Step 8: Download AAB for Play Store
+## Step 8: Download AAB/APK for Play Store
 
 1. After build completes, go to the build page
 2. Click **"Artifacts"** tab
-3. Download the `.aab` file
-4. Upload this AAB to Google Play Console
+3. Download:
+   - `.aab` file → **Play Store upload**
+   - `.apk` file → **Direct install on phone**
 
 ---
 
@@ -167,6 +188,7 @@ After downloading AAB:
 ```
 Easy-Agra/
   codemagic.yaml                  ← CI/CD workflow (this file)
+  .github/workflows/build-apk.yml ← GitHub Actions APK build
   artifacts/
     easy-agra/
       android/
@@ -188,7 +210,7 @@ Easy-Agra/
 ## Summary
 
 With this setup:
-- Every push to `main` builds automatically
-- You get a signed AAB ready for Play Store
+- **GitHub Actions** → One-click APK download from Actions tab
+- **Codemagic** → Signed AAB for Play Store on every push
 - No Android Studio, no PC needed
 - Build entirely on your phone via browser
