@@ -20,10 +20,25 @@ android {
         release {
             // For Play Store: use upload keystore (AAB signing)
             // Store these in local.properties or CI secrets, never commit to git
-            storeFile file(System.getenv("ANDROID_KEYSTORE_PATH") ?: "upload-keystore.jks")
-            storePassword System.getenv("ANDROID_KEYSTORE_PASSWORD")
-            keyAlias System.getenv("ANDROID_KEY_ALIAS")
-            keyPassword System.getenv("ANDROID_KEY_PASSWORD")
+            // Supports both generic env vars and Codemagic CI env vars
+            storeFile file(
+                System.getenv("ANDROID_KEYSTORE_PATH")
+                    ?: System.getenv("CM_KEYSTORE_PATH")
+                    ?: "upload-keystore.jks"
+            )
+            storePassword(
+                System.getenv("ANDROID_KEYSTORE_PASSWORD")
+                    ?: System.getenv("CM_KEYSTORE_PASSWORD")
+            )
+            keyAlias(
+                System.getenv("ANDROID_KEY_ALIAS")
+                    ?: System.getenv("CM_KEY_ALIAS")
+                    ?: "release"
+            )
+            keyPassword(
+                System.getenv("ANDROID_KEY_PASSWORD")
+                    ?: System.getenv("CM_KEY_PASSWORD")
+            )
         }
     }
 

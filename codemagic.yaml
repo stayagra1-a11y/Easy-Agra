@@ -1,0 +1,74 @@
+workflows:
+  easy-agra-android:
+    name: Easy Agra Android Release
+    max_build_duration: 60
+    instance_type: mac_mini_m2
+    environment:
+      node: 20.11.0
+      npm: false
+      android_signing:
+        - keystore_reference: easy_agra_keystore
+      groups:
+        - easy_agra_secrets
+      vars:
+        PNPM_VERSION: "9"
+    cache:
+      cache_paths:
+        - $CM_CACHE_DIR/node
+        - $CM_CACHE_DIR/.pnpm-store
+        - artifacts/easy-agra/node_modules
+        - artifacts/api-server/node_modules
+        - lib/db/node_modules
+        - lib/api-spec/node_modules
+    triggering:
+      events:
+        - push
+        - tag
+      branch_patterns:
+        - pattern: main
+          include: true
+          source: true
+      tag_patterns:
+        - pattern: v*.*.*
+          include: true
+    scripts:
+      - name: Install pnpm
+        script: |
+          corepack enable
+          corepack prepare pnpm@${PNPM_VERSION} --activate
+          pnpm --version
+
+      - name: Install dependencies
+        script: |
+          pnpm install --frozen-lockfile
+
+      - name: Build packages
+        script: |
+          pnpm --filter @workspace/api-spec run build
+
+      - name: Build web app
+        script: |
+          cd artifacts/easy-agra
+          pnpm run build
+
+      - name: Sync Capacitor
+        script: |
+          cd artifacts/easy-agra
+          npx cap sync
+
+      - name: Build Android AAB
+        script: |
+          cd artifacts/easy-agra/android
+          ./gradlew bundleRelease
+
+    artifacts:
+      - artifacts/easy-agra/android/app/build/outputs/bundle/release/*.aab
+      - artifacts/easy-agra/android/app/build/outputs/apk/release/*.apk
+
+    publishing:
+      email:
+        recipients:
+          - $CM_EMAIL
+        notify:
+          success: true
+          failure: true
