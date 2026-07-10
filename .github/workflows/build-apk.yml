@@ -33,10 +33,14 @@ jobs:
           cd artifacts/easy-agra
           pnpm run build
 
+      - name: Verify web build output
+        run: |
+          ls -la artifacts/easy-agra/dist/public/ | head -10 || echo "dist/public not found"
+
       - name: Sync Capacitor
         run: |
           cd artifacts/easy-agra
-          npx cap sync
+          pnpm exec cap sync
 
       - name: Setup JDK
         uses: actions/setup-java@v4
