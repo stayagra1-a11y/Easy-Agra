@@ -2,7 +2,7 @@ import { Router } from "express";
 import { db, hotelsTable, usersTable, hotelNearbyPlacesTable, hotelCommissionAgreementsTable } from "@workspace/db";
 import { eq, and, ilike, sql, isNull, asc, desc } from "drizzle-orm";
 import { logActivity, createNotification } from "../lib/auth";
-import { requireAuth, requireRole } from "../middlewares/requireAuth";
+import { optionalAuth, requireAuth, requireRole } from "../middlewares/requireAuth";
 
 const router = Router();
 
@@ -30,9 +30,9 @@ async function findHotel(id: number) {
   return hotel;
 }
 
-function ownerGuard(hotel: typeof hotelsTable.$inferSelect, userId: number, role: string): boolean {
+function ownerGuard(hotel: typeof hotelsTable.$inferSelect, userId: number | undefined, role: string | undefined): boolean {
   if (role === "admin" || role === "super_admin") return true;
-  return hotel.ownerId === userId;
+  return userId != null && hotel.ownerId === userId;
 }
 
 // ──────────────────────────────────────────────────
@@ -164,13 +164,13 @@ router.post("/hotels", requireRole("hotel_owner"), async (req, res): Promise<voi
 // ──────────────────────────────────────────────────
 // GET /hotels/:id
 // ──────────────────────────────────────────────────
-router.get("/hotels/:id", requireAuth, async (req, res): Promise<void> => {
+router.get("/hotels/:id", optionalAuth, async (req, res): Promise<void> => {
   const cu = (req as any).currentUser;
   const id = parseInt(req.params.id as string, 10);
   const hotel = await findHotel(id);
   if (!hotel || hotel.deletedAt) { res.status(404).json({ error: "Hotel not found" }); return; }
-  // Approved hotels are publicly viewable by any authenticated user
-  const canView = hotel.status === "approved" || ownerGuard(hotel, cu.id, cu.role);
+  // Approved hotels are publicly viewable (native app + web browsing without login)
+  const canView = hotel.status === "approved" || ownerGuard(hotel, cu?.id, cu?.role);
   if (!canView) { res.status(403).json({ error: "Access denied" }); return; }
   res.json(serializeHotel(hotel));
 });
@@ -371,7 +371,7 @@ router.patch("/hotels/:id/upi", requireRole("hotel_owner"), async (req, res): Pr
 
 // ── Nearby Places ──────────────────────────────────────────────────────────
 // GET /hotels/:id/nearby
-router.get("/hotels/:id/nearby", requireAuth, async (req, res): Promise<void> => {
+router.get("/hotels/:id/nearby", optionalAuth, async (req, res): Promise<void> => {
   const id = parseInt(req.params.id as string, 10);
   const hotel = await findHotel(id);
   if (!hotel) { res.status(404).json({ error: "Hotel not found" }); return; }

@@ -590,7 +590,7 @@ function RoomDetailSheet({
         <div className="overflow-y-auto" style={{ maxHeight: "calc(88vh - 48px)" }}>
           {/* Photo carousel */}
           {allPhotos.length > 0 ? (
-            <div className="relative h-52 bg-black">
+            <div className="relative h-52 bg-black" onClick={(e) => e.stopPropagation()}>
               <img
                 src={imgUrl(allPhotos[imgIdx], 800)}
                 alt={room.name}
@@ -600,13 +600,13 @@ function RoomDetailSheet({
                 <>
                   <button
                     className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 text-white rounded-full p-1"
-                    onClick={() => setImgIdx((i) => (i - 1 + allPhotos.length) % allPhotos.length)}
+                    onClick={(e) => { e.stopPropagation(); setImgIdx((i) => (i - 1 + allPhotos.length) % allPhotos.length); }}
                   >
                     <ChevronLeft className="h-5 w-5" />
                   </button>
                   <button
                     className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 text-white rounded-full p-1"
-                    onClick={() => setImgIdx((i) => (i + 1) % allPhotos.length)}
+                    onClick={(e) => { e.stopPropagation(); setImgIdx((i) => (i + 1) % allPhotos.length); }}
                   >
                     <ChevronRight className="h-5 w-5" />
                   </button>

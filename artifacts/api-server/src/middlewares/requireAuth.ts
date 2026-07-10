@@ -1,6 +1,26 @@
 import type { Request, Response, NextFunction } from "express";
 import { getUserById } from "../lib/auth";
 
+/**
+ * Attach the current user to the request when a valid session exists.
+ * Always calls next() — never returns 401.  Use this for public
+ * browsing routes that may optionally personalise content when a
+ * user is logged in.
+ */
+export async function optionalAuth(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
+  if (req.session.userId) {
+    const user = await getUserById(req.session.userId);
+    if (user && user.status !== "banned" && user.status !== "suspended") {
+      (req as any).currentUser = user;
+    }
+  }
+  next();
+}
+
 export async function requireAuth(
   req: Request,
   res: Response,

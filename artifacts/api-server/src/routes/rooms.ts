@@ -2,7 +2,7 @@ import { Router } from "express";
 import { db, roomsTable, hotelsTable } from "@workspace/db";
 import { eq, and, ilike, sql, isNull, isNotNull } from "drizzle-orm";
 import { logActivity, createNotification } from "../lib/auth";
-import { requireAuth, requireRole } from "../middlewares/requireAuth";
+import { optionalAuth, requireAuth, requireRole } from "../middlewares/requireAuth";
 
 const router = Router();
 
@@ -43,9 +43,9 @@ async function verifyHotelOwnership(hotelId: number, userId: number, role: strin
   return hotel?.ownerId === userId;
 }
 
-function roomOwnerGuard(room: RoomRow, userId: number, role: string): boolean {
+function roomOwnerGuard(room: RoomRow, userId: number | undefined, role: string | undefined): boolean {
   if (role === "admin" || role === "super_admin") return true;
-  return room.ownerId === userId;
+  return userId != null && room.ownerId === userId;
 }
 
 // ──────────────────────────────────────────────────
@@ -92,7 +92,7 @@ router.get("/rooms/stats", requireAuth, async (req, res): Promise<void> => {
 // ──────────────────────────────────────────────────
 // GET /rooms — list
 // ──────────────────────────────────────────────────
-router.get("/rooms", requireAuth, async (req, res): Promise<void> => {
+router.get("/rooms", optionalAuth, async (req, res): Promise<void> => {
   const cu = (req as any).currentUser;
   const { hotelId, status, search, page = "1", limit = "20" } = req.query as Record<string, string>;
   const pageNum = Math.max(1, parseInt(page, 10));
@@ -101,7 +101,8 @@ router.get("/rooms", requireAuth, async (req, res): Promise<void> => {
 
   const conditions: any[] = [isNull(roomsTable.deletedAt)];
 
-  if (cu.role === "hotel_owner") {
+  // For logged-in hotel owners, only show their own rooms
+  if (cu?.role === "hotel_owner") {
     conditions.push(eq(roomsTable.ownerId, cu.id));
   }
   if (hotelId) conditions.push(eq(roomsTable.hotelId, parseInt(hotelId, 10)));
