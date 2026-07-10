@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { getApiBase } from "@/lib/api-base";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -12,7 +13,7 @@ import {
 import { Link } from "wouter";
 import { useToast } from "@/hooks/use-toast";
 
-const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
+const BASE = getApiBase();
 
 async function fetchRecommendations(tripRef: string) {
   const res = await fetch(`${BASE}/api/trips/${tripRef}/recommendations`);

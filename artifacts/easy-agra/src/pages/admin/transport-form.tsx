@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { getApiBase } from "@/lib/api-base";
 import { useParams, useLocation } from "wouter";
 import { AdminLayout } from "@/components/layout/admin-layout";
 import { Button } from "@/components/ui/button";
@@ -15,7 +16,7 @@ import { uploadToCloudinary } from "@/lib/cloudinary";
 import { Link } from "wouter";
 import { ArrowLeft, Save, Loader2, Image, X } from "lucide-react";
 
-const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
+const BASE = getApiBase();
 
 const TYPES = [
   { value: "railway_station", label: "Railway Station" },

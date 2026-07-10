@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { getApiBase } from "@/lib/api-base";
 import { AdminLayout } from "@/components/layout/admin-layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -12,7 +13,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, ShieldAlert, Hotel, Utensils, Sparkles, Users, Search, Ban, CheckCircle, AlertTriangle } from "lucide-react";
 
-const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
+const BASE = getApiBase();
 
 async function fetchBusinesses() {
   const res = await fetch(`${BASE}/api/admin/security/businesses`, { credentials: "include" });

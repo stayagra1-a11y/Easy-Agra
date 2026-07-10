@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { getApiBase } from "@/lib/api-base";
 import { useListNotifications, useMarkAllNotificationsRead, useMarkNotificationRead, getListNotificationsQueryKey, getGetUnreadNotificationCountQueryKey } from "@workspace/api-client-react";
 import { OwnerLayout } from "@/components/layout/owner-layout";
 import { Button } from "@/components/ui/button";
@@ -8,7 +9,7 @@ import { useQueryClient, useMutation } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { usePushNotifications } from "@/hooks/use-push-notifications";
 
-const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
+const BASE = getApiBase();
 
 const typeColors: Record<string, string> = {
   welcome: "bg-blue-100 text-blue-700",

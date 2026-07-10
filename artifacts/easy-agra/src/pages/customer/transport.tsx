@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { getApiBase } from "@/lib/api-base";
 import { CustomerLayout } from "@/components/layout/customer-layout";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -10,7 +11,7 @@ import {
 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 
-const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
+const BASE = getApiBase();
 
 const TYPE_CONFIG: Record<string, { icon: any; label: string; color: string; badge: string }> = {
   railway_station: {

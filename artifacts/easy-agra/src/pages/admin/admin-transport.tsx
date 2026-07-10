@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { getApiBase } from "@/lib/api-base";
 import { AdminLayout } from "@/components/layout/admin-layout";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -17,7 +18,7 @@ import {
   Phone, MapPin, Clock, X,
 } from "lucide-react";
 
-const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
+const BASE = getApiBase();
 
 const TYPE_CONFIG: Record<string, { icon: any; label: string; color: string; badge: string }> = {
   railway_station: { icon: Train, label: "Railway", color: "text-blue-600", badge: "bg-blue-100 text-blue-700" },

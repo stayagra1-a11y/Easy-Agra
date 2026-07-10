@@ -1,4 +1,5 @@
 import { Link, useLocation } from "wouter";
+import { getApiBase } from "@/lib/api-base";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/use-auth";
 import { useGetUnreadNotificationCount, useListNotifications, useGetMyOwnerRequest } from "@workspace/api-client-react";
@@ -16,7 +17,7 @@ import { apiRequest } from "@/lib/api-request";
 import { imgUrl } from "@/lib/cloudinary";
 import { useI18n } from "@/lib/i18n";
 
-const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
+const BASE = getApiBase();
 
 async function fetchFeatured() {
   const res = await fetch(`${BASE}/api/platform-settings/featured`, { credentials: "include" });

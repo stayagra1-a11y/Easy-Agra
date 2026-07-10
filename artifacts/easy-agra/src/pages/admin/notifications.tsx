@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { getApiBase } from "@/lib/api-base";
 import { useListNotifications, useSendAnnouncement, getListNotificationsQueryKey } from "@workspace/api-client-react";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
 import { AdminLayout } from "@/components/layout/admin-layout";
@@ -13,7 +14,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Bell, Loader2, Send, Zap, AlertTriangle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
-const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
+const BASE = getApiBase();
 
 const typeColors: Record<string, string> = {
   welcome: "bg-blue-100 text-blue-700",

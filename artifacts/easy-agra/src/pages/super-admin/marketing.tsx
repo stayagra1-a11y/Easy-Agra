@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { getApiBase } from "@/lib/api-base";
 import { AdminLayout } from "@/components/layout/admin-layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -17,7 +18,7 @@ import {
   Image, X, Check, GripVertical
 } from "lucide-react";
 
-const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
+const BASE = getApiBase();
 
 // ─────────────────────────────────────────────────────────────────────────────
 // API helpers

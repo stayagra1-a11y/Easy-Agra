@@ -1,4 +1,5 @@
 import { Switch, Route, Router as WouterRouter } from "wouter";
+import { getApiBase } from "@/lib/api-base";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -171,7 +172,7 @@ import Maintenance from "@/pages/maintenance";
 import { useQuery } from "@tanstack/react-query";
 import { AlertTriangle } from "lucide-react";
 
-const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
+const BASE = getApiBase();
 
 const ADMIN_ROLES = ["admin", "super_admin"];
 

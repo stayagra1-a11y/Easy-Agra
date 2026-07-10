@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { getApiBase } from "@/lib/api-base";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { AdminLayout } from "@/components/layout/admin-layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -14,7 +15,7 @@ import { Settings, Loader2, Save, AlertTriangle, Globe, Percent, CreditCard, Mes
 import { useToast } from "@/hooks/use-toast";
 import { uploadToCloudinary } from "@/lib/cloudinary";
 
-const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
+const BASE = getApiBase();
 
 async function fetchSettings() {
   const res = await fetch(`${BASE}/api/platform-settings`, { credentials: "include" });

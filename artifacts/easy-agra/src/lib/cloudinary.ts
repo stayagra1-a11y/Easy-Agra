@@ -1,5 +1,7 @@
+import { getApiBase } from "@/lib/api-base";
+
 const CLOUD_NAME = "dwd9hk7ir";
-const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
+const BASE = getApiBase();
 
 export function imgUrl(url: string | null | undefined, width: number): string {
   if (!url) return "";

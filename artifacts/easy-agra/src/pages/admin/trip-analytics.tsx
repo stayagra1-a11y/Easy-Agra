@@ -1,10 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
+import { getApiBase } from "@/lib/api-base";
 import { AdminLayout } from "@/components/layout/admin-layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Map, Sparkles, Users, TrendingUp, Hotel, Utensils, MapPin, BarChart2, Loader2 } from "lucide-react";
 
-const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
+const BASE = getApiBase();
 
 async function fetchTripAnalytics() {
   const res = await fetch(`${BASE}/api/admin/trip-analytics`);

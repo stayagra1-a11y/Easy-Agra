@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
+import { getApiBase } from "@/lib/api-base";
 import { Link, useLocation, useSearch } from "wouter";
 import { useQueryClient } from "@tanstack/react-query";
 import { getGetMeQueryKey } from "@workspace/api-client-react";
 import { Map, CheckCircle2, XCircle, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
+const BASE = getApiBase();
 
 export default function VerifyEmail() {
   const [, setLocation] = useLocation();

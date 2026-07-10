@@ -29,6 +29,8 @@ jobs:
         run: pnpm --filter @workspace/api-spec run build
 
       - name: Build web app
+        env:
+          VITE_API_URL: https://4154997e-dd6f-463a-982b-1bf616112852-00-2bpkmfjoppi1v.sisko.replit.dev
         run: |
           cd artifacts/easy-agra
           pnpm run build
