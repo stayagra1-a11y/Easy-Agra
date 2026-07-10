@@ -5,7 +5,6 @@ workflows:
     instance_type: mac_mini_m2
     environment:
       node: 20.11.0
-      npm: false
       android_signing:
         - keystore_reference: easy_agra_keystore
       groups:
@@ -56,10 +55,10 @@ workflows:
           cd artifacts/easy-agra
           npx cap sync
 
-      - name: Build Android AAB
+      - name: Build Android AAB and APK
         script: |
           cd artifacts/easy-agra/android
-          ./gradlew bundleRelease
+          ./gradlew bundleRelease assembleRelease
 
     artifacts:
       - artifacts/easy-agra/android/app/build/outputs/bundle/release/*.aab
