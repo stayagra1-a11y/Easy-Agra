@@ -6,7 +6,7 @@ workflows:
     environment:
       node: 20.11.0
       android_signing:
-        - keystore_reference: easy_agra_keystore
+        - easy_agra_keystore
       groups:
         - easy_agra_secrets
       vars:
