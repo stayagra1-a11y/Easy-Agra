@@ -55,9 +55,21 @@ jobs:
           cd artifacts/easy-agra/android
           ./gradlew assembleDebug
 
+      - name: Build AAB (Play Store)
+        run: |
+          cd artifacts/easy-agra/android
+          ./gradlew bundleRelease
+
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: easy-agra-apk
           path: artifacts/easy-agra/android/app/build/outputs/apk/debug/*.apk
+          retention-days: 30
+
+      - name: Upload AAB
+        uses: actions/upload-artifact@v4
+        with:
+          name: easy-agra-aab
+          path: artifacts/easy-agra/android/app/build/outputs/bundle/release/*.aab
           retention-days: 30
