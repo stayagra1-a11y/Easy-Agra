@@ -360,7 +360,9 @@ export async function customFetch<T = unknown>(
 
   const requestInfo = { method, url: resolveUrl(input) };
 
-  const response = await fetch(input, { ...init, credentials: "include", method, headers });
+  // Native app: omit credentials to avoid CORS errors (Capacitor uses file:// origin)
+  const isNativeApp = typeof (globalThis as any).Capacitor !== "undefined" && (globalThis as any).Capacitor?.isNativePlatform?.();
+  const response = await fetch(input, { ...init, credentials: isNativeApp ? "omit" : "include", method, headers });
 
   if (!response.ok) {
     const errorData = await parseErrorBody(response, method);
