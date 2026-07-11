@@ -1,4 +1,5 @@
 import { getApiBase } from "@/lib/api-base";
+import { Capacitor } from "@capacitor/core";
 
 type ApiRequestOptions = Omit<RequestInit, "body"> & {
   body?: unknown;
@@ -21,8 +22,11 @@ export async function apiRequest(
 ): Promise<any> {
   const { body, ...rest } = options;
   const resolved = resolveUrl(url);
+  // Native app: omit credentials (session cookies don't work cross-origin in Capacitor)
+  // Web: include credentials for session cookies to work
+  const isNative = Capacitor.isNativePlatform();
   const res = await fetch(resolved, {
-    credentials: "include",
+    credentials: isNative ? "omit" : "include",
     headers: { "Content-Type": "application/json", ...(rest.headers ?? {}) },
     ...rest,
     ...(body !== undefined ? { body: JSON.stringify(body) } : {}),
