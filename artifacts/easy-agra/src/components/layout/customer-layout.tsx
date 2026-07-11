@@ -9,7 +9,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sh
 import { useState } from "react";
 import { useI18n } from "@/lib/i18n";
 
-export function CustomerLayout({ children }: { children: React.ReactNode }) {
+export function CustomerLayout({ children, backHref, backLabel }: { children: React.ReactNode; backHref?: string; backLabel?: string }) {
   const { user } = useAuth();
   const { t } = useI18n();
   const [location] = useLocation();
@@ -65,12 +65,21 @@ export function CustomerLayout({ children }: { children: React.ReactNode }) {
         style={{ WebkitTransform: 'translateZ(0)', transform: 'translateZ(0)' }}>
         <div className="flex items-center justify-between px-4 py-3 max-w-lg mx-auto">
           <div className="flex items-center gap-3">
-            <button
-              onClick={() => setMenuOpen(true)}
-              className="p-1 rounded-full hover:bg-primary-foreground/10 transition-colors"
-            >
-              <Menu className="h-5 w-5" />
-            </button>
+            {backHref ? (
+              <Link href={backHref}>
+                <button className="p-1 rounded-full hover:bg-primary-foreground/10 transition-colors flex items-center gap-1">
+                  <ChevronRight className="h-5 w-5 rotate-180" />
+                  {backLabel && <span className="text-sm font-medium">{backLabel}</span>}
+                </button>
+              </Link>
+            ) : (
+              <button
+                onClick={() => setMenuOpen(true)}
+                className="p-1 rounded-full hover:bg-primary-foreground/10 transition-colors"
+              >
+                <Menu className="h-5 w-5" />
+              </button>
+            )}
             <div className="flex items-center gap-1.5">
               <Map className="h-5 w-5 text-accent" />
               <span className="font-bold text-lg tracking-tight">Easy Agra</span>
