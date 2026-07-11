@@ -120,7 +120,7 @@ export default function BookingDetail() {
 
   if (isLoading) {
     return (
-      <CustomerLayout>
+      <CustomerLayout backHref="/customer/bookings" backLabel="My Bookings">
         <div className="p-4 max-w-lg mx-auto space-y-4">
           <Skeleton className="h-8 w-48" />
           <Skeleton className="h-32 w-full rounded-xl" />
@@ -133,7 +133,7 @@ export default function BookingDetail() {
 
   if (isError || !booking) {
     return (
-      <CustomerLayout>
+      <CustomerLayout backHref="/customer/bookings" backLabel="My Bookings">
         <div className="p-4 max-w-lg mx-auto text-center py-16">
           <AlertCircle className="h-12 w-12 mx-auto mb-3 text-muted-foreground/40" />
           <p className="font-medium text-foreground">Booking not found</p>
@@ -153,7 +153,7 @@ export default function BookingDetail() {
   const canReview = booking.status === "checked_out";
 
   return (
-    <CustomerLayout>
+    <CustomerLayout backHref="/customer/bookings" backLabel="My Bookings">
       <div className="p-4 max-w-lg mx-auto space-y-4 pb-8">
 
         {/* Back button */}

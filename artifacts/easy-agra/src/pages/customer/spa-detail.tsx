@@ -480,7 +480,7 @@ export default function SpaDetail() {
 
   if (isLoading) {
     return (
-      <CustomerLayout>
+      <CustomerLayout backHref="/spas" backLabel="Spas">
         <div className="flex justify-center py-20">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
         </div>
@@ -490,7 +490,7 @@ export default function SpaDetail() {
 
   if (!spa) {
     return (
-      <CustomerLayout>
+      <CustomerLayout backHref="/spas" backLabel="Spas">
         <div className="px-4 py-8 text-center space-y-3">
           <p className="font-medium">Spa not found</p>
           <Link href="/spas">
@@ -502,7 +502,7 @@ export default function SpaDetail() {
   }
 
   return (
-    <CustomerLayout>
+    <CustomerLayout backHref="/spas" backLabel="Spas">
       <div className="pb-4">
         {/* Cover image */}
         <div className="relative">

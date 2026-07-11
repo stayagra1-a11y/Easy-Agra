@@ -511,7 +511,7 @@ export default function RestaurantDetail() {
 
   if (restaurantQuery.isLoading) {
     return (
-      <CustomerLayout>
+      <CustomerLayout backHref="/restaurants" backLabel="Restaurants">
         <div className="p-4 max-w-lg mx-auto space-y-4">
           <Skeleton className="h-8 w-48" />
           <Skeleton className="h-56 rounded-xl" />
@@ -524,7 +524,7 @@ export default function RestaurantDetail() {
 
   if (!r) {
     return (
-      <CustomerLayout>
+      <CustomerLayout backHref="/restaurants" backLabel="Restaurants">
         <div className="p-4 text-center py-16">
           <p className="text-muted-foreground">Restaurant not found</p>
           <Button variant="outline" size="sm" className="mt-3" onClick={() => navigate("/restaurants")}>
@@ -538,7 +538,7 @@ export default function RestaurantDetail() {
   const gallery = Array.isArray(r.galleryPhotos) ? r.galleryPhotos : [];
 
   return (
-    <CustomerLayout>
+    <CustomerLayout backHref="/restaurants" backLabel="Restaurants">
       <div className="max-w-lg mx-auto pb-28">
         {/* Back + Share */}
         <div className="p-4 pb-0 flex items-center justify-between">
