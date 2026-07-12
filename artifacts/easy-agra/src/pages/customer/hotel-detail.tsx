@@ -534,6 +534,7 @@ function RoomDetailSheet({
 }) {
   const { toast } = useToast();
   const [imgIdx, setImgIdx] = useState(0);
+  const [galleryOpen, setGalleryOpen] = useState(false);
   const todayStr = new Date().toISOString().split("T")[0];
   const tomorrowStr = new Date(Date.now() + 86400000).toISOString().split("T")[0];
   const [showForm, setShowForm] = useState(false);
@@ -587,21 +588,24 @@ function RoomDetailSheet({
       {/* Backdrop */}
       <div className="flex-1 bg-black/50" />
 
-      {/* Sheet */}
+      {/* Full Screen Sheet */}
       <div
-        className="bg-background rounded-t-2xl overflow-hidden"
-        style={{ maxHeight: "88vh" }}
+        className="bg-background overflow-hidden flex flex-col"
+        style={{ height: "100vh", maxHeight: "100vh" }}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Drag handle */}
-        <div className="flex justify-center pt-3 pb-1">
-          <div className="w-10 h-1 bg-muted-foreground/30 rounded-full" />
+        {/* Top bar: Back arrow */}
+        <div className="flex items-center gap-2 px-4 py-3 border-b">
+          <button onClick={onClose} className="p-1 rounded-full hover:bg-muted transition-colors">
+            <ChevronRight className="h-5 w-5 rotate-180" />
+          </button>
+          <span className="font-semibold text-sm">{room.name}</span>
         </div>
 
-        <div className="overflow-y-auto" style={{ maxHeight: "calc(88vh - 48px)" }}>
-          {/* Photo carousel */}
+        <div className="overflow-y-auto flex-1">
+          {/* Photo carousel — clickable to fullscreen gallery */}
           {allPhotos.length > 0 ? (
-            <div className="relative h-52 bg-black" onClick={(e) => e.stopPropagation()}>
+            <div className="relative h-56 bg-black" onClick={() => setGalleryOpen(true)}>
               <img
                 src={imgUrl(allPhotos[imgIdx], 800)}
                 alt={room.name}
@@ -621,11 +625,14 @@ function RoomDetailSheet({
                   >
                     <ChevronRight className="h-5 w-5" />
                   </button>
-                  <div className="absolute bottom-2 right-3 bg-black/60 text-white text-xs px-2 py-0.5 rounded-full">
-                    {imgIdx + 1}/{allPhotos.length}
-                  </div>
                 </>
               )}
+              <div className="absolute bottom-2 right-3 bg-black/60 text-white text-xs px-2 py-0.5 rounded-full">
+                {imgIdx + 1}/{allPhotos.length}
+              </div>
+              <div className="absolute bottom-2 left-2 bg-black/60 text-white text-[10px] px-2 py-0.5 rounded-full">
+                Tap to view gallery
+              </div>
             </div>
           ) : (
             <div className="h-32 bg-muted flex items-center justify-center">
@@ -811,6 +818,54 @@ function RoomDetailSheet({
           </div>
         </div>
       </div>
+
+      {/* Fullscreen Photo Gallery */}
+      {galleryOpen && (
+        <div
+          className="fixed inset-0 z-[300] bg-black flex flex-col"
+          onClick={() => setGalleryOpen(false)}
+        >
+          {/* Top bar */}
+          <div className="flex items-center justify-between px-4 py-3">
+            <span className="text-white text-sm font-medium">
+              {imgIdx + 1} / {allPhotos.length}
+            </span>
+            <button
+              onClick={() => setGalleryOpen(false)}
+              className="p-2 rounded-full bg-white/20 text-white"
+            >
+              <X className="h-5 w-5" />
+            </button>
+          </div>
+
+          {/* Image */}
+          <div className="flex-1 flex items-center justify-center px-4" onClick={(e) => e.stopPropagation()}>
+            <img
+              src={imgUrl(allPhotos[imgIdx], 1200)}
+              alt={room.name}
+              className="max-w-full max-h-full object-contain rounded-lg"
+            />
+          </div>
+
+          {/* Bottom nav */}
+          {allPhotos.length > 1 && (
+            <div className="flex items-center justify-center gap-6 px-4 py-4">
+              <button
+                className="p-3 rounded-full bg-white/20 text-white"
+                onClick={(e) => { e.stopPropagation(); setImgIdx((i) => (i - 1 + allPhotos.length) % allPhotos.length); }}
+              >
+                <ChevronLeft className="h-6 w-6" />
+              </button>
+              <button
+                className="p-3 rounded-full bg-white/20 text-white"
+                onClick={(e) => { e.stopPropagation(); setImgIdx((i) => (i + 1) % allPhotos.length); }}
+              >
+                <ChevronRight className="h-6 w-6" />
+              </button>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
@@ -907,10 +962,8 @@ export default function HotelDetail() {
     </CustomerLayout>
   );
 
-  const isOverlayOpen = detailRoom !== null || inlineBooking.roomId !== null || selectedRoom !== null;
-
   return (
-    <CustomerLayout backHref={isOverlayOpen ? undefined : "/hotels"} backLabel={isOverlayOpen ? undefined : "Back to Hotels"}>
+    <CustomerLayout backHref="/hotels" backLabel="Back to Hotels">
       <div className="pb-20">
         {/* Back button + Share */}
         <div className="px-4 pt-4 pb-2 flex items-center justify-between">
