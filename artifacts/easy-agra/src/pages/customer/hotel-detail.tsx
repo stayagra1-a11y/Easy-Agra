@@ -528,11 +528,22 @@ function BookingModal({
 
 // ── Room Detail Sheet ──────────────────────────────────────────────────────────
 function RoomDetailSheet({
-  room, onClose, onBook,
+  room, onClose, hotelId, onSuccess,
 }: {
-  room: Room; onClose: () => void; onBook: () => void;
+  room: Room; onClose: () => void; hotelId: number; onSuccess: (ref: string) => void;
 }) {
+  const { toast } = useToast();
   const [imgIdx, setImgIdx] = useState(0);
+  const todayStr = new Date().toISOString().split("T")[0];
+  const tomorrowStr = new Date(Date.now() + 86400000).toISOString().split("T")[0];
+  const [showForm, setShowForm] = useState(false);
+  const [guestName, setGuestName] = useState("");
+  const [guestPhone, setGuestPhone] = useState("");
+  const [checkIn, setCheckIn] = useState(todayStr);
+  const [checkOut, setCheckOut] = useState(tomorrowStr);
+  const [adults, setAdults] = useState(1);
+  const [children, setChildren] = useState(0);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const allPhotos = [
     ...(room.coverImage ? [room.coverImage] : []),
     ...(room.galleryImages ?? []),
@@ -717,18 +728,86 @@ function RoomDetailSheet({
               </div>
             </div>
 
-            {/* Book button */}
-            <div className="pb-2 flex gap-2">
-              <Button variant="outline" className="flex-1" onClick={onClose}>Close</Button>
-              <Button
-                className="flex-1"
-                disabled={room.availableRooms === 0}
-                onClick={onBook}
-              >
-                <CalendarDays className="h-4 w-4 mr-2" />
-                {room.availableRooms === 0 ? "Fully Booked" : "Book this Room"}
-              </Button>
-            </div>
+            {/* Inline Booking Form in Sheet */}
+            {showForm ? (
+              <div className="pb-2 space-y-3 border-t pt-3">
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="space-y-1">
+                    <Label className="text-[11px]">Name <span className="text-red-500">*</span></Label>
+                    <Input placeholder="Full name" value={guestName} onChange={(e) => setGuestName(e.target.value)} className="h-8 text-xs" />
+                  </div>
+                  <div className="space-y-1">
+                    <Label className="text-[11px]">Phone <span className="text-red-500">*</span></Label>
+                    <Input placeholder="10-digit" type="tel" value={guestPhone} onChange={(e) => setGuestPhone(e.target.value)} className="h-8 text-xs" />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="space-y-1">
+                    <Label className="text-[11px]">Check-in</Label>
+                    <Input type="date" value={checkIn} min={todayStr} onChange={(e) => setCheckIn(e.target.value)} className="h-8 text-xs" />
+                  </div>
+                  <div className="space-y-1">
+                    <Label className="text-[11px]">Check-out</Label>
+                    <Input type="date" value={checkOut} min={checkIn || todayStr} onChange={(e) => setCheckOut(e.target.value)} className="h-8 text-xs" />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="space-y-1">
+                    <Label className="text-[11px]">Adults</Label>
+                    <div className="flex items-center gap-2">
+                      <button onClick={() => setAdults(a => Math.max(1, a - 1))} className="h-7 w-7 rounded-full border flex items-center justify-center text-sm font-medium">−</button>
+                      <span className="text-sm font-semibold">{adults}</span>
+                      <button onClick={() => setAdults(a => Math.min(room.adultsCapacity, a + 1))} className="h-7 w-7 rounded-full border flex items-center justify-center text-sm font-medium">+</button>
+                    </div>
+                  </div>
+                  <div className="space-y-1">
+                    <Label className="text-[11px]">Children</Label>
+                    <div className="flex items-center gap-2">
+                      <button onClick={() => setChildren(c => Math.max(0, c - 1))} className="h-7 w-7 rounded-full border flex items-center justify-center text-sm font-medium">−</button>
+                      <span className="text-sm font-semibold">{children}</span>
+                      <button onClick={() => setChildren(c => Math.min(room.childrenCapacity, c + 1))} className="h-7 w-7 rounded-full border flex items-center justify-center text-sm font-medium">+</button>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 pt-1">
+                  <Button variant="outline" size="sm" className="flex-1 h-9 text-xs" onClick={() => setShowForm(false)}>Cancel</Button>
+                  <Button size="sm" className="flex-1 h-9 text-xs" disabled={isSubmitting}
+                    onClick={async () => {
+                      if (!guestName.trim()) { toast({ title: "Guest name required", description: "Please enter your full name.", variant: "destructive" }); return; }
+                      if (!guestPhone.trim() || guestPhone.trim().length < 10) { toast({ title: "Valid phone required", description: "Please enter a 10-digit mobile number.", variant: "destructive" }); return; }
+                      const nights = Math.max(0, Math.ceil((new Date(checkOut).getTime() - new Date(checkIn).getTime()) / 86400000));
+                      if (nights === 0) { toast({ title: "Invalid dates", description: "Check-out must be after check-in.", variant: "destructive" }); return; }
+                      setIsSubmitting(true);
+                      try {
+                        const res = await apiRequest("/api/bookings", {
+                          method: "POST",
+                          body: { hotelId, roomId: room.id, checkInDate: checkIn, checkOutDate: checkOut, adultsCount: adults, childrenCount: children, guestName: guestName.trim(), guestPhone: guestPhone.trim(), customerNotes: "" },
+                        }) as any;
+                        toast({ title: "Booking confirmed!", description: "Ref: " + res.bookingRef });
+                        onClose(); onSuccess(res.bookingRef);
+                      } catch (err: any) {
+                        toast({ title: "Booking failed", description: err?.response?.data?.error || "Something went wrong", variant: "destructive" });
+                      } finally { setIsSubmitting(false); }
+                    }}
+                  >
+                    {isSubmitting ? <Loader2 className="h-3.5 w-3.5 animate-spin mr-1" /> : <CalendarDays className="h-3.5 w-3.5 mr-1" />}
+                    Book Now
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <div className="pb-2 flex gap-2">
+                <Button variant="outline" className="flex-1" onClick={onClose}>Close</Button>
+                <Button
+                  className="flex-1"
+                  disabled={room.availableRooms === 0}
+                  onClick={() => setShowForm(true)}
+                >
+                  <CalendarDays className="h-4 w-4 mr-2" />
+                  {room.availableRooms === 0 ? "Fully Booked" : "Book this Room"}
+                </Button>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -1357,11 +1436,12 @@ export default function HotelDetail() {
       </div>
 
       {/* Room detail sheet */}
-      {detailRoom && !selectedRoom && (
+      {detailRoom && (
         <RoomDetailSheet
           room={detailRoom}
           onClose={() => setDetailRoom(null)}
-          onBook={() => { setSelectedRoom(detailRoom); setDetailRoom(null); }}
+          hotelId={hotelId}
+          onSuccess={(ref) => { setDetailRoom(null); setBookingSuccess(ref); }}
         />
       )}
 
