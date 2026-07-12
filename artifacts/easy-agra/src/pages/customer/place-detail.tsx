@@ -116,7 +116,7 @@ export default function PlaceDetail() {
 
   if (isLoading) {
     return (
-      <CustomerLayout backHref="/places" backLabel="Places">
+      <CustomerLayout backHref="/places" backLabel="Back">
         <div className="space-y-4">
           <Skeleton className="h-72 w-full" />
           <div className="px-4 space-y-4">
@@ -135,7 +135,7 @@ export default function PlaceDetail() {
 
   if (!place) {
     return (
-      <CustomerLayout backHref="/places" backLabel="Places">
+      <CustomerLayout backHref="/places" backLabel="Back">
         <div className="text-center py-20 px-4">
           <MapPin className="h-12 w-12 text-muted-foreground/40 mx-auto mb-4" />
           <p className="font-bold text-lg">Place not found</p>
@@ -177,7 +177,7 @@ export default function PlaceDetail() {
     : mapsUrl;
 
   return (
-    <CustomerLayout backHref="/places" backLabel="Places">
+    <CustomerLayout backHref="/places" backLabel="Back">
       <div className="pb-10">
         {/* Back button */}
         <div className="px-4 pt-4 pb-2 flex items-center justify-between">

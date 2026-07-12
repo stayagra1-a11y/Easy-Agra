@@ -149,7 +149,7 @@ export default function TripDetail() {
 
   if (isLoading) {
     return (
-      <CustomerLayout backHref="/trips" backLabel="Trips">
+      <CustomerLayout backHref="/trips" backLabel="Back">
         <div className="space-y-4 animate-pulse">
           <div className="h-10 bg-muted rounded-xl w-2/3" />
           <div className="h-44 bg-muted rounded-2xl" />
@@ -162,7 +162,7 @@ export default function TripDetail() {
 
   if (!trip) {
     return (
-      <CustomerLayout backHref="/trips" backLabel="Trips">
+      <CustomerLayout backHref="/trips" backLabel="Back">
         <div className="py-16 text-center">
           <Map className="w-12 h-12 text-muted-foreground/30 mx-auto mb-3" />
           <p className="font-semibold text-muted-foreground">Trip not found</p>
@@ -181,7 +181,7 @@ export default function TripDetail() {
   const budgetCat = BUDGET_CATEGORIES.find((b) => b.value === trip.budgetCategory);
 
   return (
-    <CustomerLayout backHref="/trips" backLabel="Trips">
+    <CustomerLayout backHref="/trips" backLabel="Back">
       <div className="space-y-4">
         {/* Back nav */}
         <div className="flex items-center gap-2">

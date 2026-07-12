@@ -924,7 +924,7 @@ export default function HotelDetail() {
 
   const rooms = roomsData?.rooms ?? [];
   if (hotelLoading) return (
-    <CustomerLayout backHref="/hotels" backLabel="Back to Hotels">
+    <CustomerLayout backHref="/hotels" backLabel="Back">
       <div className="flex justify-center py-20">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
@@ -932,7 +932,7 @@ export default function HotelDetail() {
   );
 
   if (!hotel) return (
-    <CustomerLayout backHref="/hotels" backLabel="Back to Hotels">
+    <CustomerLayout backHref="/hotels" backLabel="Back">
       <div className="px-4 py-12 text-center space-y-3">
         <BedDouble className="h-10 w-10 text-muted-foreground mx-auto" />
         <p className="font-medium">Hotel not found</p>
@@ -963,7 +963,7 @@ export default function HotelDetail() {
   );
 
   return (
-    <CustomerLayout backHref="/hotels" backLabel="Back to Hotels">
+    <CustomerLayout backHref="/hotels" backLabel="Back">
       <div className="pb-20">
         {/* Back button + Share */}
         <div className="px-4 pt-4 pb-2 flex items-center justify-between">

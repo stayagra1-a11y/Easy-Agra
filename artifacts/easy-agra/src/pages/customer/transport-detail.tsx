@@ -113,7 +113,7 @@ export default function TransportDetail() {
 
   if (isLoading) {
     return (
-      <CustomerLayout backHref="/transport" backLabel="Transport">
+      <CustomerLayout backHref="/transport" backLabel="Back">
         <div className="flex justify-center py-20">
           <Loader2 className="h-6 w-6 animate-spin text-primary" />
         </div>
@@ -123,7 +123,7 @@ export default function TransportDetail() {
 
   if (!loc) {
     return (
-      <CustomerLayout backHref="/transport" backLabel="Transport">
+      <CustomerLayout backHref="/transport" backLabel="Back">
         <div className="px-4 py-10 text-center">
           <p className="text-muted-foreground">Transport location not found</p>
           <Link href="/transport">
@@ -137,7 +137,7 @@ export default function TransportDetail() {
   }
 
   return (
-    <CustomerLayout backHref="/transport" backLabel="Transport">
+    <CustomerLayout backHref="/transport" backLabel="Back">
       <div className="pb-6">
         {/* Image Header */}
         {loc.mainImage ? (
