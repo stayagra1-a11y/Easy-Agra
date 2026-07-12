@@ -746,6 +746,21 @@ export default function HotelDetail() {
   const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
   const [detailRoom, setDetailRoom] = useState<Room | null>(null);
   const [bookingSuccess, setBookingSuccess] = useState<string | null>(null);
+  const queryClient = useQueryClient();
+  const todayStr = new Date().toISOString().split("T")[0];
+  const tomorrowStr = new Date(Date.now() + 86400000).toISOString().split("T")[0];
+  const [inlineBooking, setInlineBooking] = useState<{
+    roomId: number | null;
+    checkIn: string;
+    checkOut: string;
+    adults: number;
+    children: number;
+    guestName: string;
+    guestPhone: string;
+  }>({
+    roomId: null, checkIn: todayStr, checkOut: tomorrowStr,
+    adults: 1, children: 0, guestName: "", guestPhone: "",
+  });
 
   const { data: hotel, isLoading: hotelLoading } = useQuery<Hotel>({
     queryKey: ["hotel", hotelId],
@@ -1061,23 +1076,150 @@ export default function HotelDetail() {
                           </div>
                         </div>
 
-                        {/* Book button + Pay at hotel */}
-                        <div className="flex items-center gap-2">
-                          <Button
-                            className="flex-1 h-9 text-sm"
-                            onClick={(e) => { e.stopPropagation(); setSelectedRoom(room); }}
-                            disabled={room.availableRooms === 0}
-                          >
-                            <CalendarDays className="h-4 w-4 mr-2" />
-                            {room.availableRooms === 0 ? t("fully_booked") : t("book_room")}
-                          </Button>
-                          {room.availableRooms > 0 && (
-                            <div className="flex items-center gap-1 shrink-0 bg-green-50 border border-green-200 rounded-lg px-2.5 py-2">
-                              <IndianRupee className="h-3 w-3 text-green-700" />
-                              <span className="text-[11px] font-semibold text-green-700 whitespace-nowrap">Pay at Hotel</span>
+                        {/* Inline Booking Form */}
+                        {inlineBooking.roomId === room.id ? (
+                          <div className="space-y-3 border-t pt-3" onClick={(e) => e.stopPropagation()}>
+                            <div className="grid grid-cols-2 gap-2">
+                              <div className="space-y-1">
+                                <Label className="text-[11px]">Name <span className="text-red-500">*</span></Label>
+                                <Input
+                                  placeholder="Full name"
+                                  value={inlineBooking.guestName}
+                                  onChange={(e) => setInlineBooking({ ...inlineBooking, guestName: e.target.value })}
+                                  className="h-8 text-xs"
+                                />
+                              </div>
+                              <div className="space-y-1">
+                                <Label className="text-[11px]">Phone <span className="text-red-500">*</span></Label>
+                                <Input
+                                  placeholder="10-digit number"
+                                  type="tel"
+                                  value={inlineBooking.guestPhone}
+                                  onChange={(e) => setInlineBooking({ ...inlineBooking, guestPhone: e.target.value })}
+                                  className="h-8 text-xs"
+                                />
+                              </div>
                             </div>
-                          )}
-                        </div>
+                            <div className="grid grid-cols-2 gap-2">
+                              <div className="space-y-1">
+                                <Label className="text-[11px]">Check-in</Label>
+                                <Input
+                                  type="date" value={inlineBooking.checkIn} min={todayStr}
+                                  onChange={(e) => setInlineBooking({ ...inlineBooking, checkIn: e.target.value })}
+                                  className="h-8 text-xs"
+                                />
+                              </div>
+                              <div className="space-y-1">
+                                <Label className="text-[11px]">Check-out</Label>
+                                <Input
+                                  type="date" value={inlineBooking.checkOut} min={inlineBooking.checkIn || todayStr}
+                                  onChange={(e) => setInlineBooking({ ...inlineBooking, checkOut: e.target.value })}
+                                  className="h-8 text-xs"
+                                />
+                              </div>
+                            </div>
+                            <div className="grid grid-cols-2 gap-2">
+                              <div className="space-y-1">
+                                <Label className="text-[11px]">Adults</Label>
+                                <div className="flex items-center gap-2">
+                                  <button
+                                    onClick={() => setInlineBooking(b => ({ ...b, adults: Math.max(1, b.adults - 1) }))}
+                                    className="h-7 w-7 rounded-full border flex items-center justify-center text-sm font-medium"
+                                  >−</button>
+                                  <span className="text-sm font-semibold">{inlineBooking.adults}</span>
+                                  <button
+                                    onClick={() => setInlineBooking(b => ({ ...b, adults: Math.min(room.adultsCapacity, b.adults + 1) }))}
+                                    className="h-7 w-7 rounded-full border flex items-center justify-center text-sm font-medium"
+                                  >+</button>
+                                </div>
+                              </div>
+                              <div className="space-y-1">
+                                <Label className="text-[11px]">Children</Label>
+                                <div className="flex items-center gap-2">
+                                  <button
+                                    onClick={() => setInlineBooking(b => ({ ...b, children: Math.max(0, b.children - 1) }))}
+                                    className="h-7 w-7 rounded-full border flex items-center justify-center text-sm font-medium"
+                                  >−</button>
+                                  <span className="text-sm font-semibold">{inlineBooking.children}</span>
+                                  <button
+                                    onClick={() => setInlineBooking(b => ({ ...b, children: Math.min(room.childrenCapacity, b.children + 1) }))}
+                                    className="h-7 w-7 rounded-full border flex items-center justify-center text-sm font-medium"
+                                  >+</button>
+                                </div>
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-2 pt-1">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="flex-1 h-9 text-xs"
+                                onClick={() => setInlineBooking({ roomId: null, checkIn: todayStr, checkOut: tomorrowStr, adults: 1, children: 0, guestName: "", guestPhone: "" })}
+                              >
+                                Cancel
+                              </Button>
+                              <Button
+                                size="sm"
+                                className="flex-1 h-9 text-xs"
+                                onClick={async () => {
+                                  if (!inlineBooking.guestName.trim()) {
+                                    toast({ title: "Guest name required", description: "Please enter your full name.", variant: "destructive" });
+                                    return;
+                                  }
+                                  if (!inlineBooking.guestPhone.trim() || inlineBooking.guestPhone.trim().length < 10) {
+                                    toast({ title: "Valid phone required", description: "Please enter a 10-digit mobile number.", variant: "destructive" });
+                                    return;
+                                  }
+                                  const nights = Math.max(0, Math.ceil((new Date(inlineBooking.checkOut).getTime() - new Date(inlineBooking.checkIn).getTime()) / 86400000));
+                                  if (nights === 0) {
+                                    toast({ title: "Invalid dates", description: "Check-out must be after check-in.", variant: "destructive" });
+                                    return;
+                                  }
+                                  try {
+                                    const res = await apiRequest("/api/bookings", {
+                                      method: "POST",
+                                      body: {
+                                        hotelId, roomId: room.id,
+                                        checkInDate: inlineBooking.checkIn,
+                                        checkOutDate: inlineBooking.checkOut,
+                                        adultsCount: inlineBooking.adults,
+                                        childrenCount: inlineBooking.children,
+                                        guestName: inlineBooking.guestName.trim(),
+                                        guestPhone: inlineBooking.guestPhone.trim(),
+                                        customerNotes: "",
+                                      },
+                                    }) as any;
+                                    toast({ title: "Booking confirmed!", description: "Ref: " + res.bookingRef, variant: "default" });
+                                    setBookingSuccess(res.bookingRef);
+                                    setInlineBooking({ roomId: null, checkIn: todayStr, checkOut: tomorrowStr, adults: 1, children: 0, guestName: "", guestPhone: "" });
+                                    queryClient.invalidateQueries({ queryKey: ["rooms", hotelId] });
+                                  } catch (err: any) {
+                                    toast({ title: "Booking failed", description: err?.response?.data?.error || "Something went wrong", variant: "destructive" });
+                                  }
+                                }}
+                              >
+                                <CalendarDays className="h-3.5 w-3.5 mr-1" />
+                                Book Now
+                              </Button>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="flex items-center gap-2">
+                            <Button
+                              className="flex-1 h-9 text-sm"
+                              onClick={(e) => { e.stopPropagation(); setInlineBooking({ ...inlineBooking, roomId: room.id, adults: 1, children: 0 }); }}
+                              disabled={room.availableRooms === 0}
+                            >
+                              <CalendarDays className="h-4 w-4 mr-2" />
+                              {room.availableRooms === 0 ? t("fully_booked") : "Book Now"}
+                            </Button>
+                            {room.availableRooms > 0 && (
+                              <div className="flex items-center gap-1 shrink-0 bg-green-50 border border-green-200 rounded-lg px-2.5 py-2">
+                                <IndianRupee className="h-3 w-3 text-green-700" />
+                                <span className="text-[11px] font-semibold text-green-700 whitespace-nowrap">Pay at Hotel</span>
+                              </div>
+                            )}
+                          </div>
+                        )}
                       </CardContent>
                     </Card>
                   );
