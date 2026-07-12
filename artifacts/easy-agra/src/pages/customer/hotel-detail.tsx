@@ -891,9 +891,10 @@ export default function HotelDetail() {
     children: number;
     guestName: string;
     guestPhone: string;
+    guestAddress: string;
   }>({
     roomId: null, checkIn: todayStr, checkOut: tomorrowStr,
-    adults: 1, children: 0, guestName: "", guestPhone: "",
+    adults: 1, children: 0, guestName: "", guestPhone: "", guestAddress: "",
   });
 
   // Hash-based navigation for proper back-button stack
@@ -901,7 +902,7 @@ export default function HotelDetail() {
     const onPop = () => {
       // Back button pressed — close top-most overlay
       if (selectedRoom) { setSelectedRoom(null); return; }
-      if (inlineBooking.roomId !== null) { setInlineBooking({ roomId: null, checkIn: todayStr, checkOut: tomorrowStr, adults: 1, children: 0, guestName: "", guestPhone: "" }); return; }
+      if (inlineBooking.roomId !== null) { setInlineBooking({ roomId: null, checkIn: todayStr, checkOut: tomorrowStr, adults: 1, children: 0, guestName: "", guestPhone: "", guestAddress: "" }); return; }
       if (detailRoom) { setDetailRoom(null); return; }
       // No overlays — let browser navigate back naturally
     };
@@ -1268,6 +1269,17 @@ export default function HotelDetail() {
                                 />
                               </div>
                             </div>
+                            {/* Address field */}
+                            <div className="space-y-1">
+                              <Label className="text-[11px]">Address <span className="text-red-500">*</span></Label>
+                              <textarea
+                                placeholder="House no., Street, City, State, Pincode"
+                                value={inlineBooking.guestAddress}
+                                onChange={(e) => setInlineBooking({ ...inlineBooking, guestAddress: e.target.value })}
+                                rows={2}
+                                className="w-full text-xs border rounded-lg px-3 py-1.5 resize-none focus:outline-none focus:ring-2 focus:ring-primary/50"
+                              />
+                            </div>
                             <div className="grid grid-cols-2 gap-2">
                               <div className="space-y-1">
                                 <Label className="text-[11px]">Check-in</Label>
@@ -1321,7 +1333,7 @@ export default function HotelDetail() {
                                 variant="outline"
                                 size="sm"
                                 className="flex-1 h-9 text-xs"
-                                onClick={() => setInlineBooking({ roomId: null, checkIn: todayStr, checkOut: tomorrowStr, adults: 1, children: 0, guestName: "", guestPhone: "" })}
+                                onClick={() => setInlineBooking({ roomId: null, checkIn: todayStr, checkOut: tomorrowStr, adults: 1, children: 0, guestName: "", guestPhone: "", guestAddress: "" })}
                               >
                                 Cancel
                               </Button>
@@ -1335,6 +1347,10 @@ export default function HotelDetail() {
                                   }
                                   if (!inlineBooking.guestPhone.trim() || inlineBooking.guestPhone.trim().length < 10) {
                                     toast({ title: "Valid phone required", description: "Please enter a 10-digit mobile number.", variant: "destructive" });
+                                    return;
+                                  }
+                                  if (!inlineBooking.guestAddress.trim()) {
+                                    toast({ title: "Address required", description: "Please enter your address.", variant: "destructive" });
                                     return;
                                   }
                                   const nights = Math.max(0, Math.ceil((new Date(inlineBooking.checkOut).getTime() - new Date(inlineBooking.checkIn).getTime()) / 86400000));
@@ -1353,12 +1369,13 @@ export default function HotelDetail() {
                                         childrenCount: inlineBooking.children,
                                         guestName: inlineBooking.guestName.trim(),
                                         guestPhone: inlineBooking.guestPhone.trim(),
+                                        guestAddress: inlineBooking.guestAddress.trim(),
                                         customerNotes: "",
                                       },
                                     }) as any;
                                     toast({ title: "Booking confirmed!", description: "Ref: " + res.bookingRef, variant: "default" });
                                     setBookingSuccess(res.bookingRef);
-                                    setInlineBooking({ roomId: null, checkIn: todayStr, checkOut: tomorrowStr, adults: 1, children: 0, guestName: "", guestPhone: "" });
+                                    setInlineBooking({ roomId: null, checkIn: todayStr, checkOut: tomorrowStr, adults: 1, children: 0, guestName: "", guestPhone: "", guestAddress: "" });
                                     queryClient.invalidateQueries({ queryKey: ["rooms", hotelId] });
                                   } catch (err: any) {
                                     toast({ title: "Booking failed", description: err?.response?.data?.error || "Something went wrong", variant: "destructive" });
@@ -1374,7 +1391,7 @@ export default function HotelDetail() {
                           <div className="flex items-center gap-2">
                             <Button
                               className="flex-1 h-9 text-sm"
-                              onClick={(e) => { e.stopPropagation(); setInlineBooking({ ...inlineBooking, roomId: room.id, adults: 1, children: 0 }); }}
+                              onClick={(e) => { e.stopPropagation(); setInlineBooking({ ...inlineBooking, roomId: room.id, adults: 1, children: 0, guestAddress: "" }); }}
                               disabled={room.availableRooms === 0}
                             >
                               <CalendarDays className="h-4 w-4 mr-2" />
