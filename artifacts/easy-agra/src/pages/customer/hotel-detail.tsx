@@ -907,8 +907,10 @@ export default function HotelDetail() {
     </CustomerLayout>
   );
 
+  const isOverlayOpen = detailRoom !== null || inlineBooking.roomId !== null || selectedRoom !== null;
+
   return (
-    <CustomerLayout backHref="/hotels" backLabel="Back to Hotels">
+    <CustomerLayout backHref={isOverlayOpen ? undefined : "/hotels"} backLabel={isOverlayOpen ? undefined : "Back to Hotels"}>
       <div className="pb-20">
         {/* Back button + Share */}
         <div className="px-4 pt-4 pb-2 flex items-center justify-between">
