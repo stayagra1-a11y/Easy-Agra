@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useLocation, Link } from "wouter";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { CustomerLayout } from "@/components/layout/customer-layout";
@@ -895,6 +895,40 @@ export default function HotelDetail() {
     roomId: null, checkIn: todayStr, checkOut: tomorrowStr,
     adults: 1, children: 0, guestName: "", guestPhone: "",
   });
+
+  // Hash-based navigation for proper back-button stack
+  useEffect(() => {
+    const onPop = () => {
+      // Back button pressed — close top-most overlay
+      if (selectedRoom) { setSelectedRoom(null); return; }
+      if (inlineBooking.roomId !== null) { setInlineBooking({ roomId: null, checkIn: todayStr, checkOut: tomorrowStr, adults: 1, children: 0, guestName: "", guestPhone: "" }); return; }
+      if (detailRoom) { setDetailRoom(null); return; }
+      // No overlays — let browser navigate back naturally
+    };
+    window.addEventListener("popstate", onPop);
+    return () => window.removeEventListener("popstate", onPop);
+  }, [detailRoom, inlineBooking.roomId, selectedRoom, todayStr, tomorrowStr]);
+
+  // Push hash when detailRoom opens
+  useEffect(() => {
+    if (detailRoom) {
+      window.history.pushState({ overlay: "roomDetail" }, "", window.location.href);
+    }
+  }, [detailRoom]);
+
+  // Push hash when inlineBooking opens
+  useEffect(() => {
+    if (inlineBooking.roomId !== null) {
+      window.history.pushState({ overlay: "inlineBooking" }, "", window.location.href);
+    }
+  }, [inlineBooking.roomId]);
+
+  // Push hash when selectedRoom (BookingModal) opens
+  useEffect(() => {
+    if (selectedRoom) {
+      window.history.pushState({ overlay: "bookingModal" }, "", window.location.href);
+    }
+  }, [selectedRoom]);
 
   const { data: hotel, isLoading: hotelLoading } = useQuery<Hotel>({
     queryKey: ["hotel", hotelId],
