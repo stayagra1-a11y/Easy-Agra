@@ -66,12 +66,13 @@ export function CustomerLayout({ children, backHref, backLabel }: { children: Re
         <div className="flex items-center justify-between px-4 py-3 max-w-lg mx-auto">
           <div className="flex items-center gap-3">
             {backHref ? (
-              <Link href={backHref}>
-                <button className="p-1 rounded-full hover:bg-primary-foreground/10 transition-colors flex items-center gap-1">
-                  <ChevronRight className="h-5 w-5 rotate-180" />
-                  {backLabel && <span className="text-sm font-medium">{backLabel}</span>}
-                </button>
-              </Link>
+              <button
+                onClick={() => window.history.back()}
+                className="p-1 rounded-full hover:bg-primary-foreground/10 transition-colors flex items-center gap-1"
+              >
+                <ChevronRight className="h-5 w-5 rotate-180" />
+                {backLabel && <span className="text-sm font-medium">{backLabel}</span>}
+              </button>
             ) : (
               <button
                 onClick={() => setMenuOpen(true)}
