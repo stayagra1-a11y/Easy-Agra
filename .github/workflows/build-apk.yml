@@ -89,19 +89,3 @@ jobs:
           path: artifacts/easy-agra/android/app/build/outputs/bundle/release/*.aab
           retention-days: 30
 
-      - name: Create GitHub Release with APK & AAB
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          VERSION="v$(date +%Y%m%d)-$(git rev-parse --short HEAD)"
-          APK=$(ls artifacts/easy-agra/android/app/build/outputs/apk/release/*.apk | head -1)
-          AAB=$(ls artifacts/easy-agra/android/app/build/outputs/bundle/release/*.aab | head -1)
-          echo "Creating release $VERSION"
-          echo "APK: $APK"
-          echo "AAB: $AAB"
-          gh release create "$VERSION" \
-            "$APK#easy-agra-signed.apk" \
-            "$AAB#easy-agra-signed.aab" \
-            --title "Easy Agra $VERSION" \
-            --notes "Signed APK & AAB for Play Store publishing. Package: com.easyagra.app" \
-            --repo ${{ github.repository }}
