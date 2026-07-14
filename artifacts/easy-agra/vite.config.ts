@@ -2,7 +2,6 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 import path from "path";
-import runtimeErrorOverlay from "@replit/vite-plugin-runtime-error-modal";
 import { VitePWA } from "vite-plugin-pwa";
 
 const isBuild = process.env.NODE_ENV === "production" || process.argv.includes("build");
@@ -23,7 +22,8 @@ export default defineConfig({
   plugins: [
     react(),
     tailwindcss(),
-    runtimeErrorOverlay(),
+    // runtimeErrorOverlay disabled — was causing false-positive crash overlays
+    // in dev on React module reload. Errors still appear in browser console.
     // PWA disabled in production to prevent stale service-worker caching
     // (users were seeing old builds after publish)
     ...(process.env.NODE_ENV !== "production"
